@@ -1,0 +1,43 @@
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 20
+module: part1
+
+# choices: instructor_file, student_file, yaml_file
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixure arguments in a list
+    args: [part1]
+
+questions:
+  - id: compute
+    parts:
+      - id: "1A: datasets"
+        type: dict[string,Tuple[NDArray]]
+        rel_tol: 0.01  # percent/100
+
+
+      - id: "1B: fit_kmeans"
+        type: function
+
+      - id: "1C: cluster successes"
+        # answer is dict[string, list]. Check whether list of set
+        # Answer will be checked by casting the list to a set
+        type: dict[string,set]
+
+      - id: "1C: cluster failures"
+        type: set[string]
+
+      - id: "1D: datasets sensitive to initialization"
+        type: set[string]

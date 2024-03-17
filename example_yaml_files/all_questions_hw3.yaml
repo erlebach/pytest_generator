@@ -1,0 +1,547 @@
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 15.35
+questions:
+  - id: question1
+    max_score: 20
+    parts:
+      - id: (a)
+        type: bool
+        answer: True
+
+      - id: (a) explain
+        type: explain_string
+        answer: > 
+          To be determined.
+
+      - id: (b)
+        type: bool
+        answer: True
+
+      - id: (b) explain
+        type: explain_string
+        answer: > 
+          There is no random element in the algorithms for agglomerative 
+          hierarchical techniques unless there are ties in the proximity values
+
+      - id: (c)
+        type: bool
+        answer: False
+
+      - id: (c) explain
+        type: explain_string
+        answer: > 
+          Although k-means is more computationally efficient than agglomerative 
+          hierarchical clustering, there are more efficient algorithms possible, 
+          e.g., the leader algorithm. (See Exercise 12, Chapter 7.)
+
+      - id: (d)
+        type: bool
+        answer: False
+        note: ANSWER STILL UNKNOWN
+
+      - id: (d) explain
+        type: explain_string
+        answer: >
+          Splitting decreases SSE because we have two centroids 
+          for the same set of points, which will reduce the distance 
+          of points to the nearest centroid.
+
+      - id: (e)
+        type: bool
+        answer: True
+
+      - id: (e) explain
+        type: explain_string
+        answer: >
+          For K-means, SSE is an inverse measure of the cohesion of clusters, 
+          and thus, as SSE decreases, cohesion increases and vice-versa.
+
+      - id: (f)
+        type: bool
+        answer: True
+
+      - id: (f) explain
+        type: explain_string
+        answer: >
+          For K-means SSB (the between sum of squares) is a direct 
+          measure of the separation of clusters, and thus, as SSB 
+          increases, separation increases and vice-versa.
+
+      - id: (g)
+        type: bool
+        answer: False
+
+      - id: (g) explain
+        type: explain_string
+        answer: >
+          Cohesion and separation are independent for K-Means, i.e., 
+          improving cohesion (smaller SSE) doesn’t necessarily 
+          improve separation (larger between sum of squares (SSB))
+
+      - id: (h)
+        type: bool
+        answer: True
+
+      - id: (h) explain
+        type: explain_string
+        answer: > 
+          For K-means, the total sum of squares (TSS) is the sum of SSE 
+          (or within cluster sum of squares) and the between sum of 
+          squares (SSB), TSS is constant during the K-means clustering process. 
+          See the book, page 577
+
+      - id: (i)
+        type: bool
+        answer: True
+
+      - id: (i) explain
+        type: explain_string
+        answer: >
+          For K-means, the total sum of squares (TSS) is the sum of 
+          SSE (the within cluster sum of squares) and the between sum 
+          of squares (SSB). Note TSS is constant at every step of the 
+          K-means clustering process. See the book, page 577.  
+          SSE is an inverse measure of cluster cohesion, while SSB is 
+          a direct measure of cluster separation. Thus, as cohesion 
+          increases, SSE decreases, and SSB (separation) increases since 
+          TSS = SSE + SSB is a constant. When SSE is at a local minima, 
+          BSS is at a local maxima.
+
+
+  #----------------------------------------------------------------------
+  - id: question2
+    max_score: 20
+    parts:
+      - id: (a)
+        type: bool
+        answer: True
+
+      - id: (a) explain
+        type: explain_string
+        answer: > 
+          The clusters are too far away for one centroid to 
+          attract points from another.
+      - id: (b)
+        type: bool
+        answer: False
+
+      - id: (b) explain
+        type: explain_string
+        answer: > 
+           The final clusters will have points from both of the two 
+           shaded regions since they are close to each other and not 
+           of circular shape.
+
+      - id: (c)
+        type: bool
+        answer: True
+
+      - id: (c) explain
+        type: explain_string
+        answer: > 
+          The centroid at 12.5 is farther away from all points than 
+          any other clusters and will become empty.
+
+
+  #----------------------------------------------------------------------
+  - id: question3
+    max_score: 5
+    parts:
+      - id: (a) SSE
+        type: eval_float
+        tol: 0.01
+        answer: "4 * R**2"
+        locals: {'R': [1., 2.]}
+
+      - id: (b) SSE
+        type: eval_float
+        answer: "4 * (a**2 + b**2 + c**2)"
+        locals: {'a': [1., 2.], 'b': [1., 2.], 'c': [1., 2.]}
+
+      - id: (c) SSE
+        type: eval_float
+        answer: "4*(R**2 + (R/2)**2)"
+        locals: {'R': [1., 3.]}
+
+  #----------------------------------------------------------------------
+  - id: question4
+    parts:
+      - id: (a) Circle (a)
+        type: integer
+        answer: 1
+
+      - id: (a) Circle (b)
+        type: integer
+        answer: 1
+
+      - id: (a) Circle (c)
+        type: integer
+        answer: 1
+
+      - id: (a) explain
+        type: explain_string
+        answer: >
+          All of circle A’s points will be assigned to the centroid in A. 
+          About 1/3 of circle B’s points (the ones in the left third of circle 
+          B) will be assigned to the centroid on the left in circle B. 
+          The remaining 2/3 of the points in B and all the points in C will 
+          be assigned to the centroid in the center of B. This will cause the 
+          right centroid in B to move to circle C since C has many more points 
+          than B.  In the next iteration, all points in A,B, and C will be 
+          assigned to the centroids located in their own circles and K-means 
+          will converge.
+
+      - id: (b) Circle (a)
+        type: integer
+        answer: 1
+
+      - id: (b) Circle (b)
+        type: integer
+        answer: 1
+
+      - id: (b) Circle (c)
+        type: integer
+        answer: 1
+
+      - id: (b) explain
+        type: explain_string
+        answer: >
+          Since circles A and B are close together and quite far away from 
+          circle C, the points from both A and B will be assigned to the 
+          centroid that is in A. The points in C will be split between the 
+          two centroids in C, with each centroid having 50,000 points.  Since 
+          A and B have the same number of points each, the centroid in A will 
+          move between A and B. The centroids in C will move apart slightly 
+          but both will remain in C, each having half of C’s points.
+
+      - id: (c) Circle (a)
+        type: integer
+        answer: 0
+
+      - id: (c) Circle (b)
+        type: integer
+        answer: 0
+
+      - id: (c) Circle (c)
+        type: integer
+        answer: 2
+
+      - id: (c) explain
+        type: explain_string
+        answer: >
+          Since circles A and B are close together and quite far away from 
+          circle C, the points from both A and B will be assigned to the 
+          centroid that is in A. The points in C will be split between the 
+          two centroids in C, with each centroid having 50,000 points.  
+          Since A and B have the same number of points each, the centroid 
+          in A will move between A and B. The centroids in C will move apart 
+          slightly but both will remain in C, each having half of C’s points.
+  #----------------------------------------------------------------------
+  - id: question5
+    parts:
+      - id: (a)
+        type: set
+        answer: set(["Group A", "Group B"])
+        choices: ["Group A", "Group B", "Group C"]
+
+      - id: (a) explain
+        type: explain_string
+        answer: >
+          Groups A and B will be merged since they have the smallest 
+          single link distance (between the right-most point of A 
+          and left-most point of B), as compared to Groups A and C, 
+          and Groups B and C
+
+      - id: (b)
+        type: set
+        answer: set(["Group A", "Group C"])
+        choices: ["Group A", "Group B", "Group C"]
+
+      - id: (b) explain
+        type: explain_string
+        answer: > 
+          Groups A and C will be merged since they have the smallest 
+          complete link distance (between the right-most point of A 
+          and the farthest point in C), as compared to the complete 
+          link distance of Groups A and B (between the left-most point 
+          in A and right-most point in B), and Groups B and C (between 
+          rightmost-point in B and the farthest point in C).
+  #----------------------------------------------------------------------
+  - id: question6
+    parts:
+      - id: (a) core
+        type: set
+        answer: set(["B", "C", "E", "F", "I", "J", "L", "M"])
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (a) boundary
+        type: set
+        answer: set(["D", "G"])
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (a) noise
+        type: set
+        answer: set(["A", "H"])
+        note: Choose among the clusters "A", "B", ... (see image)
+
+    # Each cluster is a subset of ['A', 'B', ..., 'M']
+    # If there are less than 4 clusters, leave them as empty lists.
+      - id: (b) cluster 1
+        type: set
+        answer: set(["B", "C", "D", "E", "F", "G"])
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (b) cluster 2
+        type: set
+        answer: set(["I", "J", "L", "M"])
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (b) cluster 3
+        type: set
+        answer: set()
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (b) cluster 4
+        type: set
+        answer: set()
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (c)-a core
+        type: set
+        answer: set(["B", "C", "E", "F", "I", "J", "L", "M", "D", "G"])
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (c)-a boundary
+        type: set
+        answer: set(["A", "H"])
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (c)-a noise
+        type: set
+        answer: set()
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (c)-b cluster 1
+        type: set
+        answer: set(["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "L", "M"])
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (c)-b cluster 2
+        type: set
+        answer: set(["A"])
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (c)-b cluster 3
+        type: set
+        answer: set()
+        note: Choose among the clusters "A", "B", ... (see image)
+
+      - id: (c)-b cluster 4
+        type: set
+        answer: set()
+        note: Choose among the clusters "A", "B", ... (see image)
+
+
+  #----------------------------------------------------------------------
+  - id: question7
+    parts:
+      - id: (a)
+        type: string
+        answer: Cluster 4
+
+      - id: (a) explain
+        type: explain_string
+        answer: Cluster 4 is the most random. 
+
+      - id: (b)
+        type: string
+        answer: Cluster 1
+
+      - id: (b) explain
+        type: explain_string
+        answer: Cluster 4 is the least random. 
+
+  #----------------------------------------------------------------------
+  - id: question8
+    parts:
+      - id: (a) Matrix 1 
+        type: string
+        answer: Dataset Z
+
+      - id: (a) explain diag entries, Matrix 1
+        type: explain_string
+        answer: >
+          2 diagonal entries are more blue and crisp compared to the 
+          other 2, indicating 2 clusters have better cohesion 
+          (B and C) than the other 2 (A and D).
+
+      - id: (a) explain non-diag entries, Matrix 1
+        type: explain_string
+        answer: >
+          1. Rows 1 and 3 correspond to clusters A and C. This is because 
+          the colors of the off-diagonal entries for these two rows are 
+          all different, indicating the different distances between cluster 
+          A (or C)’ s distances to all other clusters (i.e: A is closest to C 
+          (blue off-diagonal); followed by B (green off-diagonal); and is the 
+          furthest from D (yellow off-diagonal); similar explanation for C).
+          2. Row 2 correspond to cluster B. Same distances to A and C (green 
+          off-diagonal), furthest distance from A (red off-diagonal).
+          3. Row 4 correspond to cluster D. Same distances to A and C (yellow 
+          off-diagonal), furthest distance from B (red off-diagonal).
+
+      - id: (a) Matrix 2
+        type: string
+        answer: Dataset X
+
+      - id: (a) explain diag entries, Matrix 2
+        type: explain_string
+        answer: > 
+          Two diagonal entries are more blue and crisp compared to the other two, 
+          indicating two clusters have better cohesion (B and C) than the other 
+          two (A and D)
+      
+      - id: (a) explain non-diag entries, Matrix 2
+        type: explain_string
+        answer: > 
+          1. Rows with less crisp diagonal entries (rows 1 and 4) have all 
+          different colors, indicating that all other clusters have different 
+          distances from these clusters (e.g: Cluster A is the nearest to B, 
+          followed by C and then D, no 2 clusters have same distance to cluster A). 
+          2. Rows with more crisp diagonal entries have 2 same colors (other than 
+          the diagonal), indicating that it has same distance to 2 clusters, 
+          and is the furthest from 1 cluster (e.g: B’s distance to A and C is 
+          similar, but is the furtherst from D). 
+
+      - id: (a) Matrix 3
+        type: string
+        answer: Dataset Y
+
+      - id: (a) explain diag entries, Matrix 3
+        type: explain_string
+        answer: >
+          Two diagonal entries are more blue and crisp compared to the other two, 
+          indicating two clusters have better cohesion (B and C) than the other 
+          two (A and D). 
+
+      - id: (a) explain non-diag entries, Matrix 3
+        type: explain_string
+        answer: >
+          All rows have two similar and 1 different colors off diagonals entries. 
+          This indicates each cluster has two other clusters relatively closer 
+          to it than the remaining 1 cluster (e.g: B is similarly close to A and 
+          C compared to with D.
+
+      # Value is a dictionary with keys: "Row 1", "Row 2", "Row 3", "Row 4"
+      # The values are one of "Cluster A", "Cluster B", "Cluster C", "Cluster D"
+      - id: (b) Row 1
+        type: string
+        answer: Cluster A
+
+      - id: (b) Row 2
+        type: string
+        answer: Cluster B
+
+      - id: (b) Row 3
+        type: string
+        answer: Cluster C
+
+      - id: (b) Row 4
+        type: string
+        answer: Cluster D
+
+      - id: (b) Row 1 explain
+        type: explain_string
+        answer: >
+          Diagonal entry is less crisp, meaning the cluster is less cohesive. 
+          All off- diagonal entries have different colors, indicating all 
+          other clusters have different distances from is (closest to B, 
+          followed by C, and furthest from A). 
+
+      - id: (b) Row 2 explain
+        type: explain_string
+        answer: >
+          Diagonal entry is more crisp, indicating the cluster is cohesive. 
+          2/3 off-diagonal entries have the same color, indicating 2 other 
+          clusters are closer to it (A and C, eventhough the off-diagonal 
+          indicating distances with A is less crisp), and is the furthest 
+          from 1 other cluster (D). 
+
+      - id: (b) Row 3 explain
+        type: explain_string
+        answer: The explanation is simimilar to row 2. 
+
+      - id: (b) Row 4 explain
+        type: explain_string
+        answer: The Explanation is similar to row 1 in inverted order.
+
+  #----------------------------------------------------------------------
+  - id: question9
+    parts:
+      - id: (a)
+        type: list
+        answer: ["Hierarchical", "overlapping", "partial"]
+
+      - id: (b)
+        type: list
+        answer: ["Partitional", "exclusive", "complete"]
+
+      - id: (c)
+        type: list
+        answer: ["Partitional", "fuzzy", "complete"]
+
+      - id: (d)
+        type: list
+        answer: ["Hierarchical", "overlapping", "partial"]
+
+      - id: (e)
+        type: list
+        answer: ["Partitional", "Exclusive", "partial"]
+
+      - id: (e) explain
+        type: explain_string
+        answer: > 
+          Some students in the CS dept wouldn’t have 
+          taken the DM class and thus can’t be grouped.
+  #----------------------------------------------------------------------
+  - id: question10
+    parts:
+      - id: (a) Figure (a)
+        type: string
+        answer: 'no'
+        note: Include quotes around 'yes' and 'no' so they are not interpreted as bool
+
+      - id: (a) Figure (b)
+        type: string
+        answer: 'yes'
+
+      - id: (a) explain
+        type: explain_string
+        answer: >
+          DBSCAN can work only for (b) because in (b) the points in the nose, 
+          eyes, and mouth are much closer together than the points between 
+          these areas, and DBSCAN could distinguish these areas. For (a), 
+          the noise is much denser than the interest patterns, so the nose, 
+          eyes, and mouth will be eliminated by DBSCAN.
+
+      - id: (b) Figure (a)
+        type: string
+        answer: 'no'
+
+      - id: (b) Figure (b)
+        type: string
+        answer: 'yes'
+
+      - id: (b) explain
+        type: explain_string
+        answer: > 
+          K-means can work for (b) as long as the number of clusters 
+          was set to 4, although the lower density points would also 
+          be included. K-means does not work for (a).
+
+      - id: (c)
+        type: string
+        answer: Take the reciprocal of the density as the new density and use DBSCAN.
+
+  #----------------------------------------------------------------------

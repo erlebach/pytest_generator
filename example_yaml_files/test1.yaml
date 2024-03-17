@@ -1,0 +1,81 @@
+# Some tests fail, some succeed. This allows me to see how Gradescope shows the tests that pass and fail to the students
+# Some tests have incorrect values and some incorrect structure
+# Generate an expanded file with one id per 'answer' in the 'answers' key. 
+# Run the expanded file through the regular generator. 
+# I wonder if I should separate the correct answer from the incorrect ones. 
+visibility: visible
+max_score: 10
+module: part1
+
+# Answers are provided in the yaml file
+# Choices: 'instructor_file', 'yaml_file'
+# answer_source: instructor_file
+# Also read from instructor file if i_answer or i_answers is not present
+#
+# Choices: 'student_file', 'yaml_file'
+# One answer always comes from the student file
+# Additional student answers might be included in the yaml
+# file as a testing mechanism. 
+# In this case, when running through expansion module, generate
+# one test per answer. Specify student answer source
+# 
+# student_answer_source: student_file
+
+fixtures:
+  fixture:
+    name: run_compute
+    # Module fixture will load and run with given function defined in the fixture
+    args: [part1]  
+
+questions:
+  - id: basic_int_test
+    parts:
+      - id: correct_int
+        type: int
+        i_answer: 3
+        s_answers: 
+          - 3
+          - "3"
+
+  - id: complex_dict_string_Tuple_NDArray_test
+    parts:
+      - id: correct_complex_type
+        type: dict[string,Tuple[NDArray]]
+        s_answers: 
+          - {"strg1": (np.zeros(3), np.ones(2)), "strg2": (np.zeros(2))} 
+          - {"strg1": [np.zeros(3), np.ones(2)]} 
+
+  - id: list_NDArray_test
+    parts:
+      - id: correct_list_NDArray
+        type: list[NDArray]
+        s_answers: 
+          - [np.zeros(3), np.ones(3)]
+          - ["my string", np.ones(3)]
+
+  - id: string_test
+    parts:
+      - id: correct_string
+        type: string
+        s_answers: 
+          - "my_string"
+          - 45
+
+      - id: incorrect_string
+        type: string
+        s_answer: "gf_string"
+        i_answer: "ge_string"
+
+      - id: multiple_answers
+        type: string
+        s_answers: 
+          - "gf_string"
+          - 3
+          - 45.7
+        # What happens if an instructor answer is incorrect?:
+        i_answers: 
+          - "ge_string"
+          - 3
+          
+
+  # Add more questions for each type and scenario mentioned in your type_handlers.yaml

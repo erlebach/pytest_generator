@@ -1,0 +1,42 @@
+# Default for entire file. Each question can override
+visibility: visible
+
+# max_score: per assert
+max_score: 20
+
+module: part2
+
+# choices: instructor_file, student_file, yaml_file
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixture arguments in a list
+    args: [part2]
+
+questions:
+  - id: compute
+    max_score: 20
+    parts:
+      - id: "2A: blob"
+        type: list[NDArray]
+        rel_tol: 0.01  # percent/100
+
+      - id: "2B: fit_kmeans"
+        type: function
+
+      - id: "2C: SSE plot"
+        type: list[list[float]]
+        rel_tol: 0.01
+
+      - id: "2D: inertia plot"
+        type: list[list[float]]
+        rel_tol: 0.01
+
+      - id: "2D: do ks agree?"
+        type: string

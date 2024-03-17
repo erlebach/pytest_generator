@@ -1,0 +1,54 @@
+# Default for entire file. Each question can override
+visibility: visible
+
+# max_score: per assert
+max_score: 20
+
+module: part3
+
+# choices: instructor_file, student_file, yaml_file
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixture arguments in a list
+    args: [part3]
+
+questions:
+  - id: compute
+    max_score: 20
+    parts:
+      - id: "3A: toy data"
+        # using tuple creates a problem with eval (I guess)
+        type: dict[string,NDArray]
+        # Only check the following keys
+        keys: ["X", "y"]
+
+      - id: "3B: linkage"
+        type: NDArray
+
+      - id: "3B: dendogram"
+        type: dendrogram
+
+      - id: "3C: iteration"
+        type: int
+
+      - id: "3D: function"
+        type: function
+
+      - id: "3E: clusters"
+        # Issue in Python. set of set not allowed. Use set of frozenset
+        type: set[set]
+
+      - id: "3F: rich get richer"
+        type: string
+

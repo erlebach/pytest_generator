@@ -1,0 +1,24 @@
+test_structure:
+  # set all tests to fail
+  assert_false: False
+  max_nb_words: 10
+  fixture_import_file: my_fixtures
+
+test_answers:
+  # set all tests to fail
+  assert_false: False
+  fixture_import_file: my_fixtures
+
+imports:
+  - assert_utilities
+
+student_code:
+
+instructor_code:
+
+fixtures: 
+
+mocks:
+
+modules:
+

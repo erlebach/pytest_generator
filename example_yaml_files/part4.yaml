@@ -1,0 +1,38 @@
+# Default for entire file. Each question can override
+visibility: visible
+
+# max_score: per assert
+max_score: 20
+
+module: part4
+
+# choices: instructor_file, student_file, yaml_file
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixture arguments in a list
+    args: [part4]
+
+questions:
+  - id: compute
+    max_score: 20
+    parts:
+      - id: "4A: datasets"
+        type: dict[string,Tuple[NDArray]]
+        rel_tol: 0.01  # percent/100
+
+      - id: "4A: fit_hierarchical_cluster"
+        type: function
+
+      - id: "4B: cluster successes"
+        type: list[string]
+
+      - id: "4C: modified function"
+        type: function
+

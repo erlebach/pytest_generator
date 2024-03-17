@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+gradescope-utils = ">=0.2.3"
+scikit-learn = "*"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+pytest = "*"
+pytest-mock = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"

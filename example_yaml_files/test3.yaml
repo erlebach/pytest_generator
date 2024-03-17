@@ -1,0 +1,74 @@
+# Without fixtures, read from instructor file
+
+# Some tests fail, some succeed. This allows me to see how Gradescope shows the tests that pass and fail to the students
+# Some tests have incorrect values and some incorrect structure
+# Generate an expanded file with one id per 'answer' in the 'answers' key. 
+# Run the expanded file through the regular generator. 
+# I wonder if I should separate the correct answer from the incorrect ones. 
+visibility: visible
+max_score: 10
+module: part1
+
+# Answers are provided in the yaml file
+# Choices: 'instructor_file', 'yaml_file'
+answer_source: instructor_file
+  #answer_source: yaml_file
+#
+# Choices: 'student_file', 'yaml_file'
+# One answer always comes from the student file
+# Additional student answers might be included in the yaml
+# file as a testing mechanism. 
+# In this case, when running through expansion module, generate
+# one test per answer. Specify student answer source
+# 
+# student_answer_source: student_file
+
+questions:
+  - id: basic_int_test0
+    parts:
+      - id: correct_int
+        type: int
+        i_answer: 3
+        s_answer: 3
+
+      - id: correct_int
+        type: int
+        i_answer: 3
+        s_answers: 
+          - 3
+          - "3"
+
+  - id: basic_int_test1
+    parts:
+      - id: correct_int
+        type: int
+        i_answers: 
+          - 3
+          - "3"
+        s_answer: 3
+
+  - id: basic_int_test2
+    parts:
+      - id: correct_int
+        type: int
+        i_answers: 
+          - 3
+          - "3"
+        s_answers: 
+          - 3
+          - "3"
+
+  - id: basic_int_test3
+    parts:
+      - id: correct_int
+        type: int
+        i_answers: 
+          - 3
+          - "3"
+
+  - id: basic_int_test4
+    parts:
+      - id: correct_int
+        type: int
+        i_answer: 3
+
