@@ -15,8 +15,8 @@ types:
 
   float:
     import: ""
-    assert: "isinstance({answer_var}, float)"
-    struct_msg: Answer should be a float. 
+    assert_answer: "assert_utilities.check_answer_float(student_answer, instructor_answer, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_float(student_answer, instructor_answer)"
 
   int:
     import: ""
@@ -92,6 +92,8 @@ types:
 
   bool:
     import: ""
+    assert_answer: "assert_utilities.check_answer_bool(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_answer_bool(student_answer, instructor_answer)"
     assert: "isinstance({answer_var}, bool)"
     struct_msg: Answer should be a bool. 
 

@@ -73,11 +73,47 @@ def are_sets_equal(set1, set2, rtol=1e-5, atol=1e-6):
   return True
 
 # ======================================================================
+def check_answer_float(student_answer, instructor_answer, rel_tol):
+    """
+    Check answer correctness. Assume the structure is correct.
+    """
+    abs_err = math.fabs(student_answer - instructor_answer)
+    is_abs = False  # irrelevant if rel error criteria is satisfied
+
+    if math.fabs(instructor_answer) > 1.e-8:
+        is_rel = (student_answer - instructor_answer) / instructor_answer < rel_tol
+    else:
+        is_abs = abs_err < 1.e-8
+        is_rel = False
+
+    if is_rel:
+        status = True
+        msg_list = [f"Answer is correct to within relative error: {100*rel_tol}%"]
+    elif is_abs:
+        status = True
+        msg_list = [f"Answer is correct to within absolute error: {1.e-8}"]
+    else:
+        status = False
+        msg_list = [f"Answer is incorrect"]
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+def check_structure_float(student_answer, instructor_answer):
+    if isinstance(student_answer, float):
+        status = True
+        msg_list = ["Answer is of type float as expected."]
+    else:
+        status = False
+        msg_list = [f"Answer should be of type float. It is of type {type(student_answer)}"]
+    return status, "\n".join(msg_list)
+# ======================================================================
 
 def check_answer_dict_string_dict_str_list(student_answer, instructor_answer):
     """
     The type is a dict[str, dict[str, list]]
     """
+    # DEFINE answer_var
     if not isinstance(answer_var, dict):
         return False
 
@@ -894,10 +930,13 @@ def check_structure_dendrogram(student_dendro, instructor_dendro):
 
 def check_answer_int(student_answer, instructor_answer):
     msg_list = []
-    status = True
 
     if student_answer != instructor_answer:
         status = False
+        msg_list = ["Answer is correct."]
+    else:
+        status = True
+        msg_list = ["Answer is incorrect."]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -905,8 +944,40 @@ def check_answer_int(student_answer, instructor_answer):
 
 def check_structure_int(student_answer, instructor_answer):
     if not isinstance(student_answer, int):
-        return False, "Answer must be of type 'int'"
-    return True, "Type 'int' is Correct"    
+        status = False
+        msg_list = [f"Answer must be of type 'int'. Your answer is of type {type(student_ansewr)}."]
+    else:
+        status = True
+        msg_list = [f"Answer is of type 'int' as expected."]
+
+    return status, "\n".join(msg_list)
+
+# ======================================================================
+
+def check_answer_bool(student_answer, instructor_answer):
+    msg_list = []
+    status = True
+
+    if student_answer != instructor_answer:
+        status = False
+        msg_list = ["Answer is correct"]
+    else:
+        status = True
+        msg_list = ["Answer is incorrect"]
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+def check_structure_bool(student_answer, instructor_answer):
+    if not isinstance(student_answer, bool):
+        status = False
+        msg_list = f"Answer must be of type 'bool'. Your answer is of type {type(student_ansewr)}."
+    else:
+        status = True
+        msg_list = f"Answer is of type 'bool' as expected."
+
+    return status, "\n".join(msg_list)
 
 # ======================================================================
 
