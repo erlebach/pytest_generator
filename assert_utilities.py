@@ -113,11 +113,10 @@ def check_answer_dict_string_dict_str_list(student_answer, instructor_answer):
     """
     The type is a dict[str, dict[str, list]]
     """
-    # DEFINE answer_var
-    if not isinstance(answer_var, dict):
+    if not isinstance(student_answer, dict):
         return False
 
-    for k, v in answer_var.items():
+    for k, v in student_answer.items():
         if not (isinstance(k, str) and isinstance(v, dict)):
             return False
 
@@ -257,36 +256,41 @@ def check_structure_string(student_answer, instructor_answer):
 
 # ======================================================================
 
-def check_answer_explain_string(answer_var):   # FIX
+def check_answer_explain_string(student_answer, instructor_answer):   
     msg_list = []
     status = True
-    return_value(status, msg_list, s_answ, i_answ)
+    print(f"===> check_answer_explain_string, {student_answer=}")
+    print(f"===> check_answer_explain_string, {instructor_answer=}")
+    return return_value(status, msg_list, student_answer, instructor_answer)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
-def check_structure_explain_string(answer_var):
+def check_structure_explain_string(student_answer, instructor_answer):   
     """
     The type is an explain_string
     The string should have a minimum number of words stored in "type_handlers.yaml"
     """
     msg_list = []
-    is_answer_type = isinstance(answer_var, str)
-    if is_answer_type:
-        msg_list.append("- Type is 'str' is correct")
+    status = True
+    if isinstance(student_answer, str):
+        status = True
+        msg_list.append("- Type 'str' is correct")
     else: 
+        status = False
         msg_list.append("- Type must be of type 'str'")
 
     # Check the number of words in the string
-    max_nb_words = 10  # WHERE IS THIS SET. Should be in configuration file. 
+    max_nb_words = 4  # WHERE IS THIS SET. Should be in configuration file. 
 
-    if is_answer_type:
-        is_nb_words = len(answer_var.split()) >= max_nb_words
+    if status:
+        is_nb_words = len(student_answer.split()) >= max_nb_words
         if is_nb_words:
             msg_list.append("- Length of answer is sufficient")
         else:
+            status = False
             msg_list.append(f"- Length of answer must be > {max_nb_words}")
 
-    return is_answer_type and is_nb_words, "\n".join(msg_list)
+    return status, "\n".join(msg_list)
 
 # ======================================================================
 
@@ -502,7 +506,7 @@ def check_structure_list_NDArray(student_answer, instructor_answer):
     """
     Check that elements in the list are NDArrays
     """
-    print("==>  structure check_structure_list_NDArray....")
+    #print("==>  structure check_structure_list_NDArray....")
     status = True
     msg_list = []
 

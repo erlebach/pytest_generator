@@ -26,8 +26,14 @@ def with_custom_sys_path(path, func, *args, **kwargs):
     :param kwargs: Keyword arguments to pass to the function
     """
     original_sys_path = list(sys.path)
+    print("==> func: ", func)
+    print("==> args: ", args)
+    print("==> **kwargs: ", **kwargs)
     try:
         sys.path.insert(0, path)
+        print("\n===> sys, func= ", func)
+        print("\n===> sys, func.__name__= ", func.__name__)
+        print("\n===> args= ", args)
         return func(*args, **kwargs)
     finally:
         sys.path = original_sys_path
@@ -42,6 +48,7 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
     :param directory: Directory from which to load the module
     :return: The result of the module's `compute` function
     """
+    print("INSIDE load_and_run_module")
     original_cwd = os.getcwd()
     os.chdir(directory)
     try:
@@ -50,7 +57,11 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
         To execute, `result = module.question1()`
         invoke  `load_and_run_module(module, directory, 'question1')
         """
+        print("==> module: ", module, type(module))
+        print("==> function_name: ", function_name, type(function_name))
         func_to_run = getattr(module, function_name)
+        print("==> func_to_run: ", func_to_run.__name__)
+        print("args: ", args)
         result = func_to_run(*args, **kwargs)
     finally:
         os.chdir(original_cwd)
@@ -64,6 +75,10 @@ def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
     student_directory = "./student_code_with_answers"
     instructor_directory = "./instructor_code_with_answers"
 
+    print(f"==> {module_name=}")
+    print(f"==> {function_name=}")
+    print(f"==> {ret=}")
+
     if ret == 'both':
         student_result = with_custom_sys_path(student_directory, load_and_run_module, module_name, student_directory, function_name, *args, **kwargs)
         instructor_result = with_custom_sys_path(instructor_directory, load_and_run_module, module_name, instructor_directory, function_name, *args, **kwargs)
@@ -71,6 +86,7 @@ def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
     elif ret == 's':
         return with_custom_sys_path(student_directory, load_and_run_module, module_name, student_directory, function_name, *args, **kwargs)
     else:  # ret == 'i'
+        print("===> 'i', return from with_custom_sys_path")
         return with_custom_sys_path(instructor_directory, load_and_run_module, module_name, instructor_directory, function_name, *args, **kwargs)
 
 # ----------------------------------------------------------------------
@@ -78,6 +94,7 @@ def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
 @pytest.fixture(scope='module')
 def run_compute():
     def _module(module_name, function_name, ret, *args, **kwargs):
+        print("==> _module, function_name: ", type(function_name))   # Must be a string
         return get_module_results(module_name, function_name, ret, *args, **kwargs)
     return _module
 

@@ -51,9 +51,9 @@ def evaluate_answers(question_id, test_code, is_fixture, is_instructor_file, is_
     elif is_fixture and is_instructor_file:
         fixture_args = fixture['args']
         fixture_name = fixture['name']
-        function_name = question_id   # name of function in student/instructor module
+        module_function_name = question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
-        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {function_name}, 'i')\\n"
+        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i')\\n"
         test_code += f"    if {part_id} not in correct_answer:\\n"
         explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
@@ -72,9 +72,9 @@ def evaluate_answers(question_id, test_code, is_fixture, is_instructor_file, is_
     elif is_fixture and is_student_file:
         fixture_args = fixture['args']
         fixture_name = fixture['name']
-        function_name = question_id   # name of function in student/instructor module
+        module_function_name = question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
-        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {function_name}, 's')\\n"
+        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's')\\n"
         test_code += f"    if {part_id} not in student_answer:\\n"
         explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
@@ -125,7 +125,7 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
     test_code = "import pytest\\n"
     test_code += "import pytest\\n"
     test_code += "import assert_utilities\\n"
-    test_code += "import numpy\\n"
+    test_code += "import numpy as np\\n"
     test_code += f"from {module_} import *\\n"
     test_code += "import yaml\\n"
     test_code += "import test_utils as u\\n"

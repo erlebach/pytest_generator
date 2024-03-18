@@ -54,9 +54,9 @@ def evaluate_answers(question_id, test_code, is_fixture, is_instructor_file, is_
     elif is_fixture and is_instructor_file:
         fixture_args = fixture['args']
         fixture_name = fixture['name']
-        function_name = question_id   # name of function in student/instructor module
+        module_function_name = question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
-        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(function_name)}, 'i')\\n"
+        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i')\\n"
         test_code += f"    if {part_id} not in correct_answer:\\n"
         explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
@@ -76,9 +76,9 @@ def evaluate_answers(question_id, test_code, is_fixture, is_instructor_file, is_
         fixture_args = fixture['args']
         #fixture_name = fixture['name']
         fixture_name = fixture['name']
-        function_name = question_id   # name of function in student/instructor module
+        module_function_name = question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
-        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(function_name)}, 's')\\n"
+        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's')\\n"
         test_code += f"    if {part_id} not in student_answer:\\n"
         explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"

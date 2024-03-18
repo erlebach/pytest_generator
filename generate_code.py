@@ -26,7 +26,7 @@ def generate_python_code_from_yaml(yaml_file_path):
 
 
 # Replace 'path_to_your_yaml_file.yaml' with the actual path to your YAML file
-yaml_file_path = "all_questions.yaml"
+yaml_file_path = "hw4.yaml"
 python_code = generate_python_code_from_yaml(yaml_file_path)
 
 # Print or save the generated Python code
