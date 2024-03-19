@@ -44,8 +44,12 @@ def get_decoded_str(questions_data, part, answer_key, source_file):
         #print(f"{decode_call_str=}")
         return decode_call_str
 
-def evaluate_answers(question_id, test_code, is_fixture, is_instructor_file, is_student_file, 
+def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_instructor_file, is_student_file, 
                     decode_i_call_str, decode_s_call_str, fixture, part, function_name):
+
+    student_directory = questions_data['student_folder_name']
+    instructor_directory = questions_data['instructor_folder_name']
+
     if not is_fixture and not is_instructor_file:  # yaml file
         test_code += f"    correct_answer = eval('{decode_i_call_str}')\\n"
     elif not is_fixture and is_instructor_file:
@@ -56,7 +60,8 @@ def evaluate_answers(question_id, test_code, is_fixture, is_instructor_file, is_
         fixture_name = fixture['name']
         module_function_name = question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
-        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i')\\n"
+        test_code += f"    kwargs = {{'student_directory': {repr(student_directory)} , 'instructor_directory': {repr(instructor_directory)}}}\\n"
+        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i', **kwargs)\\n"
         test_code += f"    if {part_id} not in correct_answer:\\n"
         explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
@@ -78,7 +83,7 @@ def evaluate_answers(question_id, test_code, is_fixture, is_instructor_file, is_
         fixture_name = fixture['name']
         module_function_name = question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
-        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's')\\n"
+        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i', **kwargs)\\n"
         test_code += f"    if {part_id} not in student_answer:\\n"
         explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
@@ -217,7 +222,7 @@ with open('type_handlers.yaml', 'r') as f:
             fixture_name = fixture['name'] if is_fixture else None
             if is_fixture and fixture_name is None:
                 raise "Fixture name is not defined"
-            test_code = evaluate_answers(question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
+            test_code = evaluate_answers(questions_data, question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
                                          decode_i_call_str, decode_s_call_str, fixture, part, function_name)
 
             test_code += f"    print(f'{is_fixture=}, {is_student_file=}, {is_instructor_file=}')\\n"

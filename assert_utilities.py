@@ -949,7 +949,7 @@ def check_answer_int(student_answer, instructor_answer):
 def check_structure_int(student_answer, instructor_answer):
     if not isinstance(student_answer, int):
         status = False
-        msg_list = [f"Answer must be of type 'int'. Your answer is of type {type(student_ansewr)}."]
+        msg_list = [f"Answer must be of type 'int'. Your answer is of type {type(student_answer)}."]
     else:
         status = True
         msg_list = [f"Answer is of type 'int' as expected."]
@@ -976,7 +976,7 @@ def check_answer_bool(student_answer, instructor_answer):
 def check_structure_bool(student_answer, instructor_answer):
     if not isinstance(student_answer, bool):
         status = False
-        msg_list = f"Answer must be of type 'bool'. Your answer is of type {type(student_ansewr)}."
+        msg_list = f"Answer must be of type 'bool'. Your answer is of type {type(student_answer)}."
     else:
         status = True
         msg_list = f"Answer is of type 'bool' as expected."
