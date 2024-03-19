@@ -155,6 +155,11 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
             fixture_args = fixture['args']  # list of strings
 
         for part in question['parts']:
+            if 'fixture' in part: 
+                fixture = part['fixture']
+                fixture_name = fixture['name']
+                fixture_args = fixture['args']  # list of strings
+
             part_id_sanitized = part['id'].replace(' ', '_').replace('(', '').replace(')', '').replace('|', '_').replace('=', '_')
             function_name = f"test_structure_{question['id']}_{part_id_sanitized}_{part['type']}()"
             function_name = sanitize_function_name(function_name)
@@ -187,7 +192,7 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
             if is_fixture and fixture_name is None:
                 raise "Fixture name is not defined"
             test_code = evaluate_answers(questions_data, question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
-                                         decode_i_call_str, decode_s_call_str, fixture, part, function_name)
+                                 decode_i_call_str, decode_s_call_str, fixture, part, function_name)
 
             test_code += f"    print(f'{is_fixture=}, {is_student_file=}, {is_instructor_file=}')\\n"
             test_code += f"    answer = student_answer\\n"

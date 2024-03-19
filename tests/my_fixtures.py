@@ -102,7 +102,7 @@ def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
 def run_compute():
     # Include key args: 'student_directory'= and 'instructor_directory'=
     def _module(module_name, function_name, ret, *args, **kwargs):
-        print("==> _module, function_name: ", type(function_name))   # Must be a string
+        #print("==> _module, function_name: ", type(function_name))   # Must be a string
         return get_module_results(module_name, function_name, ret, *args, **kwargs)
     return _module
 

@@ -61,6 +61,9 @@ def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_inst
         module_function_name = question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
         test_code += f"    kwargs = {{'student_directory': {repr(student_directory)} , 'instructor_directory': {repr(instructor_directory)}}}\\n"
+        # 2024-03-19
+        # I should be able to generalize this so that the first argument is *fixture_args, which would allow fixtures with 
+        # either no args or multiple args before module_function_name, 'i', and **kwargs
         test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i', **kwargs)\\n"
         test_code += f"    if {part_id} not in correct_answer:\\n"
         explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
@@ -153,10 +156,11 @@ import {fixture_import_file}
 with open('type_handlers.yaml', 'r') as f:
     type_handlers = yaml.safe_load(f)
 '''
-    if 'max_score' in questions_data: 
-        max_score = questions_data['max_score']
-    else:
-        max_score = 0.
+    max_score = questions_data.get('max_score', 0.)
+
+    fixture = questions_data.get("fixtures", {})
+    fixture_name = fixture.get('name', "")
+    fixture_args = fixture.get('args', [])
 
     if 'fixtures' in questions_data: 
         fixture = questions_data['fixtures']['fixture']
@@ -166,10 +170,7 @@ with open('type_handlers.yaml', 'r') as f:
         fixture = None
 
     for question in questions_data['questions']:
-        if 'max_score' in question: 
-            max_score_q = question['max_score']
-        else:
-            max_score_q = max_score
+        max_score_q = question.get('max_score', max_score)
 
         if 'fixture' in question: 
             fixture = question['fixture']
@@ -177,7 +178,13 @@ with open('type_handlers.yaml', 'r') as f:
             fixture_args = fixture['args']  # list of strings
 
         for part in question['parts']:
+            if 'fixture' in part: 
+                fixture = part['fixture']
+                fixture_name = fixture['name']
+                fixture_args = fixture['args']  # list of strings
+
             part_id_sanitized = part['id'].replace(' ', '_').replace('(', '').replace(')', '').replace('|', '_').replace('=', '_')
+            max_score_part = part.get('max_score', max_score_q)
             function_name = f"test_answers_{question['id']}_{part_id_sanitized}_{part['type']}"
             function_name = sanitize_function_name(function_name)
 
@@ -203,7 +210,10 @@ with open('type_handlers.yaml', 'r') as f:
 
             test_code += f"\\n@max_score({max_score_q})\\n"
             test_code +=  "@hide_errors('')\\n"
-            test_code +=  f"def {function_name}({fixture_name}):\\n"
+            if fixture:
+                test_code +=  f"def {function_name}({fixture_name}):\\n"
+            else:
+                test_code += f"def {function_name}():\\n"
 
             is_fixture = fixture is not None and isinstance(fixture_args, list) and len(fixture_args) > 0
             is_instructor_file = questions_data.get('i_answer_source', 'yaml_file') == "instructor_file"
