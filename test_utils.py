@@ -144,7 +144,3 @@ if __name__ == "__main__":
     input_file = args.filename  + ".yaml"
     output_file = f"preprocessed_{input_file}"
     preprocess_yaml(input_file, output_file)
-    """
-    #preprocess_yaml("all_questions_hw3.yaml", "preprocessed_questions_hw3.yaml")
-    preprocess_yaml("test1.yaml", "preprocessed_test1.yaml")
-    """
