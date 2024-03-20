@@ -108,6 +108,38 @@ def check_structure_float(student_answer, instructor_answer):
         msg_list = [f"Answer should be of type float. It is of type {type(student_answer)}"]
     return status, "\n".join(msg_list)
 # ======================================================================
+def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
+    msg_list = []
+    s_answ = student_answer
+    i_answ = instructor_answer
+    s_answ = s_answ.replace('^', '**')
+    i_answ = i_answ.replace('^', '**')
+    random_values = {}
+    local_dct = {}
+
+    for _ in range(3):
+        for var, (lower, upper) in local_vars_dct.items():
+            random_values[var] = random.uniform(lower, upper)
+            local_dct[var] = random_values[var]
+        s_float = eval(student_answer, {}, local_dct)
+        i_float = eval(instructor_answer, {}, local_dct)
+        if math.fabs(i_float) < 1.e-5:
+            abs_err = math.fabs(i_float - s_float)
+            ae_status = abs_err < 1.e-5
+            status *= ae_status
+            if not ae_status:
+                msg_list += f"Absolute error > 1.e-5"
+        else:
+            rel_err = math.fabs((s_float - i_float) / i_float)
+            re_status = rel_err < rel_tol
+            status *= re_status
+            if not re_status:
+                msg_list += f"Relative error > {rel_tol}"
+            else:
+                msg_list += f"Relative error < {rel_tol}"
+        
+    return return_value(status, msg_list, s_answ, i_answ)
+# ======================================================================
 
 def check_answer_dict_string_dict_str_list(student_answer, instructor_answer):
     """

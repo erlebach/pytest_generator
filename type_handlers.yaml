@@ -170,12 +170,16 @@ types:
   # Evaluate to a float
   eval_float:
     import: ""
-    assert: "isinstance({answer_var}, str)"
-    struct_msg: Answer should evaluate to a float. 
+      #assert: "isinstance({answer_var}, str)"
+    assert_answer: "assert_utilities.check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, tol)"
+    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer)"
+    #struct_msg: Answer should evaluate to a float. 
     help: >
       A string to be evaluated using eval(). It will be important
       that the variables defined in the string be available in the 
-      context. It is not yet clear how to implement this. 
+      context. It is not yet clear how to implement this. Exponentiation is expressed 
+      with either '^' or '**'. Except for this, the string must be a valid Python expression.
+
 
   DecisionTreeClassifier:
     import: "from sklearn.tree import DecisionTreeClassifier"
