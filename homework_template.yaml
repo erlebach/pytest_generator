@@ -1,0 +1,196 @@
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 20
+module: all_questions
+
+# choices: instructor_file, student_file, yaml_file
+
+# Folders are relative to the base project folder
+#student_folder_name: student_github_template
+student_folder_name: student_code_with_answers
+instructor_folder_name: instructor_code_with_answers
+
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixure arguments in a list
+    args: [all_questions]
+
+questions:
+- id: question1
+  parts:
+    - id: (a)
+      type: string
+      answer: 'no'
+      note: Include quotes around 'yes' and 'no' so they are not interpreted as bool
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+- id: question2
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+- id: question3
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+
+- id: question4
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+
+- id: question4
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+
+- id: question5
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+
+- id: question6
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+
+- id: question7
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+
+- id: question8
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+
+- id: question9
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+
+- id: question10
+  parts:
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
+    - id:
+      type: 
+      answer: 
+
