@@ -180,10 +180,10 @@ with open('type_handlers.yaml', 'r') as f:
             fixture_args = fixture['args']  # list of strings
 
         for part in question['parts']:
-            print("xxxxxx part: ", part)
-            print("xxxxxx part['type']: ", part['type'])
-            if part['id'] in types_list: 
-                raise "ERROR"
+            #print("xxxxxx part: ", part)
+            #print("xxxxxx part['type']: ", part['type'])
+            #if part['id'] in types_list: 
+                #raise "ERROR"
             if 'fixture' in part: 
                 fixture = part['fixture']
                 fixture_name = fixture['name']
@@ -214,7 +214,7 @@ with open('type_handlers.yaml', 'r') as f:
             ## Construct the call to decode_data as a string
             #decode_call_str = f'''u.decode_data("{encoded_answer_str}")'''
 
-            test_code += f"\\n@max_score({max_score_q})\\n"
+            test_code += f"\\n@max_score({max_score_part})\\n"
             test_code +=  "@hide_errors('')\\n"
             if fixture:
                 test_code +=  f"def {function_name}({fixture_name}):\\n"
