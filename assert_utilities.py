@@ -328,6 +328,7 @@ def check_structure_explain_string(student_answer, instructor_answer):
 
 # ======================================================================
 
+# SOMETHING WRONG. 
 def check_answer_set_string(student_answer, instructor_answer):
     """
     s_answ: student answer: set of strings
