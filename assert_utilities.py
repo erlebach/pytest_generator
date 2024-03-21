@@ -122,7 +122,7 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
     random_values = {}
     local_dct = {}
 
-    for _ in range(3):
+    for i, _ in enumerate(range(3)):
         for var, (lower, upper) in local_vars_dict.items():
             random_values[var] = random.uniform(lower, upper)
             local_dct[var] = random_values[var]
@@ -147,6 +147,7 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
 
 # ======================================================================
 def check_structure_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
+    print("\nENTER check_structure_eval_float")
     try:
         ast.parse(student_answer, mode='eval')
         return True, "Valid python expression"
