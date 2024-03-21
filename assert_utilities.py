@@ -1026,8 +1026,10 @@ def check_answer_list_string(student_answer, instructor_answer):
     normalized_s_answ = [s.lower().strip() for s in student_answer]
     normalized_i_answ = [s.lower().strip() for s in instructor_answer]
 
-    if normalized_s_answ != normalized_i_answ:
-        status = False
+    for s_a, i_a in zip(normalized_s_answ, normalized_i_answ):
+        if s_a != i_a:
+            status = False
+            msg_list += "Mismatched strings"
 
     return return_value(status, msg_list, normalized_s_answ, normalized_i_answ)
 
