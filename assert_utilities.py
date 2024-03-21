@@ -1,5 +1,6 @@
 #" assert_utilities.py
 
+import ast
 import yaml
 import numpy as np
 import inspect  # <<<<
@@ -143,6 +144,16 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
                 msg_list += [f"Relative error < {rel_tol}"]
         
     return return_value(status, msg_list, s_answ, i_answ)
+
+# ======================================================================
+def check_structure_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
+    try:
+        ast.parse(student_answer, mode='eval')
+        return True, "Valid python expression"
+    except SyntaxError:
+        print("===> expression is false")
+        return False, "Your valid expression is not valid Python"
+
 # ======================================================================
 
 def check_answer_dict_string_dict_str_list(student_answer, instructor_answer):

@@ -175,13 +175,12 @@ types:
   eval_float:
     import: ""
     assert_answer: "assert_utilities.check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol)"
-    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol)"
     help: >
       A string to be evaluated using eval(). It will be important
       that the variables defined in the string be available in the 
       context. It is not yet clear how to implement this. Exponentiation is expressed 
       with either '^' or '**'. Except for this, the string must be a valid Python expression.
-
 
   DecisionTreeClassifier:
     import: "from sklearn.tree import DecisionTreeClassifier"

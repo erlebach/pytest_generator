@@ -276,12 +276,12 @@ with open('type_handlers.yaml', 'r') as f:
                 test_code +=  "    if is_success:\\n"
                 test_code +=  "        is_success, explanation_answer    = eval(msg_answer,    {'__builtins__':{}}, local_namespace)\\n"
                 test_code +=  "    else: \\n"
-                test_code +=  "        explanation_answer = \\"\\" \\n"
+                test_code +=  "        explanation_answer = 'Failed structural tests, No grade for answer component\\\\n.' \\n"
+                test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\\\n'\\n"
+                test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\\n"
                 test_code +=  "    explanation = '\\\\n'.join(['Structure tests:', explanation_structure, 'Answer tests:', explanation_answer])\\n"
                 test_code += f"    {function_name}.explanation = explanation\\n"
                 test_code += f"    assert is_success\\n"
-
-
             else:
                 test_code += f"    print('type {part['type']} NOT HANDLED!')\\n"
 
