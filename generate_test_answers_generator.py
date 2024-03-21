@@ -121,6 +121,7 @@ types_list = [
     "function",
     "set[set]",
     "NDArray", 
+    "integer",
     "string",
     "float", 
     "bool",

@@ -130,15 +130,15 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
             ae_status = abs_err < 1.e-5
             status *= ae_status
             if not ae_status:
-                msg_list += f"Absolute error > 1.e-5"
+                msg_list += ["Absolute error > 1.e-5"]
         else:
             rel_err = math.fabs((s_float - i_float) / i_float)
             re_status = rel_err < rel_tol
             status *= re_status
             if not re_status:
-                msg_list += f"Relative error > {rel_tol}"
+                msg_list += [f"Relative error > {rel_tol}"]
             else:
-                msg_list += f"Relative error < {rel_tol}"
+                msg_list += [f"Relative error < {rel_tol}"]
         
     return return_value(status, msg_list, s_answ, i_answ)
 # ======================================================================
@@ -293,8 +293,8 @@ def check_structure_string(student_answer, instructor_answer):
 def check_answer_explain_string(student_answer, instructor_answer):   
     msg_list = []
     status = True
-    print(f"===> check_answer_explain_string, {student_answer=}")
-    print(f"===> check_answer_explain_string, {instructor_answer=}")
+    #print(f"===> check_answer_explain_string, {student_answer=}")
+    #print(f"===> check_answer_explain_string, {instructor_answer=}")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
@@ -968,19 +968,21 @@ def check_structure_dendrogram(student_dendro, instructor_dendro):
 
 def check_answer_int(student_answer, instructor_answer):
     msg_list = []
+    print("===> inside check_answer_int, integer")
 
     if student_answer != instructor_answer:
         status = False
-        msg_list = ["Answer is correct."]
     else:
         status = True
-        msg_list = ["Answer is incorrect."]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
 def check_structure_int(student_answer, instructor_answer):
+    """
+    """
+    print("===> inside check_structure_int, integer")
     if not isinstance(student_answer, int):
         status = False
         msg_list = [f"Answer must be of type 'int'. Your answer is of type {type(student_answer)}."]
@@ -998,10 +1000,10 @@ def check_answer_bool(student_answer, instructor_answer):
 
     if student_answer != instructor_answer:
         status = False
-        msg_list = ["Answer is correct"]
     else:
         status = True
-        msg_list = ["Answer is incorrect"]
+
+    print("==> bool msg_list= ", msg_list)
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -1010,10 +1012,10 @@ def check_answer_bool(student_answer, instructor_answer):
 def check_structure_bool(student_answer, instructor_answer):
     if not isinstance(student_answer, bool):
         status = False
-        msg_list = f"Answer must be of type 'bool'. Your answer is of type {type(student_answer)}."
+        msg_list = [f"Answer must be of type 'bool'. Your answer is of type {type(student_answer)}."]
     else:
         status = True
-        msg_list = f"Answer is of type 'bool' as expected."
+        msg_list = [f"Answer is of type 'bool' as expected."]
 
     return status, "\n".join(msg_list)
 
@@ -1029,7 +1031,7 @@ def check_answer_list_string(student_answer, instructor_answer):
     for s_a, i_a in zip(normalized_s_answ, normalized_i_answ):
         if s_a != i_a:
             status = False
-            msg_list += "Mismatched strings"
+            msg_list += ["Mismatched strings"]
 
     return return_value(status, msg_list, normalized_s_answ, normalized_i_answ)
 

@@ -22,12 +22,12 @@ types:
     import: ""
     assert_answer: "assert_utilities.check_answer_int(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_int(student_answer, instructor_answer)"
+    # aliases: integer  (not yet implemented)
 
   integer:
     import: ""
     assert_answer: "assert_utilities.check_answer_int(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_int(student_answer, instructor_answer)"
-    #struct_msg: Answer should be an int. 
 
   list:
     import: ""

@@ -135,3 +135,6 @@ Since the answer test  first runs the structure test, I should be able to contro
 2024-03-20
 - The answers are correct.  (test_answer...) although I insert errors in the py files. Something not right. 
 - running the generator updates the files in tests/  (I checked htis)
+- type:int is treated properly
+  type:integer is not.o Yet they are both defined the same way in assert_utilities. BUT without resolution.
+----------------------------------------------------------------------
