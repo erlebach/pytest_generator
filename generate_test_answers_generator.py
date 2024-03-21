@@ -86,7 +86,7 @@ def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_inst
         fixture_name = fixture['name']
         module_function_name = question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
-        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i', **kwargs)\\n"
+        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's', **kwargs)\\n"
         test_code += f"    if {part_id} not in student_answer:\\n"
         explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
@@ -141,8 +141,8 @@ from pytest_utils.decorators import max_score, visibility, hide_errors
 import instructor_code_with_answers.{module_} as ic
 from testing_utilities import assert_almost_equal
 import assert_utilities  # <<< SHOULD be specified in config
-from student_code_with_answers import *
-import instructor_code_with_answers as sc
+#from student_code_with_answers import *
+import student_code_with_answers as sc
 from {fixture_import_file} import *   
 # Not clear why 'import conftest' does not work
 import tests.conftest as c
@@ -260,6 +260,12 @@ with open('type_handlers.yaml', 'r') as f:
                 test_code += f"    msg_answer = \\"{assertion_answer}\\"\\n"
 
                 test_code +=  "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys}\\n"
+
+                if 'locals' in part:
+                    local_vars_dict = part['locals']
+                    test_code += f"    local_vars_dict = {local_vars_dict}\\n"
+                    test_code +=  "    local_namespace['local_vars_dict'] = local_vars_dict\\n"
+
                 test_code +=  "    is_success, explanation_structure = eval(msg_structure, {'__builtins__':{}}, local_namespace)\\n"
                 test_code +=  "    if is_success:\\n"
                 test_code +=  "        is_success, explanation_answer    = eval(msg_answer,    {'__builtins__':{}}, local_namespace)\\n"

@@ -3,6 +3,7 @@
 import yaml
 import numpy as np
 import inspect  # <<<<
+import random
 import math
 
 # ......................................................................
@@ -110,6 +111,7 @@ def check_structure_float(student_answer, instructor_answer):
 # ======================================================================
 def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
     msg_list = []
+    status = True
     s_answ = student_answer
     i_answ = instructor_answer
     s_answ = s_answ.replace('^', '**')
@@ -118,7 +120,7 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
     local_dct = {}
 
     for _ in range(3):
-        for var, (lower, upper) in local_vars_dct.items():
+        for var, (lower, upper) in local_vars_dict.items():
             random_values[var] = random.uniform(lower, upper)
             local_dct[var] = random_values[var]
         s_float = eval(student_answer, {}, local_dct)

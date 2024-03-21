@@ -26,14 +26,15 @@ def with_custom_sys_path(path, func, *args, **kwargs):
     :param kwargs: Keyword arguments to pass to the function
     """
     original_sys_path = list(sys.path)
-    print("==> func: ", func)
-    print("==> args: ", args)
+    print("==> with_custom_sys_path, args: ", args)
+    #print("==> func: ", func)
+    #print("==> args: ", args)
     #print("==> **kwargs: ", **kwargs)
     try:
         sys.path.insert(0, path)
-        print("\n===> sys, func= ", func)
-        print("\n===> sys, func.__name__= ", func.__name__)
-        print("\n===> args= ", args)
+        #print("\n===> sys, func= ", func)
+        #print("\n===> sys, func.__name__= ", func.__name__)
+        #print("\n===> args= ", args)
         return func(*args, **kwargs)
     finally:
         sys.path = original_sys_path
@@ -53,7 +54,7 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
     os.chdir(directory)
     try:
         print("===> module_name: ", module_name)
-        print("===> directory: ", directory)
+        print("===> import directory: ", directory)
         module = importlib.import_module(directory + "." + module_name)
         # module = importlib.import_module(module_name) # orig
         """
@@ -91,8 +92,10 @@ def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
         student_result = with_custom_sys_path(student_directory, load_and_run_module, module_name, student_directory, function_name, *args, **kwargs)
         instructor_result = with_custom_sys_path(instructor_directory, load_and_run_module, module_name, instructor_directory, function_name, *args, **kwargs)
         return student_result, instructor_result
+
     elif ret == 's':
         return with_custom_sys_path(student_directory, load_and_run_module, module_name, student_directory, function_name, *args, **kwargs)
+
     else:  # ret == 'i'
         return with_custom_sys_path(instructor_directory, load_and_run_module, module_name, instructor_directory, function_name, *args, **kwargs)
 

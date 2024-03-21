@@ -132,3 +132,6 @@ It might be possible to have only a single generator, but use options in generat
 But the fact is that the answer generator and structure generator are close. 
 Since the answer test  first runs the structure test, I should be able to control the flow within the test itself. 
 ----------------------------------------------------------------------
+2024-03-20
+- The answers are correct.  (test_answer...) although I insert errors in the py files. Something not right. 
+- running the generator updates the files in tests/  (I checked htis)

@@ -232,6 +232,12 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
                     test_code += f"    import {eval(import_file)}\\n"
                 test_code += f"    msg = \\"{assertion}\\"\\n"
                 test_code +=  "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys}\\n"
+
+                if 'locals' in part:
+                    local_vars_dict = part['locals']
+                    test_code += f"    local_vars_dict = {local_vars_dict}\\n"
+                    test_code +=  "    local_namespace['local_vars_dict'] = {local_vars_dict}\\n"
+
                 test_code +=  "    is_success, explanation = eval(msg, {'__builtins__':{}}, local_namespace)\\n"
                 test_code += f"    {function_name}.explanation = explanation\\n"
                 test_code += f"    assert is_success\\n"

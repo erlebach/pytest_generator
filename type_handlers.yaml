@@ -27,7 +27,7 @@ types:
     import: ""
     assert_answer: "assert_utilities.check_answer_int(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_int(student_answer, instructor_answer)"
-    struct_msg: Answer should be an int. 
+    #struct_msg: Answer should be an int. 
 
   list:
     import: ""
@@ -84,13 +84,13 @@ types:
   bool:
     import: ""
     assert_answer: "assert_utilities.check_answer_bool(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_answer_bool(student_answer, instructor_answer)"
-    struct_msg: Answer should be a bool. 
+    assert_structure: "assert_utilities.check_structure_bool(student_answer, instructor_answer)"
+    #struct_msg: Answer should be a bool. 
 
   choice:
     import: ""
     assert: "{answer_var} in {valid_choices}"
-    struct_msg: Answer should one of {valid_choices}. 
+    #struct_msg: Answer should one of {valid_choices}. 
 
   float_range:
     import: ""
@@ -153,7 +153,7 @@ types:
   dict_str_list:
     import: ""
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
-    struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
+    truct_msg: "Answer should be dictionary, specifically: dict[str, str]."
 
 
   dict_str_dict_str_float:
@@ -170,10 +170,8 @@ types:
   # Evaluate to a float
   eval_float:
     import: ""
-      #assert: "isinstance({answer_var}, str)"
-    assert_answer: "assert_utilities.check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, tol)"
+    assert_answer: "assert_utilities.check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol)"
     assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer)"
-    #struct_msg: Answer should evaluate to a float. 
     help: >
       A string to be evaluated using eval(). It will be important
       that the variables defined in the string be available in the 
