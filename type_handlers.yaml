@@ -161,9 +161,13 @@ types:
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, dict) and all(isinstance(sub_k, str) and isinstance(sub_v, float) for sub_k, sub_v in v.items()) for k, v in {answer_var}.items())"
     struct_msg: "Answer should be dictionary, specifically: dict[str, dict[str, float]]."
 
+  str:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_string(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer)"
+
   string:
     import: ""
-    #assert: "isinstance({answer_var}, str)"
     assert_answer: "assert_utilities.check_answer_string(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer)"
 

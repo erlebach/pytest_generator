@@ -109,10 +109,12 @@ types_list = [
     "list[NDArray]", 
     "list[string]",
     "set[NDArray]", 
+    "eval_float",
     "set[string]",
     "dendrogram", 
     "function",
     "set[set]",
+    "integer",
     "NDArray", 
     "string",
     "float", 
@@ -155,6 +157,7 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
             fixture_args = fixture['args']  # list of strings
 
         for part in question['parts']:
+            print("===> part['type'] = ", part['type'])
             if 'fixture' in part: 
                 fixture = part['fixture']
                 fixture_name = fixture['name']
@@ -198,7 +201,7 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
             test_code += f"    answer = student_answer\\n"
 
             #assertion = f"type_handlers['types']['{part['type']}']['assert'].format(answer_var='answer')"
-            struct_msg = f"type_handlers['types']['{part['type']}']['struct_msg'].format(answer_var='answer')"
+            #struct_msg = f"type_handlers['types']['{part['type']}']['struct_msg'].format(answer_var='answer')"
 
             if part['type'] == 'float_range':
                 min_value, max_value = part['range']
@@ -228,15 +231,17 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
                 assertion = eval(f"type_handlers['types']['{part['type']}']['assert_structure']")  # Only difference
                 keys = part.get('keys', None) ### <<<< different: optional keys to consider (temporary)
                 test_code += f"    keys = {keys}\\n"
+
                 if eval(import_file):
                     test_code += f"    import {eval(import_file)}\\n"
+
                 test_code += f"    msg = \\"{assertion}\\"\\n"
                 test_code +=  "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys}\\n"
 
                 if 'locals' in part:
                     local_vars_dict = part['locals']
                     test_code += f"    local_vars_dict = {local_vars_dict}\\n"
-                    test_code +=  "    local_namespace['local_vars_dict'] = {local_vars_dict}\\n"
+                    test_code +=  "    local_namespace['local_vars_dict'] = local_vars_dict\\n"
 
                 test_code +=  "    is_success, explanation = eval(msg, {'__builtins__':{}}, local_namespace)\\n"
                 test_code += f"    {function_name}.explanation = explanation\\n"
@@ -247,6 +252,7 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
                 assertion = f"type_handlers['types']['{part['type']}']['assert'].format(answer_var='answer')"
                 #error_msg = repr(f"{part['id']} not in valid")
                 # Do not add additional quotes if they are already present
+                print("ELSE, part= ", part)
                 error_msg = str(struct_msg)
                 test_code += f"    error_msg = {error_msg}\\n"
                 explanation = repr(f"{{error_msg}}\\n")  # Change in accordance to structure check

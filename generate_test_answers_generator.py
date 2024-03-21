@@ -170,6 +170,7 @@ with open('type_handlers.yaml', 'r') as f:
         fixture = None
 
     for question in questions_data['questions']:
+        print("\\n===> question: ", question)
         max_score_q = question.get('max_score', max_score)
 
         if 'fixture' in question: 
@@ -178,6 +179,10 @@ with open('type_handlers.yaml', 'r') as f:
             fixture_args = fixture['args']  # list of strings
 
         for part in question['parts']:
+            print("xxxxxx part: ", part)
+            print("xxxxxx part['type']: ", part['type'])
+            if part['id'] in types_list: 
+                raise "ERROR"
             if 'fixture' in part: 
                 fixture = part['fixture']
                 fixture_name = fixture['name']
