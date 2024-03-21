@@ -26,7 +26,7 @@ def with_custom_sys_path(path, func, *args, **kwargs):
     :param kwargs: Keyword arguments to pass to the function
     """
     original_sys_path = list(sys.path)
-    print("==> with_custom_sys_path, args: ", args)
+    #print("==> with_custom_sys_path, args: ", args)
     #print("==> func: ", func)
     #print("==> args: ", args)
     #print("==> **kwargs: ", **kwargs)
@@ -49,24 +49,24 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
     :param directory: Directory from which to load the module
     :return: The result of the module's `compute` function
     """
-    print("INSIDE load_and_run_module")
+    #print("INSIDE load_and_run_module")
     original_cwd = os.getcwd()
     os.chdir(directory)
     try:
-        print("===> module_name: ", module_name)
-        print("===> import directory: ", directory)
+        #print("===> module_name: ", module_name)
+        #print("===> import directory: ", directory)
         module = importlib.import_module(directory + "." + module_name)
         # module = importlib.import_module(module_name) # orig
         """
         To execute, `result = module.question1()`
         invoke  `load_and_run_module(module, directory, 'question1')
         """
-        print("==> module: ", module, type(module))
-        print("==> function_name: ", function_name, type(function_name))
+        #print("==> module: ", module, type(module))
+        #print("==> function_name: ", function_name, type(function_name))
         func_to_run = getattr(module, function_name)
-        print("==> func_to_run: ", func_to_run.__name__)
-        print("args: ", args)
-        print("kwargs: ", kwargs)
+        #print("==> func_to_run: ", func_to_run.__name__)
+        #print("args: ", args)
+        #print("kwargs: ", kwargs)
         result = func_to_run(*args)
     finally:
         os.chdir(original_cwd)

@@ -241,7 +241,7 @@ with open('type_handlers.yaml', 'r') as f:
             test_code = evaluate_answers(questions_data, question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
                                          decode_i_call_str, decode_s_call_str, fixture, part, function_name)
 
-            test_code += f"    print(f'{is_fixture=}, {is_student_file=}, {is_instructor_file=}')\\n"
+            #test_code += f"    print(f'{is_fixture=}, {is_student_file=}, {is_instructor_file=}')\\n"
             #test_code += f"    answer = student_answer\\n"
 
             if part['type'] in types_list: 

@@ -47,8 +47,8 @@ def return_value(status, msg_list, s_answ, i_answ):
         msg_list.append("Answer is correct")
     else:
         msg_list.append("Answer is incorrect.")
-        msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
-        msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
+    msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
+    msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
 
     return status, "\n".join(msg_list)
 
@@ -114,7 +114,9 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
     status = True
     s_answ = student_answer
     i_answ = instructor_answer
-    s_answ = s_answ.replace('^', '**')
+    #s_answ = s_answ.replace('^', '**')
+    s_answ = s_answ.replace('x', '*')
+    s_answ = s_answ.replace('X', '*')
     i_answ = i_answ.replace('^', '**')
     random_values = {}
     local_dct = {}
@@ -293,8 +295,6 @@ def check_structure_string(student_answer, instructor_answer):
 def check_answer_explain_string(student_answer, instructor_answer):   
     msg_list = []
     status = True
-    #print(f"===> check_answer_explain_string, {student_answer=}")
-    #print(f"===> check_answer_explain_string, {instructor_answer=}")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
@@ -469,15 +469,15 @@ def check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_t
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
     """
-    print("check_structure_dict_string_NDArray")
+    #print("check_structure_dict_string_NDArray")
     status = True
     msg_list = []
 
-    print(f"arg: {keys=}")
+    #print(f"arg: {keys=}")
     keys = keys if keys else list(instructor_answer.keys())
 
     instructor_keys = set(keys)
-    print(f"{instructor_keys=}")
+    #print(f"{instructor_keys=}")
     instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
 
     student_keys = set(student_answer.keys())
@@ -493,7 +493,7 @@ def check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_t
         # some keys are filtered. Student is allowed to have 
         # keys not in the instructor set
         for k, v in instructor_answer.items():
-            print("==> key: ", k)
+            #print("==> key: ", k)
             vs = student_answer[k]
             if not isinstance(vs, type(np.zeros(1))): 
                 msg_list.append(f"- answer[{repr(k)}] should be a numpy array.")
@@ -968,7 +968,7 @@ def check_structure_dendrogram(student_dendro, instructor_dendro):
 
 def check_answer_int(student_answer, instructor_answer):
     msg_list = []
-    print("===> inside check_answer_int, integer")
+    #print("===> inside check_answer_int, integer")
 
     if student_answer != instructor_answer:
         status = False
@@ -982,7 +982,7 @@ def check_answer_int(student_answer, instructor_answer):
 def check_structure_int(student_answer, instructor_answer):
     """
     """
-    print("===> inside check_structure_int, integer")
+    #print("===> inside check_structure_int, integer")
     if not isinstance(student_answer, int):
         status = False
         msg_list = [f"Answer must be of type 'int'. Your answer is of type {type(student_answer)}."]
@@ -1003,7 +1003,7 @@ def check_answer_bool(student_answer, instructor_answer):
     else:
         status = True
 
-    print("==> bool msg_list= ", msg_list)
+    #print("==> bool msg_list= ", msg_list)
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
