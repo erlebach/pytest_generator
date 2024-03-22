@@ -267,10 +267,17 @@ with open('type_handlers.yaml', 'r') as f:
 
                 test_code +=  "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys}\\n"
 
-                if 'locals' in part:
-                    local_vars_dict = part['locals']
+                local_vars_dict = part.get('locals', None)
+                if local_vars_dict:
+                    #if 'locals' in part:
                     test_code += f"    local_vars_dict = {local_vars_dict}\\n"
                     test_code +=  "    local_namespace['local_vars_dict'] = local_vars_dict\\n"
+
+                # One of a finite number of choices for string type
+                choices = part.get('choices', None)
+                if choices:
+                    test_code += f"    choices = {choices}\\n"
+                    test_code +=  "    local_namespace['choices'] = choices\\n"
 
                 test_code +=  "    is_success, explanation_structure = eval(msg_structure, {'__builtins__':{}}, local_namespace)\\n"
                 test_code +=  "    if is_success:\\n"

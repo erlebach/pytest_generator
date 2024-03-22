@@ -2,6 +2,7 @@
 
 import ast
 import yaml
+import re
 import numpy as np
 import inspect  # <<<<
 import random
@@ -296,11 +297,35 @@ def check_answer_string(student_answer, instructor_answer):
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
-def check_structure_string(student_answer, instructor_answer):
-    if not isinstance(student_answer, str):
-        return False, "- Answer must be of type 'str'"
+# MUST FIX
+def check_structure_string(student_answer, instructor_answer, choices):
+    """
+    choices: list of strings
+    """
+    status = True
+    msg_list = []
 
-    return True, "Type 'str' is correct"
+    # clean choices (lower, strip, '  ' -> ' ')
+    student_answer = clean_str_answer(student_answer)
+
+    # Ideally, should be done when yaml file is preprocessed
+    # All strings should be lowered at that time. 
+    #choices = [clean_str_answer(s) for s in choices] 
+
+    if not isinstance(student_answer, str):
+        status = False
+        msg_list +=["- Answer must be of type 'str'"]
+    else:
+        msg_list += ["- type 'str' is correct"]
+
+    if status and choices != []:
+        if not student_answer in choices: 
+            status = False
+            msg_list += [f"- Answer must be one of {choices}"]
+        else:
+            msg_list += [f"- Answer {repr(student_answer)} is among the valid choices"]
+
+    return status, "\n".join(msg_list)
 
 # ======================================================================
 

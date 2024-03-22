@@ -164,12 +164,12 @@ types:
   str:
     import: ""
     assert_answer: "assert_utilities.check_answer_string(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer, choices)"
 
   string:
     import: ""
     assert_answer: "assert_utilities.check_answer_string(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer, choices)"
 
   # Evaluate to a float
   eval_float:

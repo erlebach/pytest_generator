@@ -238,10 +238,19 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
                 test_code += f"    msg = \\"{assertion}\\"\\n"
                 test_code +=  "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys}\\n"
 
-                if 'locals' in part:
-                    local_vars_dict = part['locals']
+                local_vars_dict = part.get('local_vars_dict', None)
+                if local_vars_dict:
                     test_code += f"    local_vars_dict = {local_vars_dict}\\n"
                     test_code +=  "    local_namespace['local_vars_dict'] = local_vars_dict\\n"
+
+                # One of a finite number of choices for string type
+                choices = part.get('choices', None)
+                if not choices and (part['type'] == 'string' or part['type'] == 'str'):
+                    choices = []
+
+                if choices is not None:
+                    test_code += f"    choices = {choices}\\n"
+                    test_code +=  "    local_namespace['choices'] = choices\\n"
 
                 test_code +=  "    is_success, explanation = eval(msg, {'__builtins__':{}}, local_namespace)\\n"
                 test_code += f"    {function_name}.explanation = explanation\\n"
@@ -260,15 +269,16 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
                 test_code += f"    {function_name}.explanation = explanation\\n"
                 test_code += f"    assert eval({assertion}), {error_msg}\\n"
 
-            if 'choices' in part:
-                part_choices = repr(part['choices'])
-                test_code += "    for el in answer:\\n"
-                # Join the choices into a single string with each choice quoted, separated by commas
-                choices_str = ', '.join([f"'{choice}'" for choice in part['choices']])
-                # Use the constructed choices_str in the assertion message
-                # TODO: return to an earlier solution using the f\\" techqnique. 
-                test_code += f"        assert el in {repr(part['choices'])}, f\\"Element {{repr(el)}} not in [{choices_str}]\\"\\n"
-                test_code +=  "    print('choices NOT HANDLED')\\n"
+            ### WHAT IS THIS? 
+#            if 'choices' in part:
+#                part_choices = repr(part['choices'])
+#                test_code += "    for el in answer:\\n"
+#                # Join the choices into a single string with each choice quoted, separated by commas
+#                choices_str = ', '.join([f"'{choice}'" for choice in part['choices']])
+#                # Use the constructed choices_str in the assertion message
+#                # TODO: return to an earlier solution using the f\\" techqnique. 
+#                test_code += f"        assert el in {repr(part['choices'])}, f'Element {{repr(el)}} not in [{choices_str}]'\\n"
+#                test_code +=  "    print('choices NOT HANDLED')\\n"
 
             if assert_false:
                 test_code += f"    assert False\\n"
