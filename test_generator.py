@@ -1,12 +1,12 @@
 
+import re
 import yaml
 import pytest
-import re
+import argparse
+from types_list import types_list
 from generator_utils import sanitize_function_name
 from generator_utils import get_decoded_str
 from generator_utils import evaluate_answers
-import argparse
-from types_list import types_list
 
 with open('type_handlers.yaml') as f:
     type_handlers = yaml.safe_load(f)
@@ -54,7 +54,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
         fixture = None
 
     for question in questions_data['questions']:
-        #print("\n===> question: ", question)
         max_score_q = question.get('max_score', max_score)
 
         if 'fixture' in question: 
@@ -101,6 +100,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
             fixture_name = fixture['name'] if is_fixture else None
             if is_fixture and fixture_name is None:
                 raise "Fixture name is not defined"
+
             test_code = evaluate_answers(questions_data, question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
                                          decode_i_call_str, decode_s_call_str, fixture, part, function_name)
 
@@ -109,9 +109,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                 part_type = repr(f"{part['type']}")
                 tol = part.get('rel_tol', 0.001)
                 test_code += f"    tol = {tol}\n"
-                ## Answer is the student answer
-                # QUESTION: perhaps I should first check for structure, and if structure passes, then check answer. 
-                # If structure does not pass, give a zero for the answer. 
                 assertion_answer = eval(f"type_handlers['types']['{part['type']}']['assert_answer']")  # Only difference
                 assertion_structure = eval(f"type_handlers['types']['{part['type']}']['assert_structure']")  # Only difference
                 keys = part.get('keys', None) ### <<<< different: optional keys to consider (temporary)
