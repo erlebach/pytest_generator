@@ -37,7 +37,7 @@ with open('type_handlers.yaml', 'r') as f:
 """
 
 
-def generate_test_answers_code(questions_data, output_file='test_answers.py'):
+def generate_test_answers_code(questions_data, sim_type, output_file='test_answers.py'):
     module_ = questions_data["module"]
     test_code = function_header_str
     max_score = questions_data.get('max_score', 0.)
@@ -54,7 +54,7 @@ def generate_test_answers_code(questions_data, output_file='test_answers.py'):
         fixture = None
 
     for question in questions_data['questions']:
-        print("\n===> question: ", question)
+        #print("\n===> question: ", question)
         max_score_q = question.get('max_score', max_score)
 
         if 'fixture' in question: 
@@ -76,22 +76,9 @@ def generate_test_answers_code(questions_data, output_file='test_answers.py'):
             decode_i_call_str = get_decoded_str(questions_data, part, 'i_answer', 'instructor_file')
             decode_s_call_str = get_decoded_str(questions_data, part, 's_answer', 'student_file')
 
-            '''  # I am not sure this is required. Not in structure genreation
-            # Ensure the encoded answer is properly escaped for inclusion in a double-quoted string
-            if questions_data.get('answer_source', 'yaml_file') == "instructor_file":
-                encoded_answer_str = None
-            else:
-                # test that ['answer'] is in part
-                try:
-                    encoded_answer_str = part['answer'].replace('"', '\"')
-                except KeyError as e:
-                    print(f"Error for question {repr(part['id'])}:")   # <<<< why this happening. 
-                    print("Question: Missing required key: 'answer' since answer_source is not 'instructor_file'")
-                    encoded_answer_str = None
-            '''
-
             test_code += f"\n@max_score({max_score_part})\n"
             test_code +=  "@hide_errors('')\n"
+
             if fixture:
                 test_code +=  f"def {function_name}({fixture_name}):\n"
             else:
@@ -117,9 +104,6 @@ def generate_test_answers_code(questions_data, output_file='test_answers.py'):
             test_code = evaluate_answers(questions_data, question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
                                          decode_i_call_str, decode_s_call_str, fixture, part, function_name)
 
-            #test_code += f"    print(f'{is_fixture=}, {is_student_file=}, {is_instructor_file=}')\n"
-            #test_code += f"    answer = student_answer\n"
-
             if part['type'] in types_list: 
                 import_file = f"type_handlers['types']['{part['type']}']['import']"
                 part_type = repr(f"{part['type']}")
@@ -132,9 +116,9 @@ def generate_test_answers_code(questions_data, output_file='test_answers.py'):
                 assertion_structure = eval(f"type_handlers['types']['{part['type']}']['assert_structure']")  # Only difference
                 keys = part.get('keys', None) ### <<<< different: optional keys to consider (temporary)
                 test_code += f"    keys = {keys}\n"
+
                 if eval(import_file):
                     test_code += f"    import {eval(import_file)}\n"
-
 
                 # Check structures
                 test_code += f"    msg_structure = \"{assertion_structure}\"\n"
@@ -150,8 +134,11 @@ def generate_test_answers_code(questions_data, output_file='test_answers.py'):
                     test_code +=  "    local_namespace['local_vars_dict'] = local_vars_dict\n"
 
                 # One of a finite number of choices for string type
-                choices = part.get('choices', None)
-                if choices:
+                choices = part.get('choices', [])
+                if type == 'string' or type == 'str':
+                    choices = []
+
+                if choices is not None:
                     test_code += f"    choices = {choices}\n"
                     test_code +=  "    local_namespace['choices'] = choices\n"
 
@@ -182,14 +169,15 @@ def generate_test_answers_code(questions_data, output_file='test_answers.py'):
 # generate_test_answers_code(questions_data)
 
 # NEW
-def main(yaml_name):
+def main(yaml_name, sim_type):
     questions_data = load_yaml_file(yaml_name) 
-    generate_test_answers_code(questions_data, f"test_answers_{yaml_name[:-5]}.py")
+    generate_test_answers_code(questions_data, sim_type, f"test_{sim_type}_{yaml_name[:-5]}.py")
 
 # ----------------------------------------------------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Pass in the name of the input yaml file.")
     parser.add_argument("-y", "--yaml", help="Name of the yaml file", required=True)
+    parser.add_argument("-t", "--simtype", help="'answers' or 'structure'", required=True)
     args = parser.parse_args()
-    main(args.yaml)
+    main(args.yaml, args.simtype)
 

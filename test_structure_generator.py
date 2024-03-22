@@ -5,7 +5,6 @@ from generator_utils import sanitize_function_name
 from generator_utils import get_decoded_str
 from generator_utils import evaluate_answers
 import argparse
-#import test_utils as u
 from types_list import types_list
 
 with open('type_handlers.yaml') as f:
