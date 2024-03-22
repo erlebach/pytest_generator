@@ -51,4 +51,27 @@ def sanitize_function_name(name):
         name = '_' + name
     
     return name
+#----------------------------------------------------------------------
+def get_decoded_str(questions_data, part, answer_key, source_file):
+    # Ensure the encoded answer is properly escaped for inclusion in a double-quoted string
+    # keys 'i_answer_source' and 's_answer_source' should be in yaml file
+    if questions_data.get(answer_key+'_source', 'yaml_file') == source_file:
+        encoded_answer_str = None
+    else:
+        # test that ['answer'] is in part
+        #print("part= ", part)
+        if answer_key in part and isinstance(part[answer_key], str):
+            encoded_answer_str = part[answer_key].replace('"', '"')
+            #print(f"{encoded_answer_str=}")
+        else:
+            print(f"'part' should contain the key {repr(answer_key)} (str)")
+            print(f"'part' read answer from the instructor/student file")
+            encoded_answer_str = None   # <<< WRONG
 
+        # Construct the call to decode_data as a string
+        # encoded_answer_str not yet defined. 
+        # So I need to handle multiple answers. 
+        decode_call_str = f'''u.decode_data("{encoded_answer_str}")''' if encoded_answer_str else None
+        #print(f"{decode_call_str=}")
+        return decode_call_str
+#----------------------------------------------------------------------
