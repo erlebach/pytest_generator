@@ -145,3 +145,9 @@ TODO:
   - To create more composite types, I could compose the functions in assert_utilities. 
   - Add a LLM component to these tests, which can be optionally turned on or off. 
 ----------------------------------------------------------------------
+2024-03-22_11:40
+- I now only have test_generator.py
+- The code is greatly simplified. 
+- ISSUE: structure: explanation is null (should be easily fixable). 
+- Think of how to add LLM. 
+----------------------------------------------------------------------

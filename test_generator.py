@@ -135,7 +135,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
                 # One of a finite number of choices for string type
                 choices = part.get('choices', [])
-                if type == 'string' or type == 'str':
+                if choices == [] and (type == 'string' or type == 'str'):
                     choices = []
 
                 if choices is not None:
@@ -143,15 +143,19 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                     test_code +=  "    local_namespace['choices'] = choices\n"
 
                 test_code +=  "    is_success, explanation_structure = eval(msg_structure, {'__builtins__':{}}, local_namespace)\n"
-                test_code +=  "    if is_success:\n"
-                test_code +=  "        is_success, explanation_answer    = eval(msg_answer,    {'__builtins__':{}}, local_namespace)\n"
-                test_code +=  "    else: \n"
-                test_code +=  "        explanation_answer = 'Failed structural tests, No grade for answer component\\n.' \n"
-                test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
-                test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
-                test_code +=  "    explanation = '\\n'.join(['Structure tests:', explanation_structure, 'Answer tests:', explanation_answer])\n"
+
+                if sim_type == 'answers':
+                    test_code +=  "    if is_success:\n"
+                    test_code +=  "        is_success, explanation_answer    = eval(msg_answer,    {'__builtins__':{}}, local_namespace)\n"
+                    test_code +=  "    else: \n"
+                    test_code +=  "        explanation_answer = 'Failed structural tests, No grade for answer component\\n.' \n"
+                    test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
+                    test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
+
+                test_code +=  "    explanation = '\\n'.join(['Structure tests:', explanation_structure])\n"
                 test_code += f"    {function_name}.explanation = explanation\n"
                 test_code += f"    assert is_success\n"
+
             else:
                 test_code += f"    print('type {part['type']} NOT HANDLED!')\n"
 
