@@ -1,11 +1,16 @@
-# Update files from test_generator
+#!/bin/bash
 
-\cp test_generator/tests/test_*.py tests/
-\cp test_generator/type_handlers.yaml .
-\cp test_generator/assert_utilities.py .
-\cp test_generator/test_utils.py .
-\cp test_generator/tests/my_fixtures.py tests/
-\cp test_generator/run_debug.x test_generator/run_tests.x .
-\cp test_generator/generator_config.yaml .
-\cp test_generator/tests/my_fixtures.py .
-\cp -rf test_generator/pytest_utils .
+# Update files from pytest_generator
+
+\cp pytest_generator/generator_config.yaml .
+\cp pytest_generator/type_handlers.yaml .
+\cp pytest_generator/hw4.yaml .
+\cp pytest_generator/assert_utilities.py .
+\cp pytest_generator/test_utils.py .
+\cp pytest_generator/tests/test_*.py tests/
+\cp pytest_generator/tests/my_fixtures.py tests/
+\cp -rf pytest_generator/pytest_utils .
+\cp pytest_generator/run_tests.x .
+\cp pytest_generator/student_code_with_answers/*.py student_code_with_answers/
+\cp pytest_generator/instructor_code_with_answers/*.py instructor_code_with_answers/
+\cp pytest_generator/student_github_template/*.py student_github_template/

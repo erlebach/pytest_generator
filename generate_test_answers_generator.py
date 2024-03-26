@@ -44,8 +44,12 @@ def get_decoded_str(questions_data, part, answer_key, source_file):
         #print(f"{decode_call_str=}")
         return decode_call_str
 
-def evaluate_answers(test_code, is_fixture, is_instructor_file, is_student_file, 
+def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_instructor_file, is_student_file, 
                     decode_i_call_str, decode_s_call_str, fixture, part, function_name):
+
+    student_directory = questions_data['student_folder_name']
+    instructor_directory = questions_data['instructor_folder_name']
+
     if not is_fixture and not is_instructor_file:  # yaml file
         test_code += f"    correct_answer = eval('{decode_i_call_str}')\\n"
     elif not is_fixture and is_instructor_file:
@@ -54,15 +58,20 @@ def evaluate_answers(test_code, is_fixture, is_instructor_file, is_student_file,
     elif is_fixture and is_instructor_file:
         fixture_args = fixture['args']
         fixture_name = fixture['name']
-        question_id = f"{repr(part['id'])}"
-        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, 'i')\\n"
-        test_code += f"    if {question_id} not in correct_answer:\\n"
-        explanation = repr(f"Key: {question_id} not found.\\n")  # Change in accordance to structure check
+        module_function_name = question_id   # name of function in student/instructor module
+        part_id = f"{repr(part['id'])}"
+        test_code += f"    kwargs = {{'student_directory': {repr(student_directory)} , 'instructor_directory': {repr(instructor_directory)}}}\\n"
+        # 2024-03-19
+        # I should be able to generalize this so that the first argument is *fixture_args, which would allow fixtures with 
+        # either no args or multiple args before module_function_name, 'i', and **kwargs
+        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i', **kwargs)\\n"
+        test_code += f"    if {part_id} not in correct_answer:\\n"
+        explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
         test_code += f"        {function_name}.explanation = explanation\\n"
         test_code += f"        assert False\\n"
         test_code += f"    else:\\n"
-        test_code += f"        correct_answer = correct_answer[{question_id}]\\n"
+        test_code += f"        correct_answer = correct_answer[{part_id}]\\n"
     else:  # fixture, yaml file
         test_code += f"    correct_answer = eval('{decode_i_call_str}')\\n"
 
@@ -73,16 +82,18 @@ def evaluate_answers(test_code, is_fixture, is_instructor_file, is_student_file,
         #test_code += f"    student_answer = eval('{decode_call_str}')\\n"
     elif is_fixture and is_student_file:
         fixture_args = fixture['args']
+        #fixture_name = fixture['name']
         fixture_name = fixture['name']
-        question_id = f"{repr(part['id'])}"
-        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, 's')\\n"
-        test_code += f"    if {question_id} not in student_answer:\\n"
-        explanation = repr(f"Key: {question_id} not found.\\n")  # Change in accordance to structure check
+        module_function_name = question_id   # name of function in student/instructor module
+        part_id = f"{repr(part['id'])}"
+        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's', **kwargs)\\n"
+        test_code += f"    if {part_id} not in student_answer:\\n"
+        explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
         test_code += f"        {function_name}.explanation = explanation\\n"
         test_code += f"        assert False\\n"
         test_code += f"    else:\\n"
-        test_code += f"        student_answer = student_answer[{question_id}]\\n"
+        test_code += f"        student_answer = student_answer[{part_id}]\\n"
     else:  # fixture, yaml file
         test_code += f"    student_answer = eval('{decode_s_call_str}')\\n"
     return test_code
@@ -105,13 +116,14 @@ types_list = [
     "list[string]",
     "set[NDArray]", 
     "set[string]",
-    "dendrogram", 
     "eval_float",
+    "dendrogram", 
     "function",
     "set[set]",
     "NDArray", 
+    "integer",
     "string",
-    "list",
+    "float", 
     "bool",
     "dict",
     "int",
@@ -119,6 +131,7 @@ types_list = [
     #"float",
     #"choice",
     #"set",
+    #"list"
 ]
 
 def generate_test_answers_code(questions_data, output_file='test_answers.py'):
@@ -129,8 +142,8 @@ from pytest_utils.decorators import max_score, visibility, hide_errors
 import instructor_code_with_answers.{module_} as ic
 from testing_utilities import assert_almost_equal
 import assert_utilities  # <<< SHOULD be specified in config
-from student_code_with_answers import *
-import instructor_code_with_answers as sc
+#from student_code_with_answers import *
+import student_code_with_answers as sc
 from {fixture_import_file} import *   
 # Not clear why 'import conftest' does not work
 import tests.conftest as c
@@ -144,10 +157,11 @@ import {fixture_import_file}
 with open('type_handlers.yaml', 'r') as f:
     type_handlers = yaml.safe_load(f)
 '''
-    if 'max_score' in questions_data: 
-        max_score = questions_data['max_score']
-    else:
-        max_score = 0.
+    max_score = questions_data.get('max_score', 0.)
+
+    fixture = questions_data.get("fixtures", {})
+    fixture_name = fixture.get('name', "")
+    fixture_args = fixture.get('args', [])
 
     if 'fixtures' in questions_data: 
         fixture = questions_data['fixtures']['fixture']
@@ -157,10 +171,8 @@ with open('type_handlers.yaml', 'r') as f:
         fixture = None
 
     for question in questions_data['questions']:
-        if 'max_score' in question: 
-            max_score_q = question['max_score']
-        else:
-            max_score_q = max_score
+        print("\\n===> question: ", question)
+        max_score_q = question.get('max_score', max_score)
 
         if 'fixture' in question: 
             fixture = question['fixture']
@@ -168,7 +180,17 @@ with open('type_handlers.yaml', 'r') as f:
             fixture_args = fixture['args']  # list of strings
 
         for part in question['parts']:
+            #print("xxxxxx part: ", part)
+            #print("xxxxxx part['type']: ", part['type'])
+            #if part['id'] in types_list: 
+                #raise "ERROR"
+            if 'fixture' in part: 
+                fixture = part['fixture']
+                fixture_name = fixture['name']
+                fixture_args = fixture['args']  # list of strings
+
             part_id_sanitized = part['id'].replace(' ', '_').replace('(', '').replace(')', '').replace('|', '_').replace('=', '_')
+            max_score_part = part.get('max_score', max_score_q)
             function_name = f"test_answers_{question['id']}_{part_id_sanitized}_{part['type']}"
             function_name = sanitize_function_name(function_name)
 
@@ -192,9 +214,12 @@ with open('type_handlers.yaml', 'r') as f:
             ## Construct the call to decode_data as a string
             #decode_call_str = f'''u.decode_data("{encoded_answer_str}")'''
 
-            test_code += f"\\n@max_score({max_score_q})\\n"
+            test_code += f"\\n@max_score({max_score_part})\\n"
             test_code +=  "@hide_errors('')\\n"
-            test_code +=  f"def {function_name}({fixture_name}):\\n"
+            if fixture:
+                test_code +=  f"def {function_name}({fixture_name}):\\n"
+            else:
+                test_code += f"def {function_name}():\\n"
 
             is_fixture = fixture is not None and isinstance(fixture_args, list) and len(fixture_args) > 0
             is_instructor_file = questions_data.get('i_answer_source', 'yaml_file') == "instructor_file"
@@ -213,10 +238,10 @@ with open('type_handlers.yaml', 'r') as f:
             fixture_name = fixture['name'] if is_fixture else None
             if is_fixture and fixture_name is None:
                 raise "Fixture name is not defined"
-            test_code = evaluate_answers(test_code, is_fixture, is_instructor_file, is_student_file, 
+            test_code = evaluate_answers(questions_data, question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
                                          decode_i_call_str, decode_s_call_str, fixture, part, function_name)
 
-            test_code += f"    print(f'{is_fixture=}, {is_student_file=}, {is_instructor_file=}')\\n"
+            #test_code += f"    print(f'{is_fixture=}, {is_student_file=}, {is_instructor_file=}')\\n"
             #test_code += f"    answer = student_answer\\n"
 
             if part['type'] in types_list: 
@@ -241,16 +266,29 @@ with open('type_handlers.yaml', 'r') as f:
                 test_code += f"    msg_answer = \\"{assertion_answer}\\"\\n"
 
                 test_code +=  "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys}\\n"
+
+                local_vars_dict = part.get('locals', None)
+                if local_vars_dict:
+                    #if 'locals' in part:
+                    test_code += f"    local_vars_dict = {local_vars_dict}\\n"
+                    test_code +=  "    local_namespace['local_vars_dict'] = local_vars_dict\\n"
+
+                # One of a finite number of choices for string type
+                choices = part.get('choices', None)
+                if choices:
+                    test_code += f"    choices = {choices}\\n"
+                    test_code +=  "    local_namespace['choices'] = choices\\n"
+
                 test_code +=  "    is_success, explanation_structure = eval(msg_structure, {'__builtins__':{}}, local_namespace)\\n"
                 test_code +=  "    if is_success:\\n"
                 test_code +=  "        is_success, explanation_answer    = eval(msg_answer,    {'__builtins__':{}}, local_namespace)\\n"
                 test_code +=  "    else: \\n"
-                test_code +=  "        explanation_answer = \\"\\" \\n"
+                test_code +=  "        explanation_answer = 'Failed structural tests, No grade for answer component\\\\n.' \\n"
+                test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\\\n'\\n"
+                test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\\n"
                 test_code +=  "    explanation = '\\\\n'.join(['Structure tests:', explanation_structure, 'Answer tests:', explanation_answer])\\n"
                 test_code += f"    {function_name}.explanation = explanation\\n"
                 test_code += f"    assert is_success\\n"
-
-
             else:
                 test_code += f"    print('type {part['type']} NOT HANDLED!')\\n"
 

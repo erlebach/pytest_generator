@@ -1,8 +1,11 @@
 #" assert_utilities.py
 
+import ast
 import yaml
+import re
 import numpy as np
 import inspect  # <<<<
+import random
 import math
 
 # ......................................................................
@@ -46,8 +49,8 @@ def return_value(status, msg_list, s_answ, i_answ):
         msg_list.append("Answer is correct")
     else:
         msg_list.append("Answer is incorrect.")
-        msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
-        msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
+    msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
+    msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
 
     return status, "\n".join(msg_list)
 
@@ -73,15 +76,96 @@ def are_sets_equal(set1, set2, rtol=1e-5, atol=1e-6):
   return True
 
 # ======================================================================
+def check_answer_float(student_answer, instructor_answer, rel_tol):
+    """
+    Check answer correctness. Assume the structure is correct.
+    """
+    abs_err = math.fabs(student_answer - instructor_answer)
+    is_abs = False  # irrelevant if rel error criteria is satisfied
+
+    if math.fabs(instructor_answer) > 1.e-8:
+        is_rel = (student_answer - instructor_answer) / instructor_answer < rel_tol
+    else:
+        is_abs = abs_err < 1.e-8
+        is_rel = False
+
+    if is_rel:
+        status = True
+        msg_list = [f"Answer is correct to within relative error: {100*rel_tol}%"]
+    elif is_abs:
+        status = True
+        msg_list = [f"Answer is correct to within absolute error: {1.e-8}"]
+    else:
+        status = False
+        msg_list = [f"Answer is incorrect"]
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+def check_structure_float(student_answer, instructor_answer):
+    if isinstance(student_answer, float):
+        status = True
+        msg_list = ["Answer is of type float as expected."]
+    else:
+        status = False
+        msg_list = [f"Answer should be of type float. It is of type {type(student_answer)}"]
+    return status, "\n".join(msg_list)
+# ======================================================================
+def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
+    msg_list = []
+    status = True
+    s_answ = student_answer
+    i_answ = instructor_answer
+    #s_answ = s_answ.replace('^', '**')
+    s_answ = s_answ.replace('x', '*')
+    s_answ = s_answ.replace('X', '*')
+    i_answ = i_answ.replace('^', '**')
+    random_values = {}
+    local_dct = {}
+
+    for i, _ in enumerate(range(3)):
+        for var, (lower, upper) in local_vars_dict.items():
+            random_values[var] = random.uniform(lower, upper)
+            local_dct[var] = random_values[var]
+        s_float = eval(s_answ, {}, local_dct)
+        i_float = eval(i_answ, {}, local_dct)
+        if math.fabs(i_float) < 1.e-5:
+            abs_err = math.fabs(i_float - s_float)
+            ae_status = abs_err < 1.e-5
+            status *= ae_status
+            if not ae_status:
+                msg_list += ["Absolute error > 1.e-5"]
+        else:
+            rel_err = math.fabs((s_float - i_float) / i_float)
+            re_status = rel_err < rel_tol
+            status *= re_status
+            if not re_status:
+                msg_list += [f"Relative error > {rel_tol}"]
+            else:
+                msg_list += [f"Relative error < {rel_tol}"]
+        
+    return return_value(status, msg_list, s_answ, i_answ)
+
+# ======================================================================
+def check_structure_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
+    print("\nENTER check_structure_eval_float")
+    try:
+        ast.parse(student_answer, mode='eval')
+        return True, "Valid python expression"
+    except SyntaxError:
+        print("===> expression is false")
+        return False, "Your valid expression is not valid Python"
+
+# ======================================================================
 
 def check_answer_dict_string_dict_str_list(student_answer, instructor_answer):
     """
     The type is a dict[str, dict[str, list]]
     """
-    if not isinstance(answer_var, dict):
+    if not isinstance(student_answer, dict):
         return False
 
-    for k, v in answer_var.items():
+    for k, v in student_answer.items():
         if not (isinstance(k, str) and isinstance(v, dict)):
             return False
 
@@ -213,47 +297,75 @@ def check_answer_string(student_answer, instructor_answer):
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
-def check_structure_string(student_answer, instructor_answer):
-    if not isinstance(student_answer, str):
-        return False, "- Answer must be of type 'str'"
+# MUST FIX
+def check_structure_string(student_answer, instructor_answer, choices):
+    """
+    choices: list of strings
+    """
+    status = True
+    msg_list = []
 
-    return True, "Type 'str' is correct"
+    # clean choices (lower, strip, '  ' -> ' ')
+    student_answer = clean_str_answer(student_answer)
+
+    # Ideally, should be done when yaml file is preprocessed
+    # All strings should be lowered at that time. 
+    #choices = [clean_str_answer(s) for s in choices] 
+
+    if not isinstance(student_answer, str):
+        status = False
+        msg_list +=["- Answer must be of type 'str'"]
+    else:
+        msg_list += ["- type 'str' is correct"]
+
+    if status and choices != []:
+        if not student_answer in choices: 
+            status = False
+            msg_list += [f"- Answer must be one of {choices}"]
+        else:
+            msg_list += [f"- Answer {repr(student_answer)} is among the valid choices"]
+
+    return status, "\n".join(msg_list)
 
 # ======================================================================
 
-def check_answer_explain_string(answer_var):   # FIX
+def check_answer_explain_string(student_answer, instructor_answer):   
     msg_list = []
     status = True
-    return_value(status, msg_list, s_answ, i_answ)
+    return return_value(status, msg_list, student_answer, instructor_answer)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
-def check_structure_explain_string(answer_var):
+def check_structure_explain_string(student_answer, instructor_answer):   
     """
     The type is an explain_string
     The string should have a minimum number of words stored in "type_handlers.yaml"
     """
     msg_list = []
-    is_answer_type = isinstance(answer_var, str)
-    if is_answer_type:
-        msg_list.append("- Type is 'str' is correct")
+    status = True
+    if isinstance(student_answer, str):
+        status = True
+        msg_list.append("- Type 'str' is correct")
     else: 
+        status = False
         msg_list.append("- Type must be of type 'str'")
 
     # Check the number of words in the string
-    max_nb_words = 10  # WHERE IS THIS SET. Should be in configuration file. 
+    max_nb_words = 4  # WHERE IS THIS SET. Should be in configuration file. 
 
-    if is_answer_type:
-        is_nb_words = len(answer_var.split()) >= max_nb_words
+    if status:
+        is_nb_words = len(student_answer.split()) >= max_nb_words
         if is_nb_words:
             msg_list.append("- Length of answer is sufficient")
         else:
+            status = False
             msg_list.append(f"- Length of answer must be > {max_nb_words}")
 
-    return is_answer_type and is_nb_words, "\n".join(msg_list)
+    return status, "\n".join(msg_list)
 
 # ======================================================================
 
+# SOMETHING WRONG. 
 def check_answer_set_string(student_answer, instructor_answer):
     """
     s_answ: student answer: set of strings
@@ -395,15 +507,15 @@ def check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_t
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
     """
-    print("check_structure_dict_string_NDArray")
+    #print("check_structure_dict_string_NDArray")
     status = True
     msg_list = []
 
-    print(f"arg: {keys=}")
+    #print(f"arg: {keys=}")
     keys = keys if keys else list(instructor_answer.keys())
 
     instructor_keys = set(keys)
-    print(f"{instructor_keys=}")
+    #print(f"{instructor_keys=}")
     instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
 
     student_keys = set(student_answer.keys())
@@ -419,7 +531,7 @@ def check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_t
         # some keys are filtered. Student is allowed to have 
         # keys not in the instructor set
         for k, v in instructor_answer.items():
-            print("==> key: ", k)
+            #print("==> key: ", k)
             vs = student_answer[k]
             if not isinstance(vs, type(np.zeros(1))): 
                 msg_list.append(f"- answer[{repr(k)}] should be a numpy array.")
@@ -466,7 +578,7 @@ def check_structure_list_NDArray(student_answer, instructor_answer):
     """
     Check that elements in the list are NDArrays
     """
-    print("==>  structure check_structure_list_NDArray....")
+    #print("==>  structure check_structure_list_NDArray....")
     status = True
     msg_list = []
 
@@ -894,19 +1006,56 @@ def check_structure_dendrogram(student_dendro, instructor_dendro):
 
 def check_answer_int(student_answer, instructor_answer):
     msg_list = []
-    status = True
+    #print("===> inside check_answer_int, integer")
 
     if student_answer != instructor_answer:
         status = False
+    else:
+        status = True
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
 def check_structure_int(student_answer, instructor_answer):
+    """
+    """
+    #print("===> inside check_structure_int, integer")
     if not isinstance(student_answer, int):
-        return False, "Answer must be of type 'int'"
-    return True, "Type 'int' is Correct"    
+        status = False
+        msg_list = [f"Answer must be of type 'int'. Your answer is of type {type(student_answer)}."]
+    else:
+        status = True
+        msg_list = [f"Answer is of type 'int' as expected."]
+
+    return status, "\n".join(msg_list)
+
+# ======================================================================
+
+def check_answer_bool(student_answer, instructor_answer):
+    msg_list = []
+    status = True
+
+    if student_answer != instructor_answer:
+        status = False
+    else:
+        status = True
+
+    #print("==> bool msg_list= ", msg_list)
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+def check_structure_bool(student_answer, instructor_answer):
+    if not isinstance(student_answer, bool):
+        status = False
+        msg_list = [f"Answer must be of type 'bool'. Your answer is of type {type(student_answer)}."]
+    else:
+        status = True
+        msg_list = [f"Answer is of type 'bool' as expected."]
+
+    return status, "\n".join(msg_list)
 
 # ======================================================================
 
@@ -917,8 +1066,10 @@ def check_answer_list_string(student_answer, instructor_answer):
     normalized_s_answ = [s.lower().strip() for s in student_answer]
     normalized_i_answ = [s.lower().strip() for s in instructor_answer]
 
-    if normalized_s_answ != normalized_i_answ:
-        status = False
+    for s_a, i_a in zip(normalized_s_answ, normalized_i_answ):
+        if s_a != i_a:
+            status = False
+            msg_list += ["Mismatched strings"]
 
     return return_value(status, msg_list, normalized_s_answ, normalized_i_answ)
 

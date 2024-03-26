@@ -41,8 +41,12 @@ def get_decoded_str(questions_data, part, answer_key, source_file):
         #print(f"{decode_call_str=}")
         return decode_call_str
 
-def evaluate_answers(test_code, is_fixture, is_instructor_file, is_student_file, 
+def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_instructor_file, is_student_file, 
                     decode_i_call_str, decode_s_call_str, fixture, part, function_name):
+
+    student_directory = questions_data['student_folder_name']
+    instructor_directory = questions_data['instructor_folder_name']
+
     if not is_fixture and not is_instructor_file:  # yaml file
         test_code += f"    correct_answer = eval('{decode_i_call_str}')\\n"
     elif not is_fixture and is_instructor_file:
@@ -51,15 +55,17 @@ def evaluate_answers(test_code, is_fixture, is_instructor_file, is_student_file,
     elif is_fixture and is_instructor_file:
         fixture_args = fixture['args']
         fixture_name = fixture['name']
-        question_id = f"{repr(part['id'])}"
-        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, 'i')\\n"
-        test_code += f"    if {question_id} not in correct_answer:\\n"
-        explanation = repr(f"Key: {question_id} not found.\\n")  # Change in accordance to structure check
+        module_function_name = question_id   # name of function in student/instructor module
+        part_id = f"{repr(part['id'])}"
+        test_code += f"    kwargs = {{'student_directory': {repr(student_directory)} , 'instructor_directory': {repr(instructor_directory)}}}\\n"
+        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i', **kwargs)\\n"
+        test_code += f"    if {part_id} not in correct_answer:\\n"
+        explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
         test_code += f"        {function_name}.explanation = explanation\\n"
         test_code += f"        assert False\\n"
         test_code += f"    else:\\n"
-        test_code += f"        correct_answer = correct_answer[{question_id}]\\n"
+        test_code += f"        correct_answer = correct_answer[{part_id}]\\n"
     else:  # fixture, yaml file
         test_code += f"    correct_answer = eval('{decode_i_call_str}')\\n"
 
@@ -71,15 +77,16 @@ def evaluate_answers(test_code, is_fixture, is_instructor_file, is_student_file,
     elif is_fixture and is_student_file:
         fixture_args = fixture['args']
         fixture_name = fixture['name']
-        question_id = f"{repr(part['id'])}"
-        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, 's')\\n"
-        test_code += f"    if {question_id} not in student_answer:\\n"
-        explanation = repr(f"Key: {question_id} not found.\\n")  # Change in accordance to structure check
+        module_function_name = question_id   # name of function in student/instructor module
+        part_id = f"{repr(part['id'])}"
+        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's', **kwargs)\\n"
+        test_code += f"    if {part_id} not in student_answer:\\n"
+        explanation = repr(f"Key: {part_id} not found.\\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\\n"
         test_code += f"        {function_name}.explanation = explanation\\n"
         test_code += f"        assert False\\n"
         test_code += f"    else:\\n"
-        test_code += f"        student_answer = student_answer[{question_id}]\\n"
+        test_code += f"        student_answer = student_answer[{part_id}]\\n"
     else:  # fixture, yaml file
         test_code += f"    student_answer = eval('{decode_s_call_str}')\\n"
     return test_code
@@ -98,19 +105,26 @@ types_list = [
     "dict[string,NDArray]", 
     "list[list[float]]", 
     "dict[string,set]",
+    "explain_string", 
     "list[NDArray]", 
     "list[string]",
     "set[NDArray]", 
+    "eval_float",
     "set[string]",
     "dendrogram", 
     "function",
     "set[set]",
+    "integer",
     "NDArray", 
     "string",
+    "float", 
     "dict",
+    "bool",
     "int",
     #"float_range",
     #"choice"
+    #"eval_float",  # no
+    #"list", # no
 ]
 
 def generate_test_structure_code(questions_data, output_file='test_structure.py'):
@@ -118,7 +132,7 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
     test_code = "import pytest\\n"
     test_code += "import pytest\\n"
     test_code += "import assert_utilities\\n"
-    test_code += "import numpy\\n"
+    test_code += "import numpy as np\\n"
     test_code += f"from {module_} import *\\n"
     test_code += "import yaml\\n"
     test_code += "import test_utils as u\\n"
@@ -143,6 +157,12 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
             fixture_args = fixture['args']  # list of strings
 
         for part in question['parts']:
+            #print("===> part['type'] = ", part['type'])
+            if 'fixture' in part: 
+                fixture = part['fixture']
+                fixture_name = fixture['name']
+                fixture_args = fixture['args']  # list of strings
+
             part_id_sanitized = part['id'].replace(' ', '_').replace('(', '').replace(')', '').replace('|', '_').replace('=', '_')
             function_name = f"test_structure_{question['id']}_{part_id_sanitized}_{part['type']}()"
             function_name = sanitize_function_name(function_name)
@@ -174,14 +194,14 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
             fixture_name = fixture['name'] if is_fixture else None
             if is_fixture and fixture_name is None:
                 raise "Fixture name is not defined"
-            test_code = evaluate_answers(test_code, is_fixture, is_instructor_file, is_student_file, 
-                                         decode_i_call_str, decode_s_call_str, fixture, part, function_name)
+            test_code = evaluate_answers(questions_data, question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
+                                 decode_i_call_str, decode_s_call_str, fixture, part, function_name)
 
-            test_code += f"    print(f'{is_fixture=}, {is_student_file=}, {is_instructor_file=}')\\n"
+            #test_code += f"    print(f'{is_fixture=}, {is_student_file=}, {is_instructor_file=}')\\n"
             test_code += f"    answer = student_answer\\n"
 
             #assertion = f"type_handlers['types']['{part['type']}']['assert'].format(answer_var='answer')"
-            struct_msg = f"type_handlers['types']['{part['type']}']['struct_msg'].format(answer_var='answer')"
+            #struct_msg = f"type_handlers['types']['{part['type']}']['struct_msg'].format(answer_var='answer')"
 
             if part['type'] == 'float_range':
                 min_value, max_value = part['range']
@@ -211,10 +231,27 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
                 assertion = eval(f"type_handlers['types']['{part['type']}']['assert_structure']")  # Only difference
                 keys = part.get('keys', None) ### <<<< different: optional keys to consider (temporary)
                 test_code += f"    keys = {keys}\\n"
+
                 if eval(import_file):
                     test_code += f"    import {eval(import_file)}\\n"
+
                 test_code += f"    msg = \\"{assertion}\\"\\n"
                 test_code +=  "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys}\\n"
+
+                local_vars_dict = part.get('local_vars_dict', None)
+                if local_vars_dict:
+                    test_code += f"    local_vars_dict = {local_vars_dict}\\n"
+                    test_code +=  "    local_namespace['local_vars_dict'] = local_vars_dict\\n"
+
+                # One of a finite number of choices for string type
+                choices = part.get('choices', None)
+                if not choices and (part['type'] == 'string' or part['type'] == 'str'):
+                    choices = []
+
+                if choices is not None:
+                    test_code += f"    choices = {choices}\\n"
+                    test_code +=  "    local_namespace['choices'] = choices\\n"
+
                 test_code +=  "    is_success, explanation = eval(msg, {'__builtins__':{}}, local_namespace)\\n"
                 test_code += f"    {function_name}.explanation = explanation\\n"
                 test_code += f"    assert is_success\\n"
@@ -224,6 +261,7 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
                 assertion = f"type_handlers['types']['{part['type']}']['assert'].format(answer_var='answer')"
                 #error_msg = repr(f"{part['id']} not in valid")
                 # Do not add additional quotes if they are already present
+                print("ELSE, part= ", part)
                 error_msg = str(struct_msg)
                 test_code += f"    error_msg = {error_msg}\\n"
                 explanation = repr(f"{{error_msg}}\\n")  # Change in accordance to structure check
@@ -231,15 +269,16 @@ def generate_test_structure_code(questions_data, output_file='test_structure.py'
                 test_code += f"    {function_name}.explanation = explanation\\n"
                 test_code += f"    assert eval({assertion}), {error_msg}\\n"
 
-            if 'choices' in part:
-                part_choices = repr(part['choices'])
-                test_code += "    for el in answer:\\n"
-                # Join the choices into a single string with each choice quoted, separated by commas
-                choices_str = ', '.join([f"'{choice}'" for choice in part['choices']])
-                # Use the constructed choices_str in the assertion message
-                # TODO: return to an earlier solution using the f\\" techqnique. 
-                test_code += f"        assert el in {repr(part['choices'])}, f\\"Element {{repr(el)}} not in [{choices_str}]\\"\\n"
-                test_code +=  "    print('choices NOT HANDLED')\\n"
+            ### WHAT IS THIS? 
+#            if 'choices' in part:
+#                part_choices = repr(part['choices'])
+#                test_code += "    for el in answer:\\n"
+#                # Join the choices into a single string with each choice quoted, separated by commas
+#                choices_str = ', '.join([f"'{choice}'" for choice in part['choices']])
+#                # Use the constructed choices_str in the assertion message
+#                # TODO: return to an earlier solution using the f\\" techqnique. 
+#                test_code += f"        assert el in {repr(part['choices'])}, f'Element {{repr(el)}} not in [{choices_str}]'\\n"
+#                test_code +=  "    print('choices NOT HANDLED')\\n"
 
             if assert_false:
                 test_code += f"    assert False\\n"

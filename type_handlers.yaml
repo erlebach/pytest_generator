@@ -15,18 +15,19 @@ types:
 
   float:
     import: ""
-    assert: "isinstance({answer_var}, float)"
-    struct_msg: Answer should be a float. 
+    assert_answer: "assert_utilities.check_answer_float(student_answer, instructor_answer, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_float(student_answer, instructor_answer)"
 
   int:
     import: ""
     assert_answer: "assert_utilities.check_answer_int(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_int(student_answer, instructor_answer)"
+    # aliases: integer  (not yet implemented)
 
   integer:
     import: ""
-    assert: "isinstance({answer_var}, int)"
-    struct_msg: Answer should be an int. 
+    assert_answer: "assert_utilities.check_answer_int(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_int(student_answer, instructor_answer)"
 
   list:
     import: ""
@@ -40,8 +41,6 @@ types:
 
   list[set]:
     import: "" #"numpy as np"
-    #assert: "isinstance({answer_var}, list) and (isinstance({answer_var}[0], list) or isinstance({answer_var}[0], set))"
-    #struct_msg: Answer should be a list of lists or a list of sets
     assert_answer: "assert_utilities.check_answer_list_set(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_list_set(student_answer, instructor_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
@@ -55,19 +54,11 @@ types:
   list[list[float]]:
     import: ""
     # Fix for structure
-    #assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"
-    #struct_msg: Answer should be of type list[list[float]]
     assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, rel_tol)"
-    #answer_msg: "Correct answer: {instructor_answer}"
     assert_structure: "assert_utilities.check_structure_list_list_float(student_answer, instructor_answer)"
  
   list[NDArray]:
     import: "" #"numpy as np"
-    #assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"
-    # Test that the norms of the matrix are within a tolerance
-    # I should be able to test the length against the expected length, either from the instructor answer
-    #    or from the answer specified in the yaml file, or against a length specified in the yaml file. NOT DONE.
-    #assert_answer: "assert_utilities.check_answer_list_NDArray({student_answer}, {instructor_answer}, {rel_tol})"
     assert_answer: "assert_utilities.check_answer_list_NDArray(student_answer, instructor_answer, rel_tol)"
     assert_structure: "assert_utilities.check_structure_list_NDArray(student_answer, instructor_answer)"
     #answer_msg: ""
@@ -92,13 +83,14 @@ types:
 
   bool:
     import: ""
-    assert: "isinstance({answer_var}, bool)"
-    struct_msg: Answer should be a bool. 
+    assert_answer: "assert_utilities.check_answer_bool(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_bool(student_answer, instructor_answer)"
+    #struct_msg: Answer should be a bool. 
 
   choice:
     import: ""
     assert: "{answer_var} in {valid_choices}"
-    struct_msg: Answer should one of {valid_choices}. 
+    #struct_msg: Answer should one of {valid_choices}. 
 
   float_range:
     import: ""
@@ -117,18 +109,15 @@ types:
     struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
 
   dict[string,dict[str,list]]:
-    import: "assert_utilities"
+    import: ""
     assert_answer: "assert_utilities.check_answer_dict_string_dict_str_list(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_dict_string_dict_str_list(student_answer, instructor_answer)"
 
   explain_string:
-    assert_answer: "assert_utilities.check_answer_explain_string({answer_var})"
-    assert_structure: "assert_utilities.check_structure_explain_string({answer_var})"
-    #struct_msg: Answer should be a string. 
+    import: ""
+    assert_answer: "assert_utilities.check_answer_explain_string(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_explain_string(student_answer, instructor_answer)"
     min_words: 10  # Should be in the configuration file
-      #help: > 
-      #Applies only to explanatory strings. In the future, we 
-      #expect to use large-language models to handle this case. 
 
   dict[string,list]:
     import: ""
@@ -164,7 +153,7 @@ types:
   dict_str_list:
     import: ""
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
-    struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
+    truct_msg: "Answer should be dictionary, specifically: dict[str, str]."
 
 
   dict_str_dict_str_float:
@@ -172,21 +161,26 @@ types:
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, dict) and all(isinstance(sub_k, str) and isinstance(sub_v, float) for sub_k, sub_v in v.items()) for k, v in {answer_var}.items())"
     struct_msg: "Answer should be dictionary, specifically: dict[str, dict[str, float]]."
 
+  str:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_string(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer, choices)"
+
   string:
     import: ""
-    #assert: "isinstance({answer_var}, str)"
     assert_answer: "assert_utilities.check_answer_string(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer, choices)"
 
   # Evaluate to a float
   eval_float:
     import: ""
-    assert: "isinstance({answer_var}, str)"
-    struct_msg: Answer should evaluate to a float. 
+    assert_answer: "assert_utilities.check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol)"
     help: >
       A string to be evaluated using eval(). It will be important
       that the variables defined in the string be available in the 
-      context. It is not yet clear how to implement this. 
+      context. It is not yet clear how to implement this. Exponentiation is expressed 
+      with either '^' or '**'. Except for this, the string must be a valid Python expression.
 
   DecisionTreeClassifier:
     import: "from sklearn.tree import DecisionTreeClassifier"

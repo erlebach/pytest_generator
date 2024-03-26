@@ -62,6 +62,6 @@ with open('type_handlers.yaml', 'r') as f:
 if __name__ == "__main__":
     # Usage example:
     # >>> all_questions.yaml might change <<<
-    questions_data = load_yaml_file('all_questions.yaml')
+    questions_data = load_yaml_file('hw4.yaml')
     #questions_data = load_yaml_file('all_questions_hw3.yaml')
     generate_test_structure_code(questions_data)

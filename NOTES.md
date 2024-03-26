@@ -132,6 +132,12 @@ It might be possible to have only a single generator, but use options in generat
 But the fact is that the answer generator and structure generator are close. 
 Since the answer test  first runs the structure test, I should be able to control the flow within the test itself. 
 ----------------------------------------------------------------------
+2024-03-20
+- The answers are correct.  (test_answer...) although I insert errors in the py files. Something not right. 
+- running the generator updates the files in tests/  (I checked htis)
+- type:int is treated properly
+  type:integer is not.o Yet they are both defined the same way in assert_utilities. BUT without resolution.
+----------------------------------------------------------------------
 2024-03-25_15:38
 Pydantic validates function arguments of many different types and is customizable. 
-However, one cannot check function return types. Strange since that could be checked if I annotate the function return type. 
+----------------------------------------------------------------------

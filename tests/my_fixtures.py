@@ -6,29 +6,6 @@ import os
 
 # ----------------------------------------------------------------------
 """
-# Cache the results. Necessary since otherwise the import within the function
-# forces the call to the student and instructor code to repeat.
-@functools.cache
-def get_module_results(module_name):
-    student_module_name = f"student_code_with_answers.{module_name}"
-    sc = importlib.import_module(student_module_name)
-    instructor_module_name = f"instructor_code_with_answers.{module_name}"
-    ic = importlib.import_module(instructor_module_name)
-    student_answer = sc.compute()
-    correct_answer = ic.compute()
-    return student_answer, correct_answer
-
-# Usage: use `run_compute` as a parameter to the test function
-#        sa, ca = run_compute(part1)
-#    to return the student and correct answers
-@pytest.fixture(scope='module')
-def run_compute():
-    def _module(module_name):
-        return get_module_results(module_name)
-    return _module
-"""
-# ----------------------------------------------------------------------
-"""
 To use @functools.cache safely, the function it is applied to must be a pure function, 
 whose results only depend on the input arguments. This is likely correct in a testing 
 environment when using serial calculations. Each test is run independently, and
@@ -38,7 +15,6 @@ Nonetheless, use is risky. If I have errors in the testing framework, I should d
 the cache and check whether the errors persist. . 
 """
 # ----------------------------------------------------------------------
-@functools.cache
 def with_custom_sys_path(path, func, *args, **kwargs):
     """
     Temporarily prepend a directory to sys.path, execute a function,
@@ -50,15 +26,22 @@ def with_custom_sys_path(path, func, *args, **kwargs):
     :param kwargs: Keyword arguments to pass to the function
     """
     original_sys_path = list(sys.path)
+    #print("==> with_custom_sys_path, args: ", args)
+    #print("==> func: ", func)
+    #print("==> args: ", args)
+    #print("==> **kwargs: ", **kwargs)
     try:
         sys.path.insert(0, path)
+        #print("\n===> sys, func= ", func)
+        #print("\n===> sys, func.__name__= ", func.__name__)
+        #print("\n===> args= ", args)
         return func(*args, **kwargs)
     finally:
         sys.path = original_sys_path
 
 # ----------------------------------------------------------------------
 @functools.cache
-def load_and_run_module(module_name, directory):
+def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
     """
     Loads a module from a specific directory and executes its `compute` function.
 
@@ -66,65 +49,64 @@ def load_and_run_module(module_name, directory):
     :param directory: Directory from which to load the module
     :return: The result of the module's `compute` function
     """
+    #print("INSIDE load_and_run_module")
     original_cwd = os.getcwd()
     os.chdir(directory)
     try:
-        module = importlib.import_module(module_name)
-        result = module.compute()
+        #print("===> module_name: ", module_name)
+        #print("===> import directory: ", directory)
+        module = importlib.import_module(directory + "." + module_name)
+        # module = importlib.import_module(module_name) # orig
+        """
+        To execute, `result = module.question1()`
+        invoke  `load_and_run_module(module, directory, 'question1')
+        """
+        #print("==> module: ", module, type(module))
+        #print("==> function_name: ", function_name, type(function_name))
+        func_to_run = getattr(module, function_name)
+        #print("==> func_to_run: ", func_to_run.__name__)
+        #print("args: ", args)
+        #print("kwargs: ", kwargs)
+        result = func_to_run(*args)
     finally:
         os.chdir(original_cwd)
     return result
-    #return module.compute()
 
 # ----------------------------------------------------------------------
 # Usage within your existing setup
 @functools.cache
-def get_module_results(module_name, ret='both'):
-    student_directory = "./student_code_with_answers"
-    instructor_directory = "./instructor_code_with_answers"
+def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
+    # Hardcoded folder names. These could be included in the generator_config.yaml file. NOT DONE.
+
+    # REMOVE HARDCODING. Add to configuration file
+    #student_directory = "student_code_with_answers"
+    ##student_directory = "student_github_template"   # for solution without correct answers
+    #instructor_directory = "instructor_code_with_answers"
+
+    if 'student_directory' in kwargs:
+        student_directory = kwargs['student_directory']
+    if 'instructor_directory' in kwargs:
+        instructor_directory = kwargs['instructor_directory']
 
     if ret == 'both':
-        student_result = with_custom_sys_path(student_directory, load_and_run_module, module_name, student_directory)
-        instructor_result = with_custom_sys_path(instructor_directory, load_and_run_module, module_name, instructor_directory)
+        student_result = with_custom_sys_path(student_directory, load_and_run_module, module_name, student_directory, function_name, *args, **kwargs)
+        instructor_result = with_custom_sys_path(instructor_directory, load_and_run_module, module_name, instructor_directory, function_name, *args, **kwargs)
         return student_result, instructor_result
+
     elif ret == 's':
-        return with_custom_sys_path(student_directory, load_and_run_module, module_name, student_directory)
+        return with_custom_sys_path(student_directory, load_and_run_module, module_name, student_directory, function_name, *args, **kwargs)
+
     else:  # ret == 'i'
-        return with_custom_sys_path(instructor_directory, load_and_run_module, module_name, instructor_directory)
+        return with_custom_sys_path(instructor_directory, load_and_run_module, module_name, instructor_directory, function_name, *args, **kwargs)
 
 # ----------------------------------------------------------------------
-"""
-# Cache the results. Necessary since otherwise the import within the function
-# forces the call to the student and instructor code to repeat.
-@functools.cache
-def get_module_results(module_name, ret='both'):
-    '''
-    ret: 'both', return both student and instructor answers
-    ret: 's', return student answer
-    ret: 'i', return instructor
-    '''
-    if ret == 'both':
-        student_module_name = f"student_code_with_answers.{module_name}"
-        sc = importlib.import_module(student_module_name)
-        instructor_module_name = f"instructor_code_with_answers.{module_name}"
-        ic = importlib.import_module(instructor_module_name)
-        student_answer = sc.compute()
-        correct_answer = ic.compute()
-        return student_answer, correct_answer
-    elif ret == 's': 
-        student_module_name = f"student_code_with_answers.{module_name}"
-        sc = importlib.import_module(student_module_name)
-        student_answer = sc.compute()
-        return student_answer
-    else:   # ret == 'i'
-        instructor_module_name = f"instructor_code_with_answers.{module_name}"
-        ic = importlib.import_module(instructor_module_name)
-        correct_answer = ic.compute()
-        return correct_answer
-"""
 
 @pytest.fixture(scope='module')
 def run_compute():
-    def _module(module_name, ret):
-        return get_module_results(module_name, ret)
+    # Include key args: 'student_directory'= and 'instructor_directory'=
+    def _module(module_name, function_name, ret, *args, **kwargs):
+        #print("==> _module, function_name: ", type(function_name))   # Must be a string
+        return get_module_results(module_name, function_name, ret, *args, **kwargs)
     return _module
+
+#----------------------------------------------------------------------
