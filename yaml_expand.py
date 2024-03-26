@@ -45,15 +45,15 @@ def main(f_in: str, f_out: str):
     expanded_questions_data = deepcopy(questions_data)
 
     for question in expanded_questions_data["questions"]:
-        print("question: ", question)
+        #print("question: ", question)
         new_parts = []
         parts = question["parts"]
         for part in parts:
-            print(f"{part=}")
+            #print(f"{part=}")
             s_answer = [part.get("s_answer", None)]
             i_answer = [part.get("i_answer", None)]
-            print(f"{s_answer=}")
-            print(f"{part.get('s_answers', [None])=}")
+            #print(f"{s_answer=}")
+            #print(f"{part.get('s_answers', [None])=}")
             s_answers = part.get("s_answers", [None]) + s_answer
             i_answers = part.get("i_answers", [None]) + i_answer
             # print(f"{s_answers=}")
@@ -62,8 +62,8 @@ def main(f_in: str, f_out: str):
             # print(f"{i_answer=}")
             i_answers = [i for i in i_answers if i is not None and i is not [None]]
             s_answers = [i for i in s_answers if i is not None and i is not [None]]
-            print(f"=> {s_answers=}")
-            print(f"=> {i_answers=}")
+            #print(f"=> {s_answers=}")
+            #print(f"=> {i_answers=}")
             # works if either s_answer or s_answers is present
             """
             if s_answers is not None and not isinstance(s_answers, list):
@@ -95,7 +95,7 @@ def main(f_in: str, f_out: str):
                     if i_answer is not None:
                         new_part["i_answer"] = i_answer
                     new_parts.append(new_part)
-                    print("new_part: ", new_part)
+                    #print("new_part: ", new_part)
         question["parts"] = new_parts
 
     with open(f_out, "w") as outfile:

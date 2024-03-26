@@ -288,8 +288,8 @@ def check_structure_dict(student_answer, instructor_answer):
 
 def check_answer_string(student_answer, instructor_answer):
     msg_list = []
-    s_answ = student_answer.lower().strip()
-    i_answ = instructor_answer.lower().strip()
+    s_answ = clean_str_answer(student_answer)
+    i_answ = clean_str_answer(instructor_answer)
 
     status = True if s_answ == i_answ else False
     msg_list.append("Strings are lowered and stripped")
@@ -302,6 +302,7 @@ def check_structure_string(student_answer, instructor_answer, choices):
     """
     choices: list of strings
     """
+    print("\n==> check_structure_string")
     status = True
     msg_list = []
 
@@ -317,14 +318,18 @@ def check_structure_string(student_answer, instructor_answer, choices):
         msg_list +=["- Answer must be of type 'str'"]
     else:
         msg_list += ["- type 'str' is correct"]
+        print("== is string")
 
     if status and choices != []:
         if not student_answer in choices: 
             status = False
             msg_list += [f"- Answer must be one of {choices}"]
+            print("is false")
         else:
             msg_list += [f"- Answer {repr(student_answer)} is among the valid choices"]
+            print("is ", status)
 
+    print("\n".join(msg_list))
     return status, "\n".join(msg_list)
 
 # ======================================================================

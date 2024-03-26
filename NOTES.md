@@ -138,6 +138,19 @@ Since the answer test  first runs the structure test, I should be able to contro
 - type:int is treated properly
   type:integer is not.o Yet they are both defined the same way in assert_utilities. BUT without resolution.
 ----------------------------------------------------------------------
+2024-03-21_22:35
+TODO: 
+  - I don't think there is a need for a generator to create a generator. At least not for the time being. I have not yet found a real use. 
+  - I should also consolidate the structure and answer generator. Thus, I could add an argument --type 'answer', or --type 'structure' to generate structure or answer tests. 
+  - To create more composite types, I could compose the functions in assert_utilities. 
+  - Add a LLM component to these tests, which can be optionally turned on or off. 
+----------------------------------------------------------------------
+2024-03-22_11:40
+- I now only have test_generator.py
+- The code is greatly simplified. 
+- ISSUE: structure: explanation is null (should be easily fixable). 
+- Think of how to add LLM. 
+----------------------------------------------------------------------
 2024-03-25_15:38
 Pydantic validates function arguments of many different types and is customizable. 
 ----------------------------------------------------------------------

@@ -49,7 +49,7 @@ def preprocess_yaml(input_file, output_file):
                 part['i_answer'] = encode_data(part['i_answer'])
             #print(f"{len(parts)=}, {i=}")
             parts[i] = part
-            print("part= ", part)
+            #print("part= ", part)
         question['parts'] = parts
     
     with open(output_file, 'w') as file:
