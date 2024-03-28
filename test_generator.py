@@ -75,7 +75,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
             decode_i_call_str = get_decoded_str(questions_data, part, 'i_answer', 'instructor_file')
             decode_s_call_str = get_decoded_str(questions_data, part, 's_answer', 'student_file')
 
-            test_code += f"\n@max_score({max_score_part})\n"
+            if sim_type == 'answers':
+                test_code += f"\n@max_score({max_score_part})\n"
             test_code +=  "@hide_errors('')\n"
 
             if fixture:
@@ -171,6 +172,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
 # NEW
 def main(yaml_name, sim_type):
+    """
+    sim_type = ['answers', 'structure']
+    """
     questions_data = load_yaml_file(yaml_name) 
     generate_test_answers_code(questions_data, sim_type, f"test_{sim_type}_{yaml_name[:-5]}.py")
 
