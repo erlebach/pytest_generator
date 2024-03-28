@@ -145,7 +145,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                     test_code +=  "    if is_success:\n"
                     test_code +=  "        is_success, explanation_answer    = eval(msg_answer,    {'__builtins__':{}}, local_namespace)\n"
                     test_code +=  "    else: \n"
-                    test_code +=  "        explanation_answer = 'Failed structural tests, No grade for answer component\\n.' \n"
+                    test_code +=  "        explanation_answer += 'Failed structural tests, No grade for answer component\\n.' \n"
                     test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
                     test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
 

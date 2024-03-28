@@ -154,3 +154,6 @@ TODO:
 2024-03-25_15:38
 Pydantic validates function arguments of many different types and is customizable. 
 ----------------------------------------------------------------------
+2024-03-27
+TODO: if there is a compiler error in the code, I should catch it and let the student know. I should put it in the 'explanation'
+----------------------------------------------------------------------

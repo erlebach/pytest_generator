@@ -83,6 +83,7 @@ def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
     ##student_directory = "student_github_template"   # for solution without correct answers
     #instructor_directory = "instructor_code_with_answers"
 
+    print("===> 0 get_module_results")
     if 'student_directory' in kwargs:
         student_directory = kwargs['student_directory']
     if 'instructor_directory' in kwargs:
@@ -97,6 +98,7 @@ def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
         return with_custom_sys_path(student_directory, load_and_run_module, module_name, student_directory, function_name, *args, **kwargs)
 
     else:  # ret == 'i'
+        print("===> get_module_results")
         return with_custom_sys_path(instructor_directory, load_and_run_module, module_name, instructor_directory, function_name, *args, **kwargs)
 
 # ----------------------------------------------------------------------
@@ -104,7 +106,9 @@ def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
 @pytest.fixture(scope='module')
 def run_compute():
     # Include key args: 'student_directory'= and 'instructor_directory'=
+    print("=== GORDON ===")
     def _module(module_name, function_name, ret, *args, **kwargs):
+        print("===> _module, kwargs: ", kwargs)
         #print("==> _module, function_name: ", type(function_name))   # Must be a string
         return get_module_results(module_name, function_name, ret, *args, **kwargs)
     return _module

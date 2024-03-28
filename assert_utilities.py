@@ -371,7 +371,8 @@ def check_structure_explain_string(student_answer, instructor_answer):
 # ======================================================================
 
 # SOMETHING WRONG. 
-def check_answer_set_string(student_answer, instructor_answer):
+'''
+def check_answer_set_string(student_answer, instructor_answer, choices=None):
     """
     s_answ: student answer: set of strings
     i_answ: instructor answer: set of strings
@@ -383,6 +384,41 @@ def check_answer_set_string(student_answer, instructor_answer):
     status = True if s_answ == i_answ else False
 
     msg_list.append("Strings are lower-cased on stripped")
+    return return_value(status, msg_list, s_answ, i_answ)
+'''
+def check_answer_set_string(student_answer, instructor_answer, choices=None):
+    """
+    s_answ: student answer: set of strings
+    i_answ: instructor answer: set of strings
+    choices: one of several choices
+    """
+    msg_list = []
+    status = True
+
+    #print("===> set_string, choices: ", choices)
+
+    s_answ = {i.lower().strip() for i in student_answer}
+    i_answ = {i.lower().strip() for i in instructor_answer}
+
+    if choices and isinstance(choices[0], list):
+        #print("===> choices: ", choices)
+        choices = [set(c) for c in choices]
+
+    #print("===> set_string, after set, choices: ", choices)
+
+    if choices and isinstance(choices[0], set):
+        #print("===> choices= ", choices)
+        for i, a_set in enumerate(choices):
+            choices[i] = {el.lower().strip() for el in a_set}
+
+    if choices and isinstance(choices[0], set):
+        status = True if s_answ in choices else False
+    else:
+        status = s_answ == i_answ
+
+    msg_list.append("Strings are lower-cased and stripped")
+    if choices and isinstance(choices[0], set):
+        msg_list.append(f"Student answer is one of {choices}")
     return return_value(status, msg_list, s_answ, i_answ)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
@@ -410,6 +446,7 @@ def check_structure_set_string(student_answer, instructor_answer):
 
     if are_all_str:
         msg_list.append("- All elements are 'str', as required")
+        status = True
 
     return status, "\n".join(msg_list)
 
@@ -696,7 +733,7 @@ def check_answer_function(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
 def check_structure_function(student_answer, instructor_answer):
-    #print(f"==> inside function: {type(student_answer)=}")
+    print(f"==> inside function: {type(student_answer)=}")
     if not isinstance(student_answer, type(lambda: None)):
         return False, "- Answer should be a Python function."
     return True, "Type 'function' is correct."
