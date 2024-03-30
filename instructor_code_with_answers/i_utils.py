@@ -1,130 +1,158 @@
-from sklearn.preprocessing import StandardScaler
-from sklearn import cluster
-from sklearn import datasets
-from typing import Any
 import numpy as np
-from numpy.typing import NDArray
-from sklearn.cluster import AgglomerativeClustering
+from tqdm import tqdm
+import torch as torch
+import torch.nn as nn
+from torch.optim import Adam 
+import matplotlib.pyplot as plt 
 
-print("==============> instructor utils")
-
-
-def load_datasets(n_samples: int) -> dict[str, Any]:
-    data: dict[str, tuple[NDArray, NDArray]] = {}
-
-    random_state = 42
-    data["nc"] = datasets.make_circles(n_samples=n_samples, factor=0.5, noise=0.05, random_state=random_state)
-    data["nm"] = datasets.make_moons(n_samples=n_samples, noise=0.05, random_state=random_state)
-
-    # Anisotropically distributed data
-    X, y = datasets.make_blobs(n_samples=n_samples, random_state=random_state)
-    transformation = [[0.6, -0.6], [-0.4, 0.8]]
-    X_aniso = np.dot(X, transformation)
-    data["add"] = (X_aniso, y)
-
-    # Blobs with varied variances random_state = 170 (bvv)
-    random_state = 42
-    data["bvv"] = datasets.make_blobs(
-        n_samples=n_samples, cluster_std=[1.0, 2.5, 0.5], random_state=random_state
-    )
-
-    # blobs
-    data["b"] = datasets.make_blobs(n_samples=n_samples, random_state=8)
-
-    return data
-
-
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
-# NEW
-def fit_transform_kmeans(data):
-    # def fit_kmeans(data, k):
+def set_seed(seed):
     """
-    data: (Xtrain, labels)
+    Ensure consistent results
+    Parameters: 
+    seed: choose an integer seed to ensure consistent results 
+        in torch and numpy
     """
-    xtrain, ytrain = data
-    scaler = StandardScaler().fit(xtrain)
-    Xtrain = scaler.transform(xtrain)
-    # ks = [2, 3, 5, 10]
-    y_kmeans = {}
-    y_kmeans[k] = fit_kmeans(Xtrain, ytrain, k=k)
-    return y_kmeans
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+
+class Model(nn.Module):
+    def __init__(self, input_dim, hidden_dim=3, out_dim=1): 
+        super(Model, self).__init__()
+        self.W1 = nn.Parameter(torch.rand(hidden_dim, input_dim)) 
+        self.W2 = nn.Parameter(torch.rand(out_dim, hidden_dim)) 
+        self.bias1=nn.Parameter(torch.zeros(hidden_dim)) 
+        self.bias2=nn.Parameter(torch.zeros(out_dim))
+
+    def forward(self,inp):
+        y1 = batch_matvec(self.W1, inp) 
+        #print(y1.shape)
+        y1= self.bias1+y1
+        #y2 = torch.sigmoid(batch_matvec(self.W2, torch.sigmoid(y1)))
+        y2 = torch.sigmoid(batch_matvec(self.W2, torch.sigmoid(y1))+self.bias2) 
+        #print(y2.shape)
+        return y1,y2.squeeze()
 
 
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
-def fit_kmeans(X, y, *, k):
-    # Is there a random_tate argument?
-    # https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html
-    kmeans = cluster.KMeans(n_clusters=k, init="random", random_state=42)
-    kmeans.fit(X)
-    y_kmeans = kmeans.predict(X)
-    return y_kmeans
+#Implement training of network
+def run_optimization(model, B, target, n_iter=1000, lr=1e-1): 
+    opt = Adam(model.parameters(), lr=lr)
+    losses = []
+    print(f"{B.shape=}")  # 8, 3
+    for k in tqdm(range(n_iter)): 
+        y1,out = model(torch.clone(B).detach())    ### ERROR
+        opt.zero_grad()
+        sqr_error = (target-out)**2 
+        loss = torch.sum(sqr_error) 
+        loss.backward()
+        opt.step() 
+        losses.append(loss.item())
+    return losses
 
+#Create binary arrays
+def make_binary_arrays(d=2):
+    return np.array(list(
+        map(lambda x: np.array(list("{0:b}".format(x).zfill(d))),range(int(2**d)))
+        )).astype(int)
 
-# the * means that all arguments following * are keyword arguments
-def fit_hierarchical(X, y, *, linkage, k):
-    # Is there a random_tate argument?
-    cut_off_dist = 0  # ???
-    aggclust = AgglomerativeClustering(
-        n_clusters=k, linkage=linkage, distance_threshold=cut_off_dist
-    )
-    aggclust.fit(X)
-    # kmeans = cluster.KMeans(n_clusters=k, init="random")
-    # kmeans.fit(X)
-    # y_kmeans = kmeans.predict(X)
-    hier_means = aggclust.predict(X)  # Use training set?
-    #print("hier_means= ", hier_means)
-    return hier_means
-
-
-# ----------------------------------------------------------------------
-def fit_transform_kmeans(data):
+#Einstein summation for neural network function 
+def batch_matvec(A,B):
     """
-    data: (Xtrain, labels)
+    i: sample
+    j: input_dim 
+    k: hidden_dim
+    [hidden_dim,input_dim] 
+    [sample_size, input_dim] 
+    [sample_size, hidden_dim]
     """
-    xtrain, ytrain = data
-    scaler = StandardScaler().fit(xtrain)
-    Xtrain = scaler.transform(xtrain)
-    ks = [2, 3, 5, 10]
-    y_kmeans = {}
-    for k in ks:
-        # calls cluster.KMeans with random_state=42
-        y_kmeans[k] = fit_kmeans(Xtrain, ytrain, k=k)
-    return y_kmeans
+    return torch.einsum('kj,ij->ik', A, B)
+
+def plot1a(iterations, losses):
+    plt.plot(iterations,losses)
+    plt.title("Plot of Losses vs. Iterations") 
+    plt.xlabel("(Iterations)") 
+    plt.ylabel("(losses)")
+    #plt.show()
+    plt.savefig("part1_losses_vs_iterations.pdf")
+
+def plot1b(test, colors):
+    #Plot outputs from model 
+    plt.scatter(test[:,0],test[:,1],color=colors[:]) 
+    plt.scatter(0,0, color='yellow') 
+    plt.scatter(0,1, color='green') 
+    plt.scatter(1,0, color='green') 
+    plt.scatter(1,1, color='yellow') 
+    plt.title("Classification of Grid of Points") 
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    #plt.show()
+    plt.savefig("part1_classification_grid_points_a")
+
+def plot1c(x, y_line, test, colors):
+    plt.scatter(test[:,0],test[:,1],color=colors[:]) 
+    plt.scatter(0,0, color='yellow') 
+    plt.scatter(0,1, color='green') 
+    plt.scatter(1,0, color='green') 
+    plt.scatter(1,1, color='green') 
+    plt.plot(x,y_line, color='black') 
+    #plt.plot(x,y_line2,color='black') 
+    plt.title("Classification of Grid of Points") 
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    #plt.show()
+    plt.savefig("part1_classification_grid_points_b")
+
+def plot1d(y1_tt, y1_np, colors2, colors3):
+    plt.scatter(y1_tt[:,0],y1_tt[:,1],color=colors2[:])
+    plt.scatter(y1_np[:,0],y1_np[:,1], color=colors3[:]) 
+    #plt.plot(x,y_line, color='black')
+    plt.title("Classification of Grid of Points with Hidden Layer Before Sigmoid") 
+    plt.xlabel("y1_i")
+    plt.ylabel("y1_j") 
+    #plt.show()
+    plt.savefig("part1_classification_grid_points_hidden_before_sigmoid.pdf")
+    #Plot after sigmoid
+
+def plot1e(x, y_line, y_line2, y1_tts, y1_nps, colors2, colors3):
+    #Plot outputs 
+    plt.scatter(y1_tts[:,0],y1_tts[:,1],color=colors2[:])
+    plt.scatter(y1_nps[:,0],y1_nps[:,1], color=colors3[:]) 
+    plt.plot(x,y_line, color='black')
+    plt.plot(x,y_line2, color='black')
+    plt.title("Classification of Grid of Points with Hidden Layer After Sigmoid") 
+    plt.xlabel("sigmoid(y1_i)")
+    plt.ylabel("sigmoid(y1_j)")
+    #plt.show()
+    plt.savefig("part1_classification_grid_points_hidden_after_sigmoid.pdf")
+
+def plot2a(B2, colors):
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d') 
+    ax.scatter(B2[:,0],B2[:,1],B2[:,2], color=colors[:])
+    #plt.show()
+    plt.savefig("plot2a, titlexxx.pdf")
+
+def plot2b(kk, losses_2):
+    plt.title("Minimum loss vs k-value(number of Hidden Dimensions)") 
+    plt.xlabel("Value of K")
+    plt.ylabel("Minimum Loss") 
+    print(f"{len(kk)=}, {len(losses_2)=}")
+    plt.plot(kk[4:7],losses_2[4:7])
+    plt.title("Minimum loss vs k-value(number of Hidden Dimensions)") 
+    plt.xlabel("Value of K")
+    plt.ylabel("Minimum Loss")
+    #plt.show()
+    plt.savefig("plot2b, min loss vs k")
 
 
-# ----------------------------------------------------------------------
-def fit_transform_hierarchical(data, linkage=None):
-    """
-    data: (Xtrain, labels)
-    """
-    xtrain, ytrain = data
-    scaler = StandardScaler().fit(xtrain)
-    Xtrain = scaler.transform(xtrain)
-    ks = [2]
-    y_kmeans = {}
-    for k in ks:
-        y_kmeans[k] = fit_hierarchical(Xtrain, ytrain, linkage=linkage, k=k)
-    return y_kmeans
-
-
-# ----------------------------------------------------------------------
-colors = [
-    "red",
-    "blue",
-    "green",
-    "yellow",
-    "magenta",
-    "orange",
-    "brown",
-    "plum",
-    "gold",
-    "lime",
-    "slategray",
-    "teal",
-]
-
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
+def plot2c(x, y, z1, z2, z3, z4, z5, B2, colors):
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d') 
+    ax.scatter(B2[:,0],B2[:,1],B2[:,2], color=colors[:]) 
+    ax.plot_surface(x,y,z1)
+    ax.plot_surface(x,y,z2) 
+    ax.plot_surface(x,y,z3) 
+    ax.plot_surface(x,y,z4) 
+    ax.plot_surface(x,y,z5)
+    plt.show()
+    plt.savefig("plot2c.pdf")
+    

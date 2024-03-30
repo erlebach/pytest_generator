@@ -117,9 +117,9 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
     s_answ = student_answer
     i_answ = instructor_answer
     #s_answ = s_answ.replace('^', '**')
-    s_answ = s_answ.replace('x', '*')
-    s_answ = s_answ.replace('X', '*')
-    i_answ = i_answ.replace('^', '**')
+    #s_answ = s_answ.replace('x', '*')
+    #s_answ = s_answ.replace('X', '*')
+    #i_answ = i_answ.replace('^', '**')
     random_values = {}
     local_dct = {}
 
@@ -149,6 +149,7 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
 # ======================================================================
 def check_structure_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
     print("\nENTER check_structure_eval_float")
+    print("student_answer= ", student_answer)
     try:
         ast.parse(student_answer, mode='eval')
         return True, "Valid python expression"
@@ -306,8 +307,6 @@ def check_structure_string(student_answer, instructor_answer, choices):
     status = True
     msg_list = []
 
-    # clean choices (lower, strip, '  ' -> ' ')
-    student_answer = clean_str_answer(student_answer)
 
     # Ideally, should be done when yaml file is preprocessed
     # All strings should be lowered at that time. 
@@ -319,6 +318,8 @@ def check_structure_string(student_answer, instructor_answer, choices):
     else:
         msg_list += ["- type 'str' is correct"]
         print("== is string")
+        # clean choices (lower, strip, '  ' -> ' ')
+        student_answer = clean_str_answer(student_answer)
 
     if status and choices != []:
         if not student_answer in choices: 
@@ -554,20 +555,30 @@ def check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_t
     msg_list = []
 
     #print(f"arg: {keys=}")
-    keys = keys if keys else list(instructor_answer.keys())
+    print(f"===> {instructor_answer=}")
+    print(f"===> {student_answer=}")
 
-    instructor_keys = set(keys)
-    #print(f"{instructor_keys=}")
-    instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
-
-    student_keys = set(student_answer.keys())
-    missing_keys = list(instructor_keys - student_keys)
-
-    if len(missing_keys) > 0:
-        msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
+    if not isinstance(instructor_answer, dict):
+        msg_list += ["Instructor answer should be a dict"]
         status = False
-    else:
-        msg_list.append(f"- No missing keys.")
+
+    if status and not isinstance(student_answer, dict):
+        msg_list += ["Student answer should be a dict"]
+        status = False
+
+    if status:
+        keys = keys if keys else list(instructor_answer.keys())
+        instructor_keys = set(keys)
+        #print(f"{instructor_keys=}")
+        instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
+        student_keys = set(student_answer.keys())
+        missing_keys = list(instructor_keys - student_keys)
+
+        if len(missing_keys) > 0:
+            msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
+            status = False
+        else:
+            msg_list.append(f"- No missing keys.")
 
     if status:
         # some keys are filtered. Student is allowed to have 

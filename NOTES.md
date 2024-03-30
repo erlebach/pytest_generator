@@ -157,3 +157,6 @@ Pydantic validates function arguments of many different types and is customizabl
 2024-03-27
 TODO: if there is a compiler error in the code, I should catch it and let the student know. I should put it in the 'explanation'
 ----------------------------------------------------------------------
+2024-03-30
+If local_vars_dict is not defined, I get an exception. Exceptions should not be possible. This implies the 
+need to write a yaml file tester. For each type, I should check that appropriate options are there. 

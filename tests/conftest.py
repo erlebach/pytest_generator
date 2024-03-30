@@ -2,7 +2,7 @@ import pytest
 
 # Monitor exceptions
 
-#"""
+"""
 def pytest_exception_interact(node, call, report):
     if call.excinfo is not None:
         # Formatting the traceback as a string
@@ -19,4 +19,4 @@ def check_traceback(request):
     if tb_string:
         # Insert your condition here. For example, always print for demonstration
         print(f"Traceback for {request.node.name}:\n{tb_string}")
-#"""
+"""

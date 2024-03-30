@@ -8,11 +8,99 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch.optim as optim 
 import torch.nn.functional as F
-import utils as u
+import i_utils as u
+
+def generate_model():
+    #Run functions and train model 
+    B = u.make_binary_arrays(2)
+    target = np.bitwise_xor(B[:,0],B[:,1])
+    
+    #Convert to torch tensor
+    B = torch.from_numpy(B).float()
+    target = torch.from_numpy(target).float()
+    
+    #declare model
+    model = u.Model(B.shape[1], hidden_dim=2)
+    return B, model
 
 
-def compute():
+def A_plot_loss():
+    answers = {}
+    answers['Training Loss'] = np.zeros([1])
+    return answers
 
+def B_grid_generation():
+    answers = {}
+
+    #Create grid of points 
+    nx, ny = (100, 100)
+    x = np.linspace(-0.5, 1.5, nx)
+    y = np.linspace(-0.5, 1.5, ny)
+    xv, yv = np.meshgrid(x, y)
+    
+    #Place grid into a set of points 
+    test=np.column_stack((xv.ravel(),yv.ravel()))
+    print("==> test: ", test.shape)
+    
+    #convert to torch tensor
+    test= torch.from_numpy(test).float()
+    
+    # create model instance
+    B, model = generate_model()
+
+    #Run these points through trained model 
+    model = u.Model(B.shape[1], hidden_dim=2)
+    y1_t,test_outputs_prob=model(test)
+    
+    #array of colors 
+    colors=[]
+    for i in range(0, len(test_outputs_prob)): 
+        if test_outputs_prob[i]<0.5:
+            colors.append('cyan') 
+        else:
+            colors.append('violet')
+    
+    answers['Grid Output Shape'] = {
+            'x': np.array(test[:, 0]), 'y': np.array(test[:, 1])
+        }
+    return answers
+
+
+def C_line_equation():
+    answers = {}
+    answers['Line Function Existence'] = "yes"  # not checked
+    answers['Line Equation Correctness'] = '3*x + 4*y - 3'
+    answers['Bias Parameter Check'] = True # not checked
+    return answers
+
+def D_second_layer():
+    answers = {}
+    answers['D, plot before sigmoid'] = '3*x+4*y-3'
+    answers['D, plot after sigmoid'] = '3*x+4*y-3'
+    answers['D, separating line'] = '3*x+4*y-3'
+    return answers
+
+def E_ReLU_repeat_C():
+    answers = {}
+    answers['EC, Line Function Existence'] = "yes"  # not checked
+    answers['EC, Line Equation Correctness'] = '3 * x + 4 * y - 3'
+    answers['EC, Bias Parameter Check'] = True # not checked
+    return answers
+
+def E_ReLU_repeat_D():
+    answers = {}
+    answers['ED, plot before sigmoid'] = '3 * x + 4*y-3'
+    answers['ED, plot after sigmoid'] = '3*x+4*y - 3'
+    answers['ED, separating line'] = '3*x+4*y-3'
+    return answers
+
+def F_nonzero_bias():
+    answers = {}
+    answers['repeat parts A-D'] = "Nothing to say about this question at this time"
+    return answers
+
+
+"""
     ###   PART 1   #####################
 
     #Run functions and train model 
@@ -86,7 +174,6 @@ def compute():
         else:
             colors.append('violet')
     
-    
     u.plot1b(test, colors)
     
     
@@ -152,7 +239,13 @@ def compute():
     ###   PART F   #####################
 
     # Plot the results of part A-D with a bias. 
-
+"""
 #----------------------------------------------------------------------
 if __name__ == '__main__':
-    compute()
+    #compute()
+    B_grid_generation()
+    C_line_equation()
+    D_second_layer()
+    E_ReLU_repeat_C()
+    E_ReLU_repeat_D()
+    F_nonzero_bias()
