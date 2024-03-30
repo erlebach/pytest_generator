@@ -75,7 +75,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
             decode_i_call_str = get_decoded_str(questions_data, part, 'i_answer', 'instructor_file')
             decode_s_call_str = get_decoded_str(questions_data, part, 's_answer', 'student_file')
 
-            test_code += f"\n@max_score({max_score_part})\n"
+            if sim_type == 'answers':
+                test_code += f"\n@max_score({max_score_part})\n"
             test_code +=  "@hide_errors('')\n"
 
             if fixture:
@@ -132,12 +133,21 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
                 # One of a finite number of choices for string type
                 choices = part.get('choices', [])
-                if choices == [] and (type == 'string' or type == 'str'):
-                    choices = []
+                #if choices == [] and (part_type == 'string' or part_type == 'str'):
+                    #choices = []
 
                 if choices is not None:
                     test_code += f"    choices = {choices}\n"
                     test_code +=  "    local_namespace['choices'] = choices\n"
+
+                #keys = part.get('keys', [])
+                #print("keys: ", keys)
+                #if keys == [] and (part_type == 'string' or part_ == 'str'):
+                    #keys = []
+
+                #if keys is not None:
+                    #test_code += f"    keys = {keys}\n"
+                    #test_code +=  "    local_namespace['keys'] = keys\n"
 
                 test_code +=  "    is_success, explanation_structure = eval(msg_structure, {'__builtins__':{}}, local_namespace)\n"
 
@@ -145,7 +155,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                     test_code +=  "    if is_success:\n"
                     test_code +=  "        is_success, explanation_answer    = eval(msg_answer,    {'__builtins__':{}}, local_namespace)\n"
                     test_code +=  "    else: \n"
-                    test_code +=  "        explanation_answer = 'Failed structural tests, No grade for answer component\\n.' \n"
+                    test_code +=  "        explanation_answer += 'Failed structural tests, No grade for answer component\\n.' \n"
                     test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
                     test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
 
@@ -171,6 +181,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
 # NEW
 def main(yaml_name, sim_type):
+    """
+    sim_type = ['answers', 'structure']
+    """
     questions_data = load_yaml_file(yaml_name) 
     generate_test_answers_code(questions_data, sim_type, f"test_{sim_type}_{yaml_name[:-5]}.py")
 

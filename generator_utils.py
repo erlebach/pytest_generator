@@ -97,7 +97,7 @@ def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_inst
         # either no args or multiple args before module_function_name, 'i', and **kwargs
         test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i', **kwargs)\n"
         test_code += f"    if {part_id} not in correct_answer:\n"
-        explanation = repr(f"Key: {part_id} not found.\n")  # Change in accordance to structure check
+        explanation = repr(f"Key: {part_id} not found in instructor answer!\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\n"
         test_code += f"        {function_name}.explanation = explanation\n"
         test_code += f"        assert False\n"
@@ -119,7 +119,7 @@ def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_inst
         part_id = f"{repr(part['id'])}"
         test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's', **kwargs)\n"
         test_code += f"    if {part_id} not in student_answer:\n"
-        explanation = repr(f"Key: {part_id} not found.\n")  # Change in accordance to structure check
+        explanation = repr(f"Key: {part_id} not found in student answer!\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\n"
         test_code += f"        {function_name}.explanation = explanation\n"
         test_code += f"        assert False\n"
