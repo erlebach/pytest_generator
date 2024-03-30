@@ -1,165 +1,158 @@
-import myplots as myplt
-import time
-import warnings
+
+#Number 1
+
+#Import needed libraries import torch
+import torch
+import torch.nn as nn
+import matplotlib.pyplot as plt 
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn import cluster, datasets, mixture
-from sklearn.datasets import make_blobs
-from sklearn.neighbors import kneighbors_graph
-from sklearn.preprocessing import StandardScaler
-from itertools import cycle, islice
-import scipy.io as io
-from scipy.cluster.hierarchy import dendrogram, linkage  #
-
-from sklearn.datasets import make_moons, make_circles, make_blobs
-from sklearn.cluster import KMeans
-
-
-# import plotly.figure_factory as ff
-import math
-from sklearn.cluster import AgglomerativeClustering
-import pickle
+import torch.optim as optim 
+import torch.nn.functional as F
 import utils as u
 
 
-# ----------------------------------------------------------------------
-"""
-Part 1: 
-Evaluation of k-Means over Diverse Datasets: 
-In the first task, you will explore how k-Means perform on datasets with diverse structure.
-"""
-
-# Fill this function with code at this location. Do NOT move it. 
-# Change the arguments and return according to 
-# the question asked. 
-
-def fit_kmeans(dataset, n_clusters):
-
-    # Unpack the dataset into its components
-    data, _ = dataset  # We ignore the labels for K-means clustering
-    
-    # Standardize the data
-    scaler = StandardScaler()
-    data_standardized = scaler.fit_transform(data)
-    
-    # Initialize and fit the KMeans model
-    kmeans = KMeans(n_clusters=n_clusters, init='random', random_state=42)
-    kmeans.fit(data_standardized)
-
-    return kmeans.labels_
-
-
 def compute():
-    answers = {}
 
-    """
-    A.	Load the following 5 datasets with 100 samples each: noisy_circles (nc), noisy_moons (nm), blobs with varied variances (bvv), Anisotropicly distributed data (add), blobs (b). Use the parameters from (https://scikit-learn.org/stable/auto_examples/cluster/plot_cluster_comparison.html), with any random state. (with random_state = 42). Not setting the correct random_state will prevent me from checking your results.
-    """
+    ###   PART 1   #####################
 
-    random_state = 42
-
-    n_samples = 100
-    noisy_circles = make_circles(n_samples=n_samples, factor=.5, noise=.05, random_state=random_state)
-    noisy_moons = make_moons(n_samples=n_samples, noise=.05, random_state=random_state)
-    blobs = make_blobs(n_samples=n_samples, random_state=random_state)
-    varied = make_blobs(n_samples=n_samples, cluster_std=[1.0, 2.5, 0.5], random_state=random_state)
-
-    # Anisotropicly distributed data
-    transformation = [[0.6, -0.6], [-0.4, 0.8]]
-    X_aniso = np.dot(blobs[0], transformation)
-    aniso = (X_aniso, blobs[1])
-
-    datasets = {
-        "nc": noisy_circles,
-        "nm": noisy_moons,
-        "bvv": varied,
-        "add": aniso,
-        "b": blobs
-        }
+    #Run functions and train model 
+    B = u.make_binary_arrays(2)
+    target = np.bitwise_xor(B[:,0],B[:,1])
     
-    # Scaling all datasets for consistency
-    for key in datasets.keys():
-        datasets[key] = (StandardScaler().fit_transform(datasets[key][0]), datasets[key][1])
-
-    # Dictionary of 5 datasets. e.g., dct["nc"] = [data, labels]
-    # 'nc', 'nm', 'bvv', 'add', 'b'. keys: 'nc', 'nm', 'bvv', 'add', 'b' (abbreviated datasets)
-    dct = answers["1A: datasets"] = datasets
-
-    #answers["1A: datasets"]["nc"] = datasets["nc"]
-    #answers["1A: datasets"]["nm"] = datasets["nm"]
-    #answers["1A: datasets"]["bvv"] = datasets["bvv"]
-    #answers["1A: datasets"]["add"] = datasets["add"]
-    #answers["1A: datasets"]["b"] = datasets["b"]
-
-    """
-   B. Write a function called fit_kmeans that takes dataset (before any processing on it), i.e., pair of (data, label) Numpy arrays, and the number of clusters as arguments, and returns the predicted labels from k-means clustering. Use the init='random' argument and make sure to standardize the data (see StandardScaler transform), prior to fitting the KMeans estimator. This is the function you will use in the following questions. 
-    """
-
-    # dct value:  the `fit_kmeans` function
-    dct = answers["1B: fit_kmeans"] = fit_kmeans
-
-
-    """
-    C.	Make a big figure (4 rows x 5 columns) of scatter plots (where points are colored by predicted label) with each column corresponding to the datasets generated in part 1.A, and each row being k=[2,3,5,10] different number of clusters. For which datasets does k-means seem to produce correct clusters for (assuming the right number of k is specified) and for which datasets does k-means fail for all values of k? 
+    #Convert to torch tensor
+    B = torch.from_numpy(B).float()
+    target = torch.from_numpy(target).float()
     
-    Create a pdf of the plots and return in your report. 
-    """
-    ks = [2, 3, 5, 10]
-
-    plt.figure(figsize=(25, 20))
-
-    # dataset titles
-    dataset_names = {"nc": "Noisy Circles", "nm": "Noisy Moons", "bvv": "Varied Variances", "add": "Anisotropic", "b": "Blobs"}
-
-    # Loop over each k value and dataset to plot
-    for i, k in enumerate(ks):
-        for j, (dataset_abbr, dataset) in enumerate(datasets.items()):
-            predicted_labels = fit_kmeans(dataset, k)
-            plt.subplot(len(ks), len(datasets), i*len(datasets) + j + 1)
-            plt.scatter(dataset[0][:, 0], dataset[0][:, 1], c=predicted_labels, s=50, cmap='viridis')
-            plt.title(f"{dataset_names[dataset_abbr]} (k={k})")
-
-    plt.tight_layout()
-    plt.show()
-
-    #answers["1C: cluster successes"] = {
-    #    "bvv": [3], 
-    #    "add": [3],  
-    #    "b": [3]     
-    #    }
+    #declare model
+    model = u.Model(B.shape[1], hidden_dim=2)
+     
+    #Run optimization of model and grab losses
+    #losses = run_optimization(model, B, target, error_fn=lambda x: skewed_error(x,alpha=0), n_iter=1000)
+    losses = u.run_optimization(model, B, target, n_iter=1000)
     
-    answers["1C: cluster failures"] = ["nc", "nm"]
+    #Plot losses in log-log plot 
+    iterations=list(range(0,1000)) 
+    
+    u.plot1a(iterations, losses)
+    
+    # Run on training set to see if working correctly 
+    y1,outputs_prob=model(B) 
+    outputs_prob=outputs_prob.detach().numpy()
+    
+    #Convert prob to classes 
+    outputs_class=[]
+    for i in range(0,len(outputs_prob)): 
+        if outputs_prob[i]>=0.5:
+            outputs_class.append(1) 
+        else:
+            outputs_class.append(0)
+    
+    
+    #Grab model parameters
+    W1_np = model.W1.detach().numpy() 
+    W2_np = model.W2.detach().numpy()
+    
+    #Grab model biases 
+    bias1_np=model.bias1.detach().numpy() 
+    bias2_np=model.bias2.detach().numpy()
+    
+    # Output paramters
+    print("W1: {}".format(W1_np))
+    print("W2: {}".format(W2_np))
+    
+    
+    ###   PART 2   #####################
 
-    # dct value: return a dictionary of one or more abbreviated dataset names (zero or more elements) 
-    # and associated k-values with correct clusters.  key abbreviations: 'nc', 'nm', 'bvv', 'add', 'b'. 
-    # The values are the list of k for which there is success. Only return datasets where the list of cluster size k is non-empty.
-    dct = answers["1C: cluster successes"] = {
-        "bvv": [3], 
-        "add": [3],  
-        "b": [3]     
-        }
+    #Create grid of points 
+    nx, ny = (100, 100)
+    x = np.linspace(-0.5, 1.5, nx)
+    y = np.linspace(-0.5, 1.5, ny)
+    xv, yv = np.meshgrid(x, y)
+    
+    #Place grid into a set of points 
+    test=np.column_stack((xv.ravel(),yv.ravel()))
+    
+    #convert to torch tensor
+    test= torch.from_numpy(test).float()
+    
+    #Run these points through trained model 
+    y1_t,test_outputs_prob=model(test)
+    
+    #array of colors 
+    colors=[]
+    for i in range(0, len(test_outputs_prob)): 
+        if test_outputs_prob[i]<0.5:
+            colors.append('cyan') 
+        else:
+            colors.append('violet')
+    
+    
+    u.plot1b(test, colors)
+    
+    
+    ###   PART 3   #####################
 
-    # dct value: return a list of 0 or more dataset abbreviations (list has zero or more elements, 
-    # which are abbreviated dataset names as strings)
-    dct = answers["1C: cluster failures"] = ["nc", "nm"]
+    #Create equation for the line 1
+    def make_explicit_line_equation(w,b,x): 
+        y=(-b-x*w[0,0])/w[0,1]
+        return y
+    
+    #Create equation for the line 2
+    def make_explicit_line_equation2(w,b,x): 
+        y=(-b-x*w[1,0])/w[1,1]
+        return y
+    
+    #Create line 1
+    x_line=x = np.linspace(-1, 2, 10) 
+    y_line=make_explicit_line_equation(W1_np, bias1_np[0], x_line)
+     
+    #y_line=make_explicit_line_equation(W1_np, 0, x_line)
+    
+    #Create line
+    y_line2=make_explicit_line_equation2(W1_np, bias1_np[0], x_line) 
+    #y_line2=make_explicit_line_equation2(W1_np, 0, x_line)
+    
+    #Plot outputs from model with line 
+    u.plot1c(x, y_line, test, colors)
 
-    """
-    D. Repeat 1.C a few times and comment on which (if any) datasets seem to be sensitive to the choice of initialization for the k=2,3 cases. You do not need to add the additional plots to your report.
+    ###   PART D   #####################
+    
+    #Create colors for plots 
+    colors2=[]
+    for i in range(0, len(y1_t)):
+        if y1_t[i,0]<0 and y1_t[i,1]<0: 
+            colors2.append('cyan')
+        else:
+            colors2.append('violet') 
+    
+    colors3=[]
+    for i in range(0, len(y1)):
+        if y1[i,0]<0 and y1[i,1]<0: 
+            colors3.append('blue')
+        else:
+            colors3.append('green')
+    
+    #Plot hidden layer
+    y1_tt= y1_t.detach().numpy() 
+    y1_np=y1.detach().numpy() 
+     
+    u.plot1d(y1_tt, y1_np, colors, colors3)
 
-    Create a pdf of the plots and return in your report. 
-    """
+    ###   PART E   #####################
+    
+    y1_s=torch.sigmoid(y1) 
+    y1_ts=torch.sigmoid(y1_t)
+    
+    #Convert to tensor
+    y1_tts= y1_ts.detach().numpy() 
+    y1_nps=y1_s.detach().numpy()
+    
+    u.plot1e(x, y_line, y_line2, y1_tts, y1_nps, colors2, colors3)
 
-    # dct value: list of dataset abbreviations
-    # Look at your plots, and return your answers.
-    # The plot is part of your report, a pdf file name "report.pdf", in your repository.
-    dct = answers["1D: datasets sensitive to initialization"] = ["The Noisy Circles and Noisy Moons datasets are sensitive to the choice of initialization because of their inherent shapes and overlaps. These datasets consist of points that form non-linear and intertwined patterns, which don't conform to the spherical cluster assumption that methods like k-means rely on. Because of this, the initial placement of centroids can heavily influence which points are captured by each cluster, especially since there are no clear boundaries."]
+    ###   PART F   #####################
 
-    return answers
+    # Plot the results of part A-D with a bias. 
 
-
-# ----------------------------------------------------------------------
-if __name__ == "__main__":
-    answers = compute()
-
-    with open("part1.pkl", "wb") as f:
-        pickle.dump(answers, f)
+#----------------------------------------------------------------------
+if __name__ == '__main__':
+    compute()
