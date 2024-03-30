@@ -150,6 +150,9 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
 def check_structure_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
     print("\nENTER check_structure_eval_float")
     print("student_answer= ", student_answer)
+    if not isinstance(student_answer, str):
+        return False, "Student_answer is {student_answer}. Should be string defining a valid Python expression."
+
     try:
         ast.parse(student_answer, mode='eval')
         return True, "Valid python expression"
