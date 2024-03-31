@@ -1066,8 +1066,10 @@ def check_answer_int(student_answer, instructor_answer):
 
     if student_answer != instructor_answer:
         status = False
+        msg_list = ["Answer is incorrect"]
     else:
         status = True
+        msg_list = ["Answer is correct"]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -1094,8 +1096,10 @@ def check_answer_bool(student_answer, instructor_answer):
 
     if student_answer != instructor_answer:
         status = False
+        msg_list = ["Answer is incorrect."]
     else:
         status = True
+        msg_list = ["Answer is correct."]
 
     #print("==> bool msg_list= ", msg_list)
 
