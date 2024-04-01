@@ -133,12 +133,20 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
                 # One of a finite number of choices for string type
                 choices = part.get('choices', [])
-                #if choices == [] and (part_type == 'string' or part_type == 'str'):
-                    #choices = []
 
                 if choices is not None:
                     test_code += f"    choices = {choices}\n"
                     test_code +=  "    local_namespace['choices'] = choices\n"
+
+                notes = part.get('notes', None)
+                if notes is not None:
+                    test_code += f"    notes = {repr(notes)}\n"
+                    test_code += f"    {function_name}.notes = notes\n"
+
+                explanation = part.get('explanation', None)
+                if explanation is not None:
+                    test_code += f"    answer_notes = {repr(explanation)}\n"
+                    test_code += f"    {function_name}.answer_notes = answer_notes\n"
 
                 #keys = part.get('keys', [])
                 #print("keys: ", keys)

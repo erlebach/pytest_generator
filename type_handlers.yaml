@@ -131,6 +131,16 @@ types:
     assert_structure: "assert_utilities.check_structure_dict_string_set(student_answer, instructor_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
+  dict[string,float]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
+
+  dict[str,float]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
+
   dict[string,NDArray]:
     import: "" #"numpy as np"
     #assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"

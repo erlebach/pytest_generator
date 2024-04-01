@@ -306,10 +306,9 @@ def check_structure_string(student_answer, instructor_answer, choices):
     """
     choices: list of strings
     """
-    print("\n==> check_structure_string")
     status = True
     msg_list = []
-
+    choices = [clean_str_answer(c) for c in choices]
 
     # Ideally, should be done when yaml file is preprocessed
     # All strings should be lowered at that time. 
@@ -320,7 +319,6 @@ def check_structure_string(student_answer, instructor_answer, choices):
         msg_list +=["- Answer must be of type 'str'"]
     else:
         msg_list += ["- type 'str' is correct"]
-        print("== is string")
         # clean choices (lower, strip, '  ' -> ' ')
         student_answer = clean_str_answer(student_answer)
 
@@ -328,10 +326,8 @@ def check_structure_string(student_answer, instructor_answer, choices):
         if not student_answer in choices: 
             status = False
             msg_list += [f"- Answer must be one of {choices}"]
-            print("is false")
         else:
             msg_list += [f"- Answer {repr(student_answer)} is among the valid choices"]
-            print("is ", status)
 
     print("\n".join(msg_list))
     return status, "\n".join(msg_list)
@@ -514,6 +510,85 @@ def check_structure_dict_string_set(student_answer, instructor_answer):
             status = True
 
     return status, "\n".join(msg_list)
+
+# ======================================================================
+
+def check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys):
+    """
+    student answer: dictionary with keys:str, values: an NDArray
+    instructor answer: dictionary with keys:str, values: a set of objects
+    rel_tol: tolerance on the matrix norm
+    keys: None if all keys should be considered
+    """
+    msg_list = []
+    status = True
+    keys = list(instructor_answer.keys()) if keys == None else keys
+
+    # Need an exception in case the student key is not found
+    for k in keys:
+        s_float = student_answer[k]
+        i_float = instructor_answer[k]
+        if math.fabs(i_float) < 1.e-6:
+            if math.fabs(s_flaot) > 1.e-6:
+                status = False
+            else:
+                status = True
+        else:
+            rel_err = math.fabs(s_float - i_float) / math.fabs(i_float)
+            status *= rel_err < rel_tol
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+def check_structure_dict_string_float(student_answer, instructor_answer, rel_tol, keys=None):
+    """
+    student answer: dictionary with keys:str, values: float
+    instructor answer: dictionary with keys:str, values: a set of objects
+    rel_tol: tolerance on the matrix norm
+    keys: None if all keys should be considered
+    """
+    status = True
+    msg_list = []
+
+    if not isinstance(instructor_answer, dict):
+        msg_list += ["Instructor answer should be a dict"]
+        status = False
+
+    if status and not isinstance(student_answer, dict):
+        msg_list += ["Student answer should be a dict"]
+        status = False
+
+    if status:
+        keys = keys if keys else list(instructor_answer.keys())
+        instructor_keys = set(keys)
+        instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
+        student_keys = set(student_answer.keys())
+        missing_keys = list(instructor_keys - student_keys)
+
+        if len(missing_keys) > 0:
+            msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
+            status = False
+        else:
+            msg_list.append(f"- No missing keys.")
+
+    if status:
+        # some keys are filtered. Student is allowed to have 
+        # keys not in the instructor set
+        for k, v in instructor_answer.items():
+            vs = student_answer[k]
+            if not isinstance(vs, float):
+                msg_list.append(f"- answer[{repr(k)}] should be a float.")
+                status = False
+
+        if status:
+            msg_list.append(f"- All elements are of type float as expected.")
+
+    if status:
+        msg_list.append(f"Type 'dict[str, float]' is correct")
+
+    return status, "\n".join(msg_list)
+
 
 # ======================================================================
 

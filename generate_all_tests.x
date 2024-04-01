@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./generate_homework_tests.x part1
+./generate_homework_tests.x hw5
