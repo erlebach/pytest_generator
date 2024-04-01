@@ -27,170 +27,321 @@ fixtures:
     args: [all_questions]
 
 questions:
-- id: question1
-  parts:
-    - id: (a)
-      type: string
-      answer: 'no'
-      note: Include quotes around 'yes' and 'no' so they are not interpreted as bool
-
-    - id:
-      type: 
-      answer: 
-
-    - id:
-      type: 
-      answer: 
-
-    - id:
-      type: 
-      answer: 
-
-- id: question2
+- id:
   parts:
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
+      note:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
-- id: question3
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+#----------------------------------------------------------------------
+- id:
   parts:
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
 
 
-- id: question4
+#----------------------------------------------------------------------
+- id:
   parts:
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
 
 
-- id: question4
+#----------------------------------------------------------------------
+- id:
   parts:
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
+    - id:
+      type:
+      answer:
 
-- id: question5
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+#----------------------------------------------------------------------
+
+- id:
   parts:
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
+    - id:
+      type:
+      answer:
 
-- id: question6
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+      explanation: 
+
+    - id:
+      type:
+      answer:
+      note:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+      explanation: 
+
+    - id:
+      type:
+      answer:
+      explanation: 
+#----------------------------------------------------------------------
+- id:
   parts:
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
+      note:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
 
     - id:
-      type: 
-      answer: 
+      type:
+      answer:
+      note:
+
+    - id:
+      type:
+      answer:
 
 
-- id: question7
+#----------------------------------------------------------------------
+- id:
   parts:
     - id:
-      type: 
-      answer: 
-
+      type:
+      answer:
     - id:
-      type: 
-      answer: 
-
+      type:
+      answer:
     - id:
-      type: 
-      answer: 
-
-
-- id: question8
-  parts:
+      type:
+      answer:
     - id:
-      type: 
-      answer: 
-
+      type:
+      answer:
     - id:
-      type: 
-      answer: 
-
+      type:
+      answer:
     - id:
-      type: 
-      answer: 
-
-
-- id: question9
-  parts:
+      type:
+      answer:
     - id:
-      type: 
-      answer: 
-
+      type:
+      answer:
+  
     - id:
-      type: 
-      answer: 
-
+      type:
+      answer:
+      note:
     - id:
-      type: 
-      answer: 
-
-
-- id: question10
-  parts:
+      type:
+      answer:
     - id:
-      type: 
-      answer: 
-
+      type:
+      answer:
     - id:
-      type: 
-      answer: 
-
+      type:
+      answer:
     - id:
-      type: 
-      answer: 
-
+      type:
+      answer:
+  
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+  
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+  
+  
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+  
