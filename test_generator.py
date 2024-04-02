@@ -69,7 +69,12 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
             part_id_sanitized = part['id'].replace(' ', '_').replace('(', '').replace(')', '').replace('|', '_').replace('=', '_')
             max_score_part = part.get('max_score', max_score_q)
-            function_name = f"test_answers_{question['id']}_{part_id_sanitized}_{part['type']}"
+
+            if sim_type == 'answers':
+                function_name = f"test_answers_{question['id']}_{part_id_sanitized}_{part['type']}"
+            else:
+                function_name = f"test_structure_{question['id']}_{part_id_sanitized}_{part['type']}"
+
             function_name = sanitize_function_name(function_name)
 
             decode_i_call_str = get_decoded_str(questions_data, part, 'i_answer', 'instructor_file')
