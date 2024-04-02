@@ -128,8 +128,10 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
         for var, (lower, upper) in local_vars_dict.items():
             random_values[var] = random.uniform(lower, upper)
             local_dct[var] = random_values[var]
-        s_float = eval(s_answ, {}, local_dct)
-        i_float = eval(i_answ, {}, local_dct)
+        print("==> s_answ: ", s_answ)
+        print("==> local_dct: ", local_dct)
+        s_float = eval(s_answ, {'math': math}, local_dct)
+        i_float = eval(i_answ, {'math': math}, local_dct)
         if math.fabs(i_float) < 1.e-5:
             abs_err = math.fabs(i_float - s_float)
             ae_status = abs_err < 1.e-5
