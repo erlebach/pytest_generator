@@ -4,9 +4,11 @@
 
 \cp pytest_generator/generator_config.yaml .
 \cp pytest_generator/type_handlers.yaml .
-\cp pytest_generator/hw4.yaml .
+\cp pytest_generator/*hw5*.yaml .
 \cp pytest_generator/assert_utilities.py .
+\cp pytest_generator/testing_utilities.py .
 \cp pytest_generator/test_utils.py .
+\cp pytest_generator/yaml_expand.py .
 \cp pytest_generator/tests/test_*.py tests/
 \cp pytest_generator/tests/my_fixtures.py tests/
 \cp -rf pytest_generator/pytest_utils .
