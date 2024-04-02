@@ -138,15 +138,15 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                     test_code += f"    choices = {choices}\n"
                     test_code +=  "    local_namespace['choices'] = choices\n"
 
-                notes = part.get('notes', None)
-                if notes is not None:
-                    test_code += f"    notes = {repr(notes)}\n"
-                    test_code += f"    {function_name}.notes = notes\n"
+                note = part.get('note', None)
+                if sim_type == 'answers' and note is not None:
+                    test_code += f"    note = {repr(note)}\n"
+                    test_code += f"    {function_name}.note = note\n"
 
                 explanation = part.get('explanation', None)
-                if explanation is not None:
-                    test_code += f"    answer_notes = {repr(explanation)}\n"
-                    test_code += f"    {function_name}.answer_notes = answer_notes\n"
+                if sim_type == 'answers' and  explanation is not None:
+                    test_code += f"    answer_note = {repr(explanation)}\n"
+                    test_code += f"    {function_name}.answer_note = answer_note\n"
 
                 #keys = part.get('keys', [])
                 #print("keys: ", keys)

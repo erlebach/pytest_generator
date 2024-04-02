@@ -9,6 +9,8 @@ def pytest_runtest_makereport(item):
     x._result.visibility = getattr(item._obj, 'visibility', 'visible')
     x._result.partial_score = getattr(item._obj, 'partial_score', '0')
     x._result.explanation = getattr(item._obj, 'explanation', None)
+    x._result.answer_note = getattr(item._obj, 'answer_note', None)
+    x._result.note = getattr(item._obj, 'note', None)
     x._result.hide_errors = getattr(item._obj, 'hide_errors', None)
 
 def pytest_terminal_summary(terminalreporter, exitstatus):
@@ -20,6 +22,8 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
         'stdout_visibility': 'hidden',
         'visibility': 'visible',
         'explanation': '',
+        'note': '',
+        'answer_note': '',
         'hide_errors': '',
         'partial_score': 0,
         'extra_data': {},
@@ -63,8 +67,11 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
 
         if True:
             if s.explanation is not None:
-                # print adittional explanation
-                output += f"\nExplanation: {s.explanation!s}"  # str()
+                # print additional explanation
+                output += f"\nExplanation: {s.explanation!s}"  
+
+            if s.answer_note is not None and s.answer_note is not "":
+                output += f"\nAdditional note: {s.answer_note!s}"  
 
             if hasattr(s, 'hide_errors') and s.hide_errors is not None:
                 output += s.hide_errors
