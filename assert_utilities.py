@@ -51,6 +51,7 @@ def return_value(status, msg_list, s_answ, i_answ):
         msg_list.append("Answer is incorrect.")
     msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
     msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
+    #print(f"==> {msg_list=}")
 
     return status, "\n".join(msg_list)
 
@@ -297,6 +298,8 @@ def check_answer_string(student_answer, instructor_answer):
 
     status = True if s_answ == i_answ else False
     msg_list.append("Strings are lowered and stripped")
+    #print("==> check_answer_string")
+    #print("==> ", msg_list)
     return return_value(status, msg_list, s_answ, i_answ)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 

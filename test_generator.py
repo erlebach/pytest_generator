@@ -174,7 +174,12 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                     test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
                     test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
 
-                test_code +=  "    explanation = '\\n'.join(['Structure tests:', explanation_structure])\n"
+                if sim_type == 'answers': 
+                    test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure, '==Answer tests==:', explanation_answer])\n"
+                else: 
+                    test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure])\n"
+
+                #test_code +=  "    explanation = '\\n'.join(['Structure tests:', explanation_structure])\n"
                 test_code += f"    {function_name}.explanation = explanation\n"
                 test_code += f"    assert is_success\n"
 
