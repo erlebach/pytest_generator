@@ -138,6 +138,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
                 # One of a finite number of choices for string type
                 choices = part.get('choices', [])
+                if choices == [] and (type == 'string' or type == 'str'):
+                    choices = []
 
                 if choices is not None:
                     test_code += f"    choices = {choices}\n"
