@@ -9,6 +9,19 @@ test_answers:
   assert_false: False
   fixture_import_file: my_fixtures
 
+# Options related to type
+types:
+  eval_float:
+    local_namespaces: {'math': math}
+    locals: {}
+  string:
+    choices: []
+    types: []
+  float:
+    tol: 1.e-3
+  explain_string:
+    max_nb_words: 5
+
 imports:
   - assert_utilities
 
