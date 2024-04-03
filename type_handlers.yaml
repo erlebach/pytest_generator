@@ -108,6 +108,11 @@ types:
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in {answer_var}.items())"
     struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
 
+  dict[int,list]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer)"
+
   dict[string,dict[str,list]]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_string_dict_str_list(student_answer, instructor_answer)"
@@ -149,7 +154,11 @@ types:
     #    or from the answer specified in the yaml file, or against a length specified in the yaml file. NOT DONE.
     assert_answer: "assert_utilities.check_answer_dict_string_NDArray(student_answer, instructor_answer, rel_tol, keys)"
     assert_structure: "assert_utilities.check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_tol, keys)"
-    #answer_msg: "Correct answer: {instructor_answer}"
+
+  dict[int,NDArray]:
+    import: "" 
+    assert_answer: "assert_utilities.check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
 
   dict[string,Tuple[NDArray]]:
     import: "" #"numpy as np"

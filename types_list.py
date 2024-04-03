@@ -5,6 +5,8 @@ types_list = [
     "dict[string,float]", 
     "dict[str,float]", 
     "dict[str,NDArray]",
+    "dict[int,NDArray]",
+    "dict[int,list]",
     "list[list[float]]", 
     "dict[string,set]",
     "explain_string", 

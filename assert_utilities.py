@@ -683,6 +683,187 @@ def check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_t
 
 # ======================================================================
 
+def check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys):
+    """
+    Similar to check_answer_dict_string_NDArray
+    student answer: dictionary with keys:str, values: an NDArray
+    instructor answer: dictionary with keys:str, values: a set of objects
+    rel_tol: tolerance on the matrix norm
+    keys: None if all keys should be considered
+    """
+    msg_list = []
+    status = True
+    i_dict_norm = {}
+    s_dict_norm = {}
+    keys = list(instructor_answer.keys()) if keys == None else keys
+
+    # Need an exception in case the student key is not found
+    for k in keys:
+        s_arr = student_answer[k]
+        i_arr = instructor_answer[k]
+        if s_arr.shape != i_arr.shape:
+            status = False
+            msg_list.append(f"key: {key}, incorrect shape {s_arr.shape}, should be {i_arr.shape}.")
+        s_norm = np.linalg.norm(s_arr)
+        i_norm = np.linalg.norm(i_arr)
+        i_dict_norm[k] = i_norm
+        s_dict_norm[k] = s_norm
+        rel_err = math.fabs(s_norm - i_norm) / math.fabs(i_norm)
+        if rel_err > rel_tol:
+            status = False
+            msg_list.append(f"key: {key}, L2 norm is not within {int(100*rel_tol)}%\n\
+                            relative error of the correct norm of {i_norm}.")
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+def check_structure_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys=None):
+    """
+    student answer: dictionary with keys:str, values: an NDArray
+    instructor answer: dictionary with keys:str, values: a set of objects
+    rel_tol: tolerance on the matrix norm
+    keys: None if all keys in the instructor_answer should be considered (list of ints)
+    """
+    status = True
+    msg_list = []
+
+    if not isinstance(instructor_answer, dict):
+        msg_list += ["Instructor answer should be a dict"]
+        status = False
+
+    if status and not isinstance(student_answer, dict):
+        msg_list += ["Student answer should be a dict"]
+        status = False
+
+    for key in student_answer.keys():
+        if not is_instance(key, int):
+            status = False
+            msg_list += [f"key {key} should be of type 'int', but is type {type(key).__name__}."]
+
+    if status:
+        keys = keys if keys else list(instructor_answer.keys())
+        instructor_keys = set(keys)
+        instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
+        student_keys = set(student_answer.keys())
+        missing_keys = list(instructor_keys - student_keys)
+
+        if len(missing_keys) > 0:
+            msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
+            status = False
+        else:
+            msg_list.append(f"- No missing keys.")
+
+    if status:
+        # some keys are filtered. Student is allowed to have 
+        # keys not in the instructor set
+        for k, v in instructor_answer.items():
+            #print("==> key: ", k)
+            vs = student_answer[k]
+            if not isinstance(vs, type(np.zeros(1))): 
+                msg_list.append(f"- answer[{repr(k)}] should be a numpy array.")
+                status = False
+
+        if status:
+            msg_list.append(f"- All elements are of type NDArray as expected.")
+
+    if status:
+        msg_list.append(f"Type 'dict[str, NDArray]' is correct")
+
+    return status, "\n".join(msg_list)
+
+# ======================================================================
+def check_answer_dict_int_list(student_answer, instructor_answer, rel_tol, keys):
+    """
+    Similar to check_answer_dict_string_NDArray
+    list of floats (if not specified)
+    student answer: dictionary with keys:str, values: an NDArray
+    instructor answer: dictionary with keys:str, values: a set of objects
+    rel_tol: tolerance on the matrix norm
+    keys: None if all keys should be considered
+
+    # HOW TO CHECK?
+    """
+    msg_list = []
+    status = True
+    i_dict_norm = {}
+    s_dict_norm = {}
+    keys = list(instructor_answer.keys()) if keys == None else keys
+
+    # Need an exception in case the student key is not found
+    for k in keys:
+        s_arr = student_answer[k]
+        i_arr = instructor_answer[k]
+        if s_arr.shape != i_arr.shape:
+            status = False
+            msg_list.append(f"key: {key}, incorrect shape {s_arr.shape}, should be {i_arr.shape}.")
+        s_norm = np.linalg.norm(s_arr)
+        i_norm = np.linalg.norm(i_arr)
+        i_dict_norm[k] = i_norm
+        s_dict_norm[k] = s_norm
+        rel_err = math.fabs(s_norm - i_norm) / math.fabs(i_norm)
+        if rel_err > rel_tol:
+            status = False
+            msg_list.append(f"key: {key}, L2 norm is not within {int(100*rel_tol)}%\n\
+                            relative error of the correct norm of {i_norm}.")
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+def check_structure_dict_int_list(student_answer, instructor_answer, rel_tol, keys=None):
+    """
+    student answer: dictionary with keys:str, values: an NDArray
+    list of floats (if not specified)
+    instructor answer: dictionary with keys:str, values: a set of objects
+    rel_tol: tolerance on the matrix norm
+    keys: None if all keys in the instructor_answer should be considered (list of ints)
+    """
+    status = True
+    msg_list = []
+
+    if not isinstance(instructor_answer, dict):
+        msg_list += ["Instructor answer should be a dict"]
+        status = False
+
+    if status and not isinstance(student_answer, dict):
+        msg_list += ["Student answer should be a dict"]
+        status = False
+
+    # I am not handling the keys argument yet <<<<<<
+    # Check the length of the lists (NOT DONE) <<<<<
+    # I could convert list to NDArray and call the function with NDARRAY for checking. 
+    # If the list cannot be converted, it has the wrong format. So use an try/except. 
+
+    if status:
+        # some keys are filtered. Student is allowed to have 
+        # keys not in the instructor set
+        for k, v in instructor_answer.items():
+            key = student_answer.get(k, None)
+            if key is None:
+                status = False
+                msg_list.append(f"Key {k} is missing from student answer")
+                continue
+            vs = student_answer[k]
+            if not isinstance(vs, list):
+                status = False
+                msg_list.append(f"student_answer[{k}] is not type 'list'. Cannot proceed with answer check.")
+            for el in vs:
+                if not isinstance(el, float):
+                    status = False
+                    msg_list.append(f"student_answer[{k}] is a list with at least one non-float element. Cannot proceed with answer check.")
+                    break
+
+        if status:
+            msg_list.append(f"- All elements are of type list of float as expected.")
+
+    if status:
+        msg_list.append(f"Type 'dict[str, list]' is correct")
+
+    return status, "\n".join(msg_list)
+
+
+# ======================================================================
+
+
 def check_answer_list_NDArray(student_answer, instructor_answer, rel_tol):
     """
     tol: max relative error on the L2 norm
