@@ -371,7 +371,6 @@ def check_structure_explain_string(student_answer, instructor_answer):
 
     # Check the number of words in the string
     max_nb_words = config_dict['max_nb_words']
-    print(f"===> {max_nb_words=}")
 
     if status:
         is_nb_words = len(student_answer.split()) >= max_nb_words
