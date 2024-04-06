@@ -34,6 +34,17 @@ def load_yaml_file(file_path):
 
 config_dict = load_yaml_file("generator_config.yaml")
 max_nb_words = config_dict["test_structure"]["max_nb_words"]
+def extract_config_dict():
+    dct = {}
+    config_dict = load_yaml_file("generator_config.yaml")
+    test_structure = config_dict.get("test_structure", None)
+    dct['max_nb_words'] = test_structure.get("max_nb_words", 10) if test_structure else 10
+    types = test_structure.get("types", {})
+    eval_float = types.get("eval_float", {})
+    dct['local_namespaces'] = eval_float.get("local_namespaces")
+    return dct
+
+config_dict = extract_config_dict()
 
 
 #----------------------------------------------------------------------
@@ -128,10 +139,8 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
         for var, (lower, upper) in local_vars_dict.items():
             random_values[var] = random.uniform(lower, upper)
             local_dct[var] = random_values[var]
-        print("==> s_answ: ", s_answ)
-        print("==> local_dct: ", local_dct)
-        s_float = eval(s_answ, {'math': math}, local_dct)
-        i_float = eval(i_answ, {'math': math}, local_dct)
+        s_float = eval(s_answ, config_dict['local_namespaces'], local_dct)
+        i_float = eval(i_answ, config_dict['local_namespaces'], local_dct)
         if math.fabs(i_float) < 1.e-5:
             abs_err = math.fabs(i_float - s_float)
             ae_status = abs_err < 1.e-5
@@ -361,7 +370,8 @@ def check_structure_explain_string(student_answer, instructor_answer):
         msg_list.append("- Type must be of type 'str'")
 
     # Check the number of words in the string
-    max_nb_words = 4  # WHERE IS THIS SET. Should be in configuration file. 
+    max_nb_words = config_dict['max_nb_words']
+    print(f"===> {max_nb_words=}")
 
     if status:
         is_nb_words = len(student_answer.split()) >= max_nb_words
@@ -982,6 +992,8 @@ def check_structure_NDArray(student_answer, instructor_answer):
     Check that all elements in the list have matching norms
     instructor_answer: not used
     """
+    #print(f"===> {type(np.zeros([1]))=}")
+    #print(f"===> {type(student_answer)=}")
     if not isinstance(student_answer, type(np.zeros([1]))):
         return False, "- Answer should be a numpy array." 
     return True, "Type 'NDArray' is correct."
