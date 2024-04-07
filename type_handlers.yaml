@@ -61,7 +61,11 @@ types:
     import: "" #"numpy as np"
     assert_answer: "assert_utilities.check_answer_list_NDArray(student_answer, instructor_answer, rel_tol)"
     assert_structure: "assert_utilities.check_structure_list_NDArray(student_answer, instructor_answer)"
-    #answer_msg: ""
+
+  list[int]:
+    import: "" 
+    assert_answer: "assert_utilities.check_answer_list_int(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_list_int(student_answer, instructor_answer)"
 
   list[string]:
     import: ""
@@ -115,8 +119,8 @@ types:
 
   dict[int,list[float]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer, keys, rel_tol)"
-    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_dict_int_list_float(student_answer, instructor_answer, keys)"
 
   dict[string,dict[str,list]]:
     import: ""
@@ -164,6 +168,11 @@ types:
     import: "" 
     assert_answer: "assert_utilities.check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
     assert_structure: "assert_utilities.check_structure_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
+
+  dict[tuple[int],NDArray]:
+    import: "" 
+    assert_answer: "assert_utilities.check_answer_dict_tuple_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_tuple_int_NDArray(student_answer, instructor_answer, keys)"
 
   dict[string,Tuple[NDArray]]:
     import: "" #"numpy as np"

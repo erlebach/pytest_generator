@@ -69,6 +69,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
         for part in question['parts']:
             part_type = part.get("type", answer_type)
+            print("==> part_type: ", part_type)
             if 'fixture' in part: 
                 fixture = part['fixture']
                 fixture_name = fixture['name']

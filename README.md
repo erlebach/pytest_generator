@@ -25,44 +25,12 @@ files+folders inside template_folder/:
     # cp pyproject.toml to parent folder to template_folder/
     pyproject.toml  # template for most homeworks
     yaml_expand.py
+----------------------------------------------------------------------
+2024-04-07_16:24
+- TODO: 
+    - answer_type is null should never happen
+    - in yaml_expand.py, remove spaces from types (fixes instructor errors)
 
-Assignment3SolPDF.docx
-answer_part1.py
-generator_utils.py
-results.json
-test_utils.py
-DEBUG.md
-assert_utilities.py
-homework_template.yaml
-run_debug.x
-testing_utilities.py
-HOW_TO_DEBUG.md
-bak_assignment3
-run_tests.x
-tests
-INSTALL.md
-example_yaml_files
-load_yaml.py
-scripts
-type_handlers.yaml
-LICENSE
-generate_all_tests.x
-part1.yaml
-student_code_with_answers
-types_list.py
-NOTES.md
-generate_answers.x
-part2.yaml
-Pipfile
-generate_homework_tests.x
-preprocessed_part1.yaml
-student_github_template
-yaml_expand.py
-README.md
-generate_structure.x
-preprocessed_part1_expand.yaml
-template_code_generator.py
-__pycache__
-generator_config.yaml
-pytest_utils
-test_generator.py
+
+
+----------------------------------------------------------------------

@@ -691,6 +691,113 @@ def check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_t
     return status, "\n".join(msg_list)
 
 # ======================================================================
+def check_answer_dict_tuple_int_NDArray(student_answer, instructor_answer, rel_tol, keys):
+    """
+    Similar to check_answer_dict_string_NDArray
+    student answer: dictionary with keys:str, values: an NDArray
+    instructor answer: dictionary with keys:str, values: a set of objects
+    rel_tol: tolerance on the matrix norm
+    keys: None if all keys should be considered
+    """
+    msg_list = []
+    status = True
+    i_dict_norm = {}
+    s_dict_norm = {}
+    keys = list(instructor_answer.keys()) if keys == None else keys
+    sub_instructor_answer = {k: instructor_answer[k] for k in keys}
+
+    # Need an exception in case the student key is not found
+    for k in sub_instructor_answer.keys():
+        i_v = instructor_answer.get(k, None)
+        s_v = student_answer.get(k, None)
+        if k not in student_answer: 
+            status = False
+            msg_list.append(f"The key {k} is missing")
+            break
+        s_arr = student_answer[k]
+        i_arr = instructor_answer[k]
+        if s_arr.shape != i_arr.shape:
+            status = False
+            msg_list.append(f"key: {key}, incorrect shape {s_arr.shape}, should be {i_arr.shape}.")
+        s_norm = np.linalg.norm(s_arr)
+        i_norm = np.linalg.norm(i_arr)
+        i_dict_norm[k] = i_norm
+        s_dict_norm[k] = s_norm
+        if i_norm < 1.e-5:
+            abs_err = math.fabs(s_norm - i_norm)
+            if abs_err > 1.e-5:
+                status = False
+                msg_list.append(f"- key {k} has a norm with absolute error > 1.e-5")
+        else:
+            rel_err = math.fabs(s_norm - i_norm) / math.fabs(i_norm)
+            if rel_err > rel_tol:
+                status = False
+                msg_list.append(f"key: {key}, L2 norm is not within {int(100*rel_tol)}%\n\
+                                relative error of the correct norm of {i_norm}.")
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+def check_structure_dict_tuple_int_NDArray(student_answer, instructor_answer, keys):
+    """
+    """
+    status = True
+    msg_list = []
+
+    if not isinstance(instructor_answer, dict):
+        msg_list += ["Instructor answer should be a dict"]
+        status = False
+
+    if status and not isinstance(student_answer, dict):
+        msg_list += ["Student answer should be a dict"]
+        status = False
+
+    for key in student_answer.keys():
+        if not isinstance(key, tuple):
+            status = False
+            msg_list += [f"key {key} should be of type 'tuple', but is type {type(key).__name__}."]
+
+    if status:
+        keys = keys if keys else list(instructor_answer.keys())
+        instructor_keys = set(keys)
+        instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
+        student_keys = set(student_answer.keys())
+        missing_keys = list(instructor_keys - student_keys)
+
+        if len(missing_keys) > 0:
+            msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
+            status = False
+        else:
+            msg_list.append(f"- No missing keys.")
+
+    if status:
+        # some keys are filtered. Student is allowed to have 
+        # keys not in the instructor set
+        for k, v in student_answer.items():
+            if not isinstance(k, tuple): 
+                status = False
+                msg_list.append("At least one of your keys is not of type 'tuple'.")
+                break
+            for el in k:
+                if not isinstance(el, int):
+                    status = False
+                    msg_list.append("At least one element of one key is not an 'int'.")
+                    break
+            vs = student_answer[k]
+            if not isinstance(vs, type(np.zeros(1))): 
+                msg_list.append(f"- answer[{repr(k)}] should be a numpy array.")
+                status = False
+
+        if status:
+            msg_list.append(f"- All keys are tuples of ints and values are of type NDArray as expected.")
+
+    if status:
+        msg_list.append(f"Type 'dict[tuple[int], NDArray]' is correct")
+
+    return status, "\n".join(msg_list)
+
+#----------------------------------------------------------------------
 
 def check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys):
     """
@@ -717,15 +824,22 @@ def check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, ke
         i_norm = np.linalg.norm(i_arr)
         i_dict_norm[k] = i_norm
         s_dict_norm[k] = s_norm
-        rel_err = math.fabs(s_norm - i_norm) / math.fabs(i_norm)
-        if rel_err > rel_tol:
-            status = False
-            msg_list.append(f"key: {key}, L2 norm is not within {int(100*rel_tol)}%\n\
-                            relative error of the correct norm of {i_norm}.")
+        if i_norm < 1.e-5:
+            abs_err = math.fabs(s_norm - i_norm)
+            if abs_err > 1.e-5:
+                status = False
+                msg_list.append(f"- key {k} has a norm with absolute error > 1.e-5")
+        else:
+            rel_err = math.fabs(s_norm - i_norm) / math.fabs(i_norm)
+            if rel_err > rel_tol:
+                status = False
+                msg_list.append(f"key: {key}, L2 norm is not within {int(100*rel_tol)}%\n\
+                                relative error of the correct norm of {i_norm}.")
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
 def check_structure_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys=None):
     """
     student answer: dictionary with keys:str, values: an NDArray
@@ -894,9 +1008,6 @@ def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, re
     for k in keys:
         s_arr = student_answer[k]
         i_arr = instructor_answer[k]
-        if s_arr.shape != i_arr.shape:
-            status = False
-            msg_list.append(f"key: {key}, incorrect shape {s_arr.shape}, should be {i_arr.shape}.")
         for ii, (i_el, s_el) in enumerate(zip(i_arr, s_arr)):
             if math.fabs(i_el) <= 1.e-6:
                 abs_err = math.fabs(i_el - s_el)
@@ -910,6 +1021,7 @@ def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, re
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
 def check_structure_dict_int_list_float(student_answer, instructor_answer, keys=None):
     """
     student answer: dictionary with keys:str, values: an NDArray
@@ -939,7 +1051,7 @@ def check_structure_dict_int_list_float(student_answer, instructor_answer, keys=
     if status:
         # some keys are filtered. Student is allowed to have 
         # keys not in the instructor set
-        for k, v in sub_instructor.items():
+        for k, v in sub_instructor_answer.items():
             key = student_answer.get(k, None)
             if key is None:
                 status = False
@@ -965,6 +1077,64 @@ def check_structure_dict_int_list_float(student_answer, instructor_answer, keys=
 
 # ======================================================================
 
+
+def check_answer_list_int(student_answer, instructor_answer):
+    """
+    tol: max relative error on the L2 norm
+    Check that all elements in the list have matching norms
+    """
+    msg_list = []
+    status = True
+    answ_eq_len = len(student_answer) == len(instructor_answer)
+
+    if answ_eq_len:
+        for s_el, i_el in zip(student_answer, instructor_answer):
+            if s_el == i_el:
+                status = True
+            else:
+                status = False
+
+    if not status: 
+        msg_list.append("Some elements are incorrect")
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+def check_structure_list_int(student_answer, instructor_answer):
+    """
+    Check that elements in the list are NDArrays
+    """
+    #print("==>  structure check_structure_list_NDArray....")
+    status = True
+    msg_list = []
+
+    if not isinstance(student_answer, list):
+        status = False
+        msg_list.append(f"- The answer should be of type 'list'; your type is {type(student_answer).__name__}")
+    else:
+        msg_list.append("- The answer is type list. Correct.")
+
+    # Check length of list
+    if status:
+        if len(student_answer) != len(instructor_answer):
+            status = False
+            msg_list.append(f"- The length of your list is incorrect. Your list length is {len(student_answer)}. The length should be {len(instructor_answer)}.")
+        else: 
+            msg_list.append("- The length of the list is correct.")
+
+    if status: 
+        for i, s_arr in enumerate(instructor_answer):
+            if not isinstance(s_arr, int): 
+                status = False
+                msg_list.append("- Element {i} of your list should be of type 'int'.")
+        
+    if status:
+        msg_list.append("- All list elements are type 'int'.")
+
+    return status, "\n".join(msg_list)
+
+# ======================================================================
 
 def check_answer_list_NDArray(student_answer, instructor_answer, rel_tol):
     """
@@ -1071,9 +1241,17 @@ def check_answer_NDArray(student_answer, instructor_answer, tol):
     i_norm = np.linalg.norm(instructor_answer)
 
     # Can i_norm be zero?
-    status *= (s_norm - i_norm) / i_norm <= tol
+    if math.fabs(i_norm) < 1.e-5:
+        abs_err = math.fabs(i_norm - s_norm)
+        if abs_err >= 1.e-5:
+            status = False
+            msg_list.append("Student answer has an absolute error > 1.e-5")
+    else:
+        status *= (s_norm - i_norm) / i_norm <= tol
+
     if not status:
-        print("Replace the array by its norm")
+        msg_list.append("For comparison, the array was replaced by its norm")
+        msg_list.append(f"The norms have relative error > {tol}")
 
     return return_value(status, msg_list, s_norm, i_norm)
 
@@ -1084,8 +1262,8 @@ def check_structure_NDArray(student_answer, instructor_answer):
     Check that all elements in the list have matching norms
     instructor_answer: not used
     """
-    #print(f"===> {type(np.zeros([1]))=}")
-    #print(f"===> {type(student_answer)=}")
+    print(f"===> {type(np.zeros([1]))=}")
+    print(f"===> {type(student_answer)=}")
     if not isinstance(student_answer, type(np.zeros([1]))):
         return False, f"- Answer should be a numpy array rather than {type(student_answer)}"
     return True, "Type 'NDArray' is correct."
