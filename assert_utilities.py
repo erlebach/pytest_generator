@@ -120,7 +120,7 @@ def check_structure_float(student_answer, instructor_answer):
         msg_list = ["Answer is of type float as expected."]
     else:
         status = False
-        msg_list = [f"Answer should be of type float. It is of type {type(student_answer)}"]
+        msg_list = [f"Answer should be of type float. It is of type {repr(type(student_answer).__name__)}"]
     return status, "\n".join(msg_list)
 # ======================================================================
 def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
@@ -160,8 +160,8 @@ def check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, 
 
 # ======================================================================
 def check_structure_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol):
-    print("\nENTER check_structure_eval_float")
-    print("student_answer= ", student_answer)
+    #print("\nENTER check_structure_eval_float")
+    #print("student_answer= ", student_answer)
     if not isinstance(student_answer, str):
         return False, "Student_answer is {student_answer}. Should be string defining a valid Python expression."
 
@@ -343,7 +343,7 @@ def check_structure_string(student_answer, instructor_answer, choices):
         else:
             msg_list += [f"- Answer {repr(student_answer)} is among the valid choices"]
 
-    print("\n".join(msg_list))
+    #print("\n".join(msg_list))
     return status, "\n".join(msg_list)
 
 # ======================================================================
@@ -745,7 +745,7 @@ def check_structure_dict_int_NDArray(student_answer, instructor_answer, rel_tol,
         status = False
 
     for key in student_answer.keys():
-        if not is_instance(key, int):
+        if not isinstance(key, int):
             status = False
             msg_list += [f"key {key} should be of type 'int', but is type {type(key).__name__}."]
 
@@ -781,13 +781,12 @@ def check_structure_dict_int_NDArray(student_answer, instructor_answer, rel_tol,
     return status, "\n".join(msg_list)
 
 # ======================================================================
-def check_answer_dict_int_list(student_answer, instructor_answer, rel_tol, keys):
+def check_answer_dict_int_list(student_answer, instructor_answer, keys):
     """
     Similar to check_answer_dict_string_NDArray
     list of floats (if not specified)
     student answer: dictionary with keys:str, values: an NDArray
     instructor answer: dictionary with keys:str, values: a set of objects
-    rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
 
     # HOW TO CHECK?
@@ -805,25 +804,30 @@ def check_answer_dict_int_list(student_answer, instructor_answer, rel_tol, keys)
         if s_arr.shape != i_arr.shape:
             status = False
             msg_list.append(f"key: {key}, incorrect shape {s_arr.shape}, should be {i_arr.shape}.")
-        s_norm = np.linalg.norm(s_arr)
-        i_norm = np.linalg.norm(i_arr)
-        i_dict_norm[k] = i_norm
-        s_dict_norm[k] = s_norm
-        rel_err = math.fabs(s_norm - i_norm) / math.fabs(i_norm)
-        if rel_err > rel_tol:
-            status = False
-            msg_list.append(f"key: {key}, L2 norm is not within {int(100*rel_tol)}%\n\
-                            relative error of the correct norm of {i_norm}.")
+        for i_el, s_el in zip(i_arr, s_arr):
+            if i_el == s_el:
+                status = True
+            else:
+                status = False
+                msg_list.append(f"Elements not equal (instructor/student): {i_el}/{s_el}")
+        #s_norm = np.linalg.norm(s_arr)
+        #i_norm = np.linalg.norm(i_arr)
+        #i_dict_norm[k] = i_norm
+        #s_dict_norm[k] = s_norm
+        #rel_err = math.fabs(s_norm - i_norm) / math.fabs(i_norm)
+        #if rel_err > rel_tol:
+            #status = False
+            #msg_list.append(f"key: {key}, L2 norm is not within {int(100*rel_tol)}%\n\
+                            #relative error of the correct norm of {i_norm}.")
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
-def check_structure_dict_int_list(student_answer, instructor_answer, rel_tol, keys=None):
+def check_structure_dict_int_list(student_answer, instructor_answer, keys=None):
     """
     student answer: dictionary with keys:str, values: an NDArray
     list of floats (if not specified)
     instructor answer: dictionary with keys:str, values: a set of objects
-    rel_tol: tolerance on the matrix norm
     keys: None if all keys in the instructor_answer should be considered (list of ints)
     """
     status = True
@@ -869,6 +873,95 @@ def check_structure_dict_int_list(student_answer, instructor_answer, rel_tol, ke
 
     return status, "\n".join(msg_list)
 
+# ======================================================================
+def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol):
+    """
+    Similar to check_answer_dict_string_NDArray
+    list of floats (if not specified)
+    student answer: dictionary with keys:str, values: an NDArray
+    instructor answer: dictionary with keys:str, values: a set of objects
+    keys: None if all keys should be considered
+
+    # HOW TO CHECK?
+    """
+    msg_list = []
+    status = True
+    i_dict_norm = {}
+    s_dict_norm = {}
+    keys = list(instructor_answer.keys()) if keys == None else keys
+
+    # Need an exception in case the student key is not found
+    for k in keys:
+        s_arr = student_answer[k]
+        i_arr = instructor_answer[k]
+        if s_arr.shape != i_arr.shape:
+            status = False
+            msg_list.append(f"key: {key}, incorrect shape {s_arr.shape}, should be {i_arr.shape}.")
+        for ii, (i_el, s_el) in enumerate(zip(i_arr, s_arr)):
+            if math.fabs(i_el) <= 1.e-6:
+                abs_err = math.fabs(i_el - s_el)
+                status = True
+            elif fabs((i_el - s_el)/i_el) < rel_err:
+                status = True
+            else:
+                status = False
+                msg_list.append(f"Element {ii+1} not equal (instructor/student): {i_el}/{s_el}")
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+def check_structure_dict_int_list_float(student_answer, instructor_answer, keys=None):
+    """
+    student answer: dictionary with keys:str, values: an NDArray
+    list of floats (if not specified)
+    instructor answer: dictionary with keys:str, values: a set of objects
+    keys: None if all keys in the instructor_answer should be considered (list of ints)
+    """
+    status = True
+    msg_list = []
+
+    if not isinstance(instructor_answer, dict):
+        msg_list += ["Instructor answer should be a dict"]
+        status = False
+
+    if status and not isinstance(student_answer, dict):
+        msg_list += ["Student answer should be a dict"]
+        status = False
+
+    keys = list(instructor_answer.keys()) if keys == None else keys
+    sub_instructor_answer = {k: instructor_answer[k] for k in keys}
+
+    # I am not handling the keys argument yet <<<<<<
+    # Check the length of the lists (NOT DONE) <<<<<
+    # I could convert list to NDArray and call the function with NDARRAY for checking. 
+    # If the list cannot be converted, it has the wrong format. So use an try/except. 
+
+    if status:
+        # some keys are filtered. Student is allowed to have 
+        # keys not in the instructor set
+        for k, v in sub_instructor.items():
+            key = student_answer.get(k, None)
+            if key is None:
+                status = False
+                msg_list.append(f"Key {k} is missing from student answer.")
+                continue
+            vs = student_answer[k]
+            if not isinstance(vs, list):
+                status = False
+                msg_list.append(f"student_answer[{k}] is not type 'list'. Cannot proceed with answer check.")
+            for el in vs:
+                if not isinstance(el, float):
+                    status = False
+                    msg_list.append(f"student_answer[{k}] is a list with at least one non-float element. Cannot proceed with answer check.")
+                    break
+
+        if status:
+            msg_list.append(f"- All elements are of type list[float] as expected.")
+
+    if status:
+        msg_list.append(f"Type 'dict[str, list[float]]' is correct.")
+
+    return status, "\n".join(msg_list)
 
 # ======================================================================
 
@@ -994,7 +1087,7 @@ def check_structure_NDArray(student_answer, instructor_answer):
     #print(f"===> {type(np.zeros([1]))=}")
     #print(f"===> {type(student_answer)=}")
     if not isinstance(student_answer, type(np.zeros([1]))):
-        return False, "- Answer should be a numpy array." 
+        return False, f"- Answer should be a numpy array rather than {type(student_answer)}"
     return True, "Type 'NDArray' is correct."
 
 # ======================================================================
@@ -1350,10 +1443,9 @@ def check_answer_int(student_answer, instructor_answer):
 def check_structure_int(student_answer, instructor_answer):
     """
     """
-    #print("===> inside check_structure_int, integer")
     if not isinstance(student_answer, int):
         status = False
-        msg_list = [f"Answer must be of type 'int'. Your answer is of type {type(student_answer)}."]
+        msg_list = [f"Answer must be of type 'int'. Your answer is of type {type(student_answer).__name__}."]
     else:
         status = True
         msg_list = [f"Answer is of type 'int' as expected."]

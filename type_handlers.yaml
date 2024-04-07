@@ -110,8 +110,13 @@ types:
 
   dict[int,list]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer, keys)"
+
+  dict[int,list[float]]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer, keys, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer, keys)"
 
   dict[string,dict[str,list]]:
     import: ""

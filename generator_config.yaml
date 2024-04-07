@@ -1,3 +1,6 @@
+all_tests:
+  type: float
+
 test_structure:
   # set all tests to fail
   assert_false: False
