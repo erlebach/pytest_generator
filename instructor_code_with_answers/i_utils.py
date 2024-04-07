@@ -222,15 +222,17 @@ def plot1e(x, y_line, y_line2, y1_tts, y1_nps, colors2, colors3):
 
 def plot2a(B, target):
     fig = plt.figure()
-    ax = fig.add_subplot(projection="3d")
-    #print(f"plot2a, {target[:]=}")
-    #print(f"plot2a, {target=}")
+    ax = fig.add_subplot(projection="3d")  # makes it 3D
     target = np.asarray(target).astype(int)
     new_colors = [["red", "blue"][i] for i in target % 2]
     alpha = [1] * len(target)
-    ax.scatter(B[:, 0], B[:, 1], B[:, 2], c=new_colors)
+    #print(f"===> {B[:, 0].shape=}")
+    #print(f"===> {B[:, 1].shape=}")
+    #print(f"===> {B[:, 2].shape=}")
+    plot = ax.scatter(B[:, 0], B[:, 1], B[:, 2], c=new_colors)
     plt.savefig("plot2a, titlexxx.pdf")
     plt.close()
+    return plot
 
 
 def plot2b(kk, losses_2):

@@ -1529,8 +1529,6 @@ def check_answer_dendrogram(student_dendro, instructor_dendro, rel_tol):
     status = True
     msg_list = []
 
-    # from scipy.cluster.hierarchy import dendrogram
-
     dend1 = student_dendro
     dend2 = instructor_dendro
 
@@ -1695,3 +1693,59 @@ def check_structure_list_string(student_answer, instructor_answer):
     return status, "\n".join(msg_list)
 
 # ======================================================================
+
+def check_answer_scatterplot3d(student_answer, instructor_answer, rel_tol):
+    status = True
+    msg_list = []
+
+    s_answ = student_answer
+    i_answ = instructor_answer
+
+    # Check for equality
+    x, y, z = s_answ._offsets3d
+    s_x, s_y, s_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+
+    x, y, z = i_answ._offsets3d
+    i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+
+    #print(f"==> {i_x=}, {i_y=}, {i_z=}")
+    #print(f"==> {s_x=}, {s_y=}, {s_z=}")
+
+    sum_i =  np.sum(i_x) + np.sum(i_y) + np.sum(i_z)
+    sum_s =  np.sum(s_x) + np.sum(s_y) + np.sum(s_z)
+
+    rel_err = (sum_i - sum_s)  / (sum_s)
+    if rel_err >= rel_tol:
+        status = False
+        msg_list.append(f"The graph points do not match between instructor and student to within relative error {rel_tol}")
+
+    return status, "\n".join(msg_list)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+def check_structure_scatterplot3d(student_answer, instructor_answer, choices):
+    from matplotlib.collections import PathCollection
+    status = True
+    msg_list = []
+
+    s_answ = student_answer
+    i_answ = instructor_answer
+
+    if not isinstance(student_answer, PathCollection):
+        status = False
+        msg_list.append("The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'.")
+
+    x, y, z = s_answ._offsets3d
+    s_x, s_y, s_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+
+    x, y, z = i_answ._offsets3d
+    i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+
+    if i_x.shape == s_x.shape and i_y.shape == s_y.shape and i_z.shape == s_z.shape:
+        status == False
+        msg_list.append(f"The number of points ({s_x.shape[0]}) is incorrect")
+
+    return status, "\n".join(msg_list)
+
+# ======================================================================
+

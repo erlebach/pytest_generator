@@ -28,9 +28,12 @@ types_list = [
     "bool",
     "dict",
     "int",
+    "scatterplot3d", 
     #"float_range",
     #"float",
     #"choice",
     #"set",
     #"list"
+    #list[tuples[int]]
+    #list[tuples[float]]
 ]

@@ -220,6 +220,11 @@ types:
     assert: "isinstance({answer_var}, DecisionTreeClassifier)"
     struct_msg: Answer should be a DecisionTreeClassifier instance. 
 
+  scatterplot3d:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_scatterplot3d(student_answer, instructor_answer, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_scatterplot3d(student_answer, instructor_answer, choices)"
+
   dendrogram: 
     import: ""
     # Return from Dendrogram function
