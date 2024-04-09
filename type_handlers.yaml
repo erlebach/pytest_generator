@@ -127,6 +127,11 @@ types:
     assert_answer: "assert_utilities.check_answer_dict_string_dict_str_list(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_dict_string_dict_str_list(student_answer, instructor_answer)"
 
+  dict[str,dict[str,float]]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_dict_str_dict_str_float(student_answer, instructor_answer)"
+
   explain_string:
     import: ""
     assert_answer: "assert_utilities.check_answer_explain_string(student_answer, instructor_answer)"

@@ -1,4 +1,5 @@
 types_list = [
+    "dict[str,dict[str,float]]",
     "dict[string,dict[str,list]]",
     "dict[string,Tuple[NDArray]]", 
     "dict[string,NDArray]", 

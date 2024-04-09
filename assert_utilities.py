@@ -5,6 +5,7 @@ import random
 import math
 import numpy as np
 import yaml
+from pprint import pprint
 import matplotlib.pyplot as plt
 
 # ......................................................................
@@ -250,6 +251,66 @@ def check_structure_dict_string_dict_str_list(student_answer, instructor_answer)
 
     if status is True:
         msg_list.append("Type 'dict[str, dict[str, list]' is correct.")
+
+    return status, "\n".join(msg_list)
+
+
+# ======================================================================
+def check_answer_dict_str_dict_str_float(student_answer, instructor_answer):
+    """
+    The type is a dict[str, dict[str, list]]
+    """
+    if not isinstance(student_answer, dict):
+        return False
+
+    for k, v in student_answer.items():
+        if not (isinstance(k, str) and isinstance(v, dict)):
+            return False
+
+        for inner_k, inner_v in v.items():
+            if not (isinstance(inner_k, str) and isinstance(inner_v, list)):
+                return False
+
+    return True
+
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
+def check_structure_dict_str_dict_str_float(student_answer, instructor_answer):
+    """
+    Check the structure of the answer. Expected type: dict[str, dict[str, float]]
+    """
+    msg_list = []
+    status = True
+    i_ans = instructor_answer
+    s_ans = student_answer
+
+    # Assumes instructor answer is correct. Ideally, the keys should be listed
+    # in the yaml file.
+    missing_keys = set(i_ans.keys()) - set(s_ans.keys())
+    if len(missing_keys) > 0:
+        return False, f"- Missing keys: {[repr(k) for k in missing_keys]}."
+
+    print("answer keys: ", list(student_answer.keys()))
+    for k, v in instructor_answer.items():
+        print(f"key: {k}, value: {v}")
+
+    for k, v in instructor_answer.items():
+        if not isinstance(v, dict):
+            msg_list.append(f"- answer[{repr(k)}] must be of type 'dict'")
+            status *= False
+            continue
+        # v is a dict
+        for kk, vv in v.items():
+            if not (isinstance(kk, str) and isinstance(vv, float)):
+                msg_list.append(
+                    f"- answer[{repr(k)}] must have keys of type 'str' and values of type 'float'"
+                )
+                status *= False
+
+    if status is True:
+        msg_list.append("Type 'dict[str, dict[str, float]' is correct.")
 
     return status, "\n".join(msg_list)
 
