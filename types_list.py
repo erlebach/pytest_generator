@@ -29,6 +29,8 @@ types_list = [
     "dict",
     "int",
     "scatterplot3d", 
+    "scatterplot2d",
+    "lineplot",
     #"float_range",
     #"float",
     #"choice",
