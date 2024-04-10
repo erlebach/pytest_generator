@@ -177,7 +177,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                 test_code += f"    question_id = {repr(part_question_id)}\n"
                 test_code += f"    subquestion_id = {repr(part_id)}\n"
 
-                test_code += f"    partial_score_frac_l = [1.]\n"  # FIGURE OUT HOW TO HANDLE THIS
+                test_code += f"    partial_score_frac_l = [0.]\n"  # FIGURE OUT HOW TO HANDLE THIS
                 test_code +=  "    local_namespace['partial_score_frac_l'] = partial_score_frac_l\n"
 
                 test_code +=  "    function_name.answer_type = answer_type\n"
@@ -199,11 +199,16 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                 if sim_type == 'answers':
                     test_code +=  "    if is_success:\n"
                     test_code +=  "        is_success, explanation_answer    = eval(msg_answer,    {'__builtins__':{}}, local_namespace)\n"
+                    test_code +=  "        if is_success is True:\n"
+                    test_code +=  "            function_name.partial_score_frac = 1.0\n"
+                    test_code +=  "        else:\n"
+                    test_code +=  "            function_name.partial_score_frac = partial_score_frac_l[0]\n"
                     test_code +=  "    else: \n"
                     test_code +=  "        explanation_answer = 'Failed structural tests, No grade for answer component\\n.' \n"
                     test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
                     test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
-                    test_code +=  "    function_name.partial_score_frac = partial_score_frac_l[0]\n"
+                    test_code +=  "        function_name.partial_score_frac = partial_score_frac_l[0]\n"
+                    test_code +=  "        print(f'FAILURE, partial score: {function_name.partial_score_frac}')\n"
 
                 if sim_type == 'answers': 
                     test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure, '==Answer tests==:', explanation_answer])\n"

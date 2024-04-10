@@ -112,6 +112,7 @@ def check_answer_float(student_answer, instructor_answer, rel_tol):
 
 
     if math.fabs(instructor_answer) < 1.0e-5:
+        # if the denominator of relative error is near zero
         abs_err = math.fabs(student_answer - instructor_answer)
         if abs_err > 1.e-4:
             status = False
@@ -120,14 +121,19 @@ def check_answer_float(student_answer, instructor_answer, rel_tol):
             msg_list = [f"Answer is correct to within absolute error of {1.e-8}"]
 
     else:
+        # the relative error can be computed
         rel_err = (student_answer - instructor_answer) / instructor_answer
         rel_err = math.fabs(rel_err)
+        print(f"{rel_err=}, {student_answer=}, {instructor_answer}, {rel_tol=}")
         if rel_err > rel_tol:
             status = False
+            #print("==> (rel_err > rel_tol) {status=}") 
             msg_list = [f"Answer is not correct to within relative error: {100*rel_tol}%"]
         else:
+            status = True
             msg_list = [f"Answer is correct to within relative error: {100*rel_tol}%"]
 
+    print(f"return: {status=}") 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
