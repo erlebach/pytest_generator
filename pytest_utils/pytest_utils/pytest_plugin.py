@@ -15,7 +15,6 @@ def pytest_runtest_makereport(item):
     x._result.answer_type = getattr(item._obj, 'answer_type', None)
     x._result.question_id = getattr(item._obj, 'question_id', None)
     x._result.subquestion_id = getattr(item._obj, 'subquestion_id', None)
-    x._result.partial_score_frac = getattr(item._obj, 'partial_score_frac', None)
     x._result.note = getattr(item._obj, 'note', None)
     x._result.hide_errors = getattr(item._obj, 'hide_errors', None)
 
@@ -110,11 +109,16 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
             output = ''
             status = 'failed'
 
-        print("=======  1. score: ", score)
         score = round(score, 2)
         rescaled_score = round(rescaled_score, 2)
         s.partial_score_frac = round(s.partial_score_frac, 2)
-        print("=======  2 .score: ", score)
+        #s.partial_score = round(s.partial_score, 2)
+
+        output += f"partial_score_frac: {s.partial_score_frac}\n"
+        output += f"max_score: {s.max_score}\n"
+        output += f"partial_score: {score}\n"
+        output += f"score: {rescaled_score}\n"
+
 
         json_results["tests"].append(
             {

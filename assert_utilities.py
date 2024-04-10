@@ -1974,13 +1974,10 @@ def check_answer_list_string(student_answer, instructor_answer, exclude: list[in
             nb_mismatched += 1
             mismatched_strings.append(i_a)
 
-    print("===> nb mismatched: ", nb_mismatched)
-    print("===> nb total: ", nb_total)
     partial_score_frac[0] = 1. - nb_mismatched / nb_total
-    print("==> partial_score_frac: ", partial_score_frac[0])
 
     msg_list += [f"List elements in position()s {exclude} is/are not graded.\n"]
-    msg_list += [f"There is/are {nb_mismatched} mismatched strings ({mismatched_strings})."]
+    msg_list += [f"There is/are {nb_mismatched} mismatched string(s): ({mismatched_strings})."]
 
     return return_value(status, msg_list, normalized_s_answ, normalized_i_answ)
 
