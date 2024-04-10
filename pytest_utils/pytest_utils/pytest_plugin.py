@@ -116,17 +116,19 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
 
         output += f"partial_score_frac: {s.partial_score_frac}\n"
         output += f"max_score: {s.max_score}\n"
-        output += f"partial_score: {score}\n"
-        output += f"score: {rescaled_score}\n"
-
+        output += f"score: {score}\n"
+        output += f"partial_score: {partial_score}\n"
+        output += f"rescaled_score: {rescaled_score}\n"
 
         json_results["tests"].append(
             {
                 'question_id': s.question_id,
                 'subquestion_id': s.subquestion_id,
-                'score': rescaled_score,
+                #'score': rescaled_score,
+                'score': score,
                 'partial_score_frac': s.partial_score_frac,
-                'partial_score': score,
+                'partial_score': partial_score,
+                #'partial_score': score,
                 'max_score': s.max_score,
                 'answer_type': s.answer_type,
                 'name': s.location[2],
