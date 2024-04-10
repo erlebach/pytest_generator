@@ -28,9 +28,8 @@ def preprocess_yaml(input_file, output_file):
     
     for question in data.get('questions', []):
         parts = question.get('parts', [])
-        #print(f"{parts=}")
         for i, part in enumerate(parts):
-            #print("i= ", i)
+            print("part: ", part)
             # Encode all answers
             #part['answer'] = encode_answer(part['answer'])
             if 's_answers' in part and isinstance(part['s_answers'], list):

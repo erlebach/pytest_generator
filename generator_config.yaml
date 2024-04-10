@@ -1,13 +1,29 @@
+all_tests:
+  type: float
+
 test_structure:
   # set all tests to fail
   assert_false: False
-  max_nb_words: 10
+  max_nb_words: 5
   fixture_import_file: my_fixtures
 
 test_answers:
   # set all tests to fail
   assert_false: False
   fixture_import_file: my_fixtures
+
+# Options related to type
+types:
+  eval_float:
+    local_namespaces: {'math': math}
+    locals: {}
+  string:
+    choices: []
+    types: []
+  float:
+    tol: 2.e-2
+  explain_string:
+    max_nb_words: 5
 
 imports:
   - assert_utilities

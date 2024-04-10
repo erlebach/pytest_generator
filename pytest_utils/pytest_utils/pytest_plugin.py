@@ -10,11 +10,16 @@ def pytest_runtest_makereport(item):
     x._result.partial_score = getattr(item._obj, 'partial_score', '0')
     x._result.explanation = getattr(item._obj, 'explanation', None)
     x._result.answer_note = getattr(item._obj, 'answer_note', None)
+    x._result.answer_type = getattr(item._obj, 'answer_type', None)
+    x._result.question_id = getattr(item._obj, 'question_id', None)
+    x._result.subquestion_id = getattr(item._obj, 'subquestion_id', None)
     x._result.note = getattr(item._obj, 'note', None)
     x._result.hide_errors = getattr(item._obj, 'hide_errors', None)
 
 def pytest_terminal_summary(terminalreporter, exitstatus):
     json_results = {
+        'question_id': '',
+        'subquestion_id': '',
         'output': 'Text relevant to the entire submission',
         'output_format': 'simple_format',
         'test_output_format': 'text',
@@ -66,19 +71,28 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
         #output += f"\nExplanation: {s.explanation!s}"  # str()
 
         if True:
+            if s.question_id is not None:
+                output += f"Question: {repr(s.question_id)}\n"
+
+            if s.subquestion_id is not None:
+                output += f"Subquestion: {repr(s.subquestion_id)}\n"
+
+            if s.answer_type is not None:
+                output += f"Correct answer type: {repr(s.answer_type)}\n"
+
             if s.explanation is not None:
                 # print additional explanation
-                output += f"\nExplanation: {s.explanation!s}"  
+                output += f"Explanation: {s.explanation!s}\n"
 
             if s.answer_note is not None and s.answer_note is not "":
-                output += f"\nAdditional note: {s.answer_note!s}"  
+                output += f"Additional note: {s.answer_note!s}\n"
 
             if hasattr(s, 'hide_errors') and s.hide_errors is not None:
-                output += s.hide_errors
+                output += f"{s.hide_errors}\n"
             else:
                 # print assert error message
                 error_message = str(s.longrepr.reprcrash.message)
-                output += error_message
+                output += f"{error_message}\n"
 
         if (s.outcome == 'failed'):
             score = 0
@@ -92,10 +106,13 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
 
         json_results["tests"].append(
             {
+                'question_id': s.question_id,
+                'subquestion_id': s.subquestion_id,
                 'score': rescaled_score,
                 'partial_score': s.partial_score,
                 'non-scaled_score': score,
                 'max_score': s.max_score,
+                'answer_type': s.answer_type,
                 'name': s.location[2],
                 'output': output,
                 'visibility': s.visibility,

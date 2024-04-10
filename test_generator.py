@@ -18,6 +18,9 @@ def load_yaml_file(file_path):
 
 with open("generator_config.yaml", "r") as f:
     config = yaml.safe_load(f)
+    answer_type = config.get("all_tests").get("type", "float")
+    tol = config.get("types", {}).get("float", {}).get("tol", 0.01)
+
 # How to access an element of config dict and set to default value for non-existent key?
 gen_config = config['test_answers']
 assert_false = gen_config.get("assert_false", False)
@@ -38,6 +41,8 @@ with open('type_handlers.yaml', 'r') as f:
 
 
 def generate_test_answers_code(questions_data, sim_type, output_file='test_answers.py'):
+    global tol
+
     module_ = questions_data["module"]
     test_code = function_header_str
     max_score = questions_data.get('max_score', 0.)
@@ -55,6 +60,10 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
     for question in questions_data['questions']:
         max_score_q = question.get('max_score', max_score)
+        part_question_id = question.get('id', None)
+        if part_question_id == None:
+            print("Question does not have an id")
+            quit()
 
         if 'fixture' in question: 
             fixture = question['fixture']
@@ -62,18 +71,21 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
             fixture_args = fixture['args']  # list of strings
 
         for part in question['parts']:
+            part_type = part.get("type", answer_type)
+            # print("==> part_type: ", part_type)
             if 'fixture' in part: 
                 fixture = part['fixture']
                 fixture_name = fixture['name']
                 fixture_args = fixture['args']  # list of strings
 
-            part_id_sanitized = part['id'].replace(' ', '_').replace('(', '').replace(')', '').replace('|', '_').replace('=', '_')
+            part_id = part['id']
+            part_id_sanitized = part_id.replace(' ', '_').replace('(', '').replace(')', '').replace('|', '_').replace('=', '_')
             max_score_part = part.get('max_score', max_score_q)
 
             if sim_type == 'answers':
-                function_name = f"test_answers_{question['id']}_{part_id_sanitized}_{part['type']}"
+                function_name = f"test_answers_{question['id']}_{part_id_sanitized}_{part_type}"
             else:
-                function_name = f"test_structure_{question['id']}_{part_id_sanitized}_{part['type']}"
+                function_name = f"test_structure_{question['id']}_{part_id_sanitized}_{part_type}"
 
             function_name = sanitize_function_name(function_name)
 
@@ -110,13 +122,12 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
             test_code = evaluate_answers(questions_data, question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
                                          decode_i_call_str, decode_s_call_str, fixture, part, function_name)
 
-            if part['type'] in types_list: 
-                import_file = f"type_handlers['types']['{part['type']}']['import']"
-                part_type = repr(f"{part['type']}")
-                tol = part.get('rel_tol', 0.001)
+            if part_type in types_list: 
+                import_file = f"type_handlers['types']['{part_type}']['import']"
+                tol = part.get('tol', tol)
                 test_code += f"    tol = {tol}\n"
-                assertion_answer = eval(f"type_handlers['types']['{part['type']}']['assert_answer']")  # Only difference
-                assertion_structure = eval(f"type_handlers['types']['{part['type']}']['assert_structure']")  # Only difference
+                assertion_answer = eval(f"type_handlers['types']['{part_type}']['assert_answer']")  # Only difference
+                assertion_structure = eval(f"type_handlers['types']['{part_type}']['assert_structure']")  # Only difference
                 keys = part.get('keys', None) ### <<<< different: optional keys to consider (temporary)
                 test_code += f"    keys = {keys}\n"
 
@@ -155,6 +166,14 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                     test_code += f"    answer_note = {repr(explanation)}\n"
                     test_code += f"    {function_name}.answer_note = answer_note\n"
 
+                test_code += f"    answer_type = {repr(part_type)}\n"
+                test_code += f"    {function_name}.answer_type = answer_type\n"
+
+                test_code += f"    question_id = {repr(part_question_id)}\n"
+                test_code += f"    subquestion_id = {repr(part_id)}\n"
+                test_code += f"    {function_name}.question_id = question_id\n"
+                test_code += f"    {function_name}.subquestion_id = subquestion_id\n"
+
                 #keys = part.get('keys', [])
                 #print("keys: ", keys)
                 #if keys == [] and (part_type == 'string' or part_ == 'str'):
@@ -170,11 +189,16 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                     test_code +=  "    if is_success:\n"
                     test_code +=  "        is_success, explanation_answer    = eval(msg_answer,    {'__builtins__':{}}, local_namespace)\n"
                     test_code +=  "    else: \n"
-                    test_code +=  "        explanation_answer += 'Failed structural tests, No grade for answer component\\n.' \n"
+                    test_code +=  "        explanation_answer = 'Failed structural tests, No grade for answer component\\n.' \n"
                     test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
                     test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
 
-                test_code +=  "    explanation = '\\n'.join(['Structure tests:', explanation_structure])\n"
+                if sim_type == 'answers': 
+                    test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure, '==Answer tests==:', explanation_answer])\n"
+                else: 
+                    test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure])\n"
+
+                #test_code +=  "    explanation = '\\n'.join(['Structure tests:', explanation_structure])\n"
                 test_code += f"    {function_name}.explanation = explanation\n"
                 test_code += f"    assert is_success\n"
 

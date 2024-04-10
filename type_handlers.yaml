@@ -61,7 +61,11 @@ types:
     import: "" #"numpy as np"
     assert_answer: "assert_utilities.check_answer_list_NDArray(student_answer, instructor_answer, rel_tol)"
     assert_structure: "assert_utilities.check_structure_list_NDArray(student_answer, instructor_answer)"
-    #answer_msg: ""
+
+  list[int]:
+    import: "" 
+    assert_answer: "assert_utilities.check_answer_list_int(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_list_int(student_answer, instructor_answer)"
 
   list[string]:
     import: ""
@@ -108,10 +112,25 @@ types:
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in {answer_var}.items())"
     struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
 
+  dict[int,list]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer, keys)"
+
+  dict[int,list[float]]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_dict_int_list_float(student_answer, instructor_answer, keys)"
+
   dict[string,dict[str,list]]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_string_dict_str_list(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_dict_string_dict_str_list(student_answer, instructor_answer)"
+
+  dict[str,dict[str,float]]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_dict_str_dict_str_float(student_answer, instructor_answer)"
 
   explain_string:
     import: ""
@@ -149,7 +168,16 @@ types:
     #    or from the answer specified in the yaml file, or against a length specified in the yaml file. NOT DONE.
     assert_answer: "assert_utilities.check_answer_dict_string_NDArray(student_answer, instructor_answer, rel_tol, keys)"
     assert_structure: "assert_utilities.check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_tol, keys)"
-    #answer_msg: "Correct answer: {instructor_answer}"
+
+  dict[int,NDArray]:
+    import: "" 
+    assert_answer: "assert_utilities.check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
+
+  dict[tuple[int],NDArray]:
+    import: "" 
+    assert_answer: "assert_utilities.check_answer_dict_tuple_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_tuple_int_NDArray(student_answer, instructor_answer, keys)"
 
   dict[string,Tuple[NDArray]]:
     import: "" #"numpy as np"
@@ -196,6 +224,21 @@ types:
     import: "from sklearn.tree import DecisionTreeClassifier"
     assert: "isinstance({answer_var}, DecisionTreeClassifier)"
     struct_msg: Answer should be a DecisionTreeClassifier instance. 
+
+  lineplot:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_lineplot(student_answer, instructor_answer, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_lineplot(student_answer, instructor_answer, choices)"
+
+  scatterplot2d:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_scatterplot2d(student_answer, instructor_answer, choices)"
+
+  scatterplot3d:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_scatterplot3d(student_answer, instructor_answer, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_scatterplot3d(student_answer, instructor_answer, choices)"
 
   dendrogram: 
     import: ""

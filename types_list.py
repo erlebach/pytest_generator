@@ -1,15 +1,21 @@
 types_list = [
+    "dict[str,dict[str,float]]",
     "dict[string,dict[str,list]]",
     "dict[string,Tuple[NDArray]]", 
     "dict[string,NDArray]", 
     "dict[string,float]", 
     "dict[str,float]", 
     "dict[str,NDArray]",
+    "dict[int,NDArray]",
+    "dict[int,list]",
+    "dict[int,list[float]]",
+    "dict[tuple[int],NDArray]",
     "list[list[float]]", 
     "dict[string,set]",
     "explain_string", 
     "list[NDArray]", 
     "list[string]",
+    "list[int]",
     "set[NDArray]", 
     "set[string]",
     "eval_float",
@@ -23,9 +29,14 @@ types_list = [
     "bool",
     "dict",
     "int",
+    "scatterplot3d", 
+    "scatterplot2d",
+    "lineplot",
     #"float_range",
     #"float",
     #"choice",
     #"set",
     #"list"
+    #list[tuples[int]]
+    #list[tuples[float]]
 ]
