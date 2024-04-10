@@ -38,8 +38,6 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
     }
 
     all_tests = []
-    total_obtained_score = 0
-    total_max_score = 0
 
     if ('failed' in terminalreporter.stats):
         all_tests = all_tests + terminalreporter.stats['failed']
@@ -49,10 +47,10 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
     #### Where is s.outcome determined?
 
     # First, calculate total scores
+    total_max_score = 0
     for s in all_tests:
         total_max_score += s.max_score
-        if s.outcome == 'passed':
-            total_obtained_score += s.max_score  # NOT USED
+    global_scaling_factor = 100.  / total_max_score 
 
     for s in all_tests:
         # Printed after each message
@@ -97,9 +95,8 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
                 output += f"{error_message}\n"
 
         if (s.outcome == 'failed'):
-            partial_score = s.max_score * s.partial_score_frac
-            score = partial_score
-            rescaled_score = (partial_score / (total_max_score+.01)) * 100
+            score = s.max_score * s.partial_score_frac
+            rescaled_score = (score / (total_max_score+.01)) * 100
             status = 'failed'  # not sure if needed
         elif (s.outcome == 'passed'):
             score = s.max_score
@@ -112,12 +109,10 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
         score = round(score, 2)
         rescaled_score = round(rescaled_score, 2)
         s.partial_score_frac = round(s.partial_score_frac, 2)
-        #s.partial_score = round(s.partial_score, 2)
 
         output += f"partial_score_frac: {s.partial_score_frac}\n"
         output += f"max_score: {s.max_score}\n"
         output += f"score: {score}\n"
-        output += f"partial_score: {partial_score}\n"
         output += f"rescaled_score: {rescaled_score}\n"
 
         json_results["tests"].append(
@@ -125,9 +120,8 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
                 'question_id': s.question_id,
                 'subquestion_id': s.subquestion_id,
                 #'score': rescaled_score,
-                'score': score,
+                'score': round(score * global_scaling_factor, 2),
                 'partial_score_frac': s.partial_score_frac,
-                'partial_score': partial_score,
                 #'partial_score': score,
                 'max_score': s.max_score,
                 'answer_type': s.answer_type,
