@@ -19,6 +19,7 @@ def load_yaml_file(file_path):
 with open("generator_config.yaml", "r") as f:
     config = yaml.safe_load(f)
     answer_type = config.get("all_tests").get("type", "float")
+    tol = config.get("types", {}).get("float", {}).get("tol", 0.01)
 
 # How to access an element of config dict and set to default value for non-existent key?
 gen_config = config['test_answers']
@@ -40,6 +41,8 @@ with open('type_handlers.yaml', 'r') as f:
 
 
 def generate_test_answers_code(questions_data, sim_type, output_file='test_answers.py'):
+    global tol
+
     module_ = questions_data["module"]
     test_code = function_header_str
     max_score = questions_data.get('max_score', 0.)
@@ -69,7 +72,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
         for part in question['parts']:
             part_type = part.get("type", answer_type)
-            print("==> part_type: ", part_type)
+            # print("==> part_type: ", part_type)
             if 'fixture' in part: 
                 fixture = part['fixture']
                 fixture_name = fixture['name']
@@ -121,7 +124,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
 
             if part_type in types_list: 
                 import_file = f"type_handlers['types']['{part_type}']['import']"
-                tol = part.get('rel_tol', 0.001)
+                tol = part.get('tol', tol)
                 test_code += f"    tol = {tol}\n"
                 assertion_answer = eval(f"type_handlers['types']['{part_type}']['assert_answer']")  # Only difference
                 assertion_structure = eval(f"type_handlers['types']['{part_type}']['assert_structure']")  # Only difference

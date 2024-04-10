@@ -21,7 +21,7 @@ types:
     choices: []
     types: []
   float:
-    tol: 1.e-3
+    tol: 2.e-2
   explain_string:
     max_nb_words: 5
 

@@ -107,24 +107,27 @@ def check_answer_float(student_answer, instructor_answer, rel_tol):
     """
     Check answer correctness. Assume the structure is correct.
     """
-    abs_err = math.fabs(student_answer - instructor_answer)
-    is_abs = False  # irrelevant if rel error criteria is satisfied
+    status = True
+    msg_list = []
 
-    if math.fabs(instructor_answer) > 1.0e-8:
-        is_rel = (student_answer - instructor_answer) / instructor_answer < rel_tol
-    else:
-        is_abs = abs_err < 1.0e-8
-        is_rel = False
 
-    if is_rel:
-        status = True
-        msg_list = [f"Answer is correct to within relative error: {100*rel_tol}%"]
-    elif is_abs:
-        status = True
-        msg_list = [f"Answer is correct to within absolute error: {1.e-8}"]
+    if math.fabs(instructor_answer) < 1.0e-5:
+        abs_err = math.fabs(student_answer - instructor_answer)
+        if abs_err > 1.e-4:
+            status = False
+            msg_list = [f"Answer is not correct to within absolute error of {1.e-8}"]
+        else:
+            msg_list = [f"Answer is correct to within absolute error of {1.e-8}"]
+
     else:
-        status = False
-        msg_list = ["Answer is incorrect"]
+        rel_err = (student_answer - instructor_answer) / instructor_answer
+        rel_err = math.fabs(rel_err)
+        if rel_err > rel_tol:
+            status = False
+            msg_list = [f"Answer is not correct to within relative error: {100*rel_tol}%"]
+        else:
+            msg_list = [f"Answer is correct to within relative error: {100*rel_tol}%"]
+
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 

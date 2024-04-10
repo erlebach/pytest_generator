@@ -71,19 +71,28 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
         #output += f"\nExplanation: {s.explanation!s}"  # str()
 
         if True:
+            if s.question_id is not None:
+                output += f"Question: {repr(s.question_id)}\n"
+
+            if s.subquestion_id is not None:
+                output += f"Subquestion: {repr(s.subquestion_id)}\n"
+
+            if s.answer_type is not None:
+                output += f"Correct answer type: {repr(s.answer_type)}\n"
+
             if s.explanation is not None:
                 # print additional explanation
-                output += f"\nExplanation: {s.explanation!s}"  
+                output += f"Explanation: {s.explanation!s}\n"
 
             if s.answer_note is not None and s.answer_note is not "":
-                output += f"\nAdditional note: {s.answer_note!s}"  
+                output += f"Additional note: {s.answer_note!s}\n"
 
             if hasattr(s, 'hide_errors') and s.hide_errors is not None:
-                output += s.hide_errors
+                output += f"{s.hide_errors}\n"
             else:
                 # print assert error message
                 error_message = str(s.longrepr.reprcrash.message)
-                output += error_message
+                output += f"{error_message}\n"
 
         if (s.outcome == 'failed'):
             score = 0
