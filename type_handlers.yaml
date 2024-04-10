@@ -54,7 +54,7 @@ types:
   list[list[float]]:
     import: ""
     # Fix for structure
-    assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, rel_tol)"
+    assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_list_float(student_answer, instructor_answer)"
  
   list[NDArray]:
@@ -120,7 +120,7 @@ types:
 
   dict[int,list[float]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol)"
+    assert_answer: "assert_utilities.check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_int_list_float(student_answer, instructor_answer, keys)"
 
   dict[string,dict[str,list]]:
@@ -130,7 +130,7 @@ types:
 
   dict[str,dict[str,float]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_dict_str_float(student_answer, instructor_answer)"
 
   explain_string:
@@ -153,12 +153,12 @@ types:
 
   dict[string,float]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
 
   dict[str,float]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
 
   dict[string,NDArray]:

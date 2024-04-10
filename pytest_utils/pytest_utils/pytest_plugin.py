@@ -38,23 +38,23 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
     }
 
     all_tests = []
+    total_student_score = 0
 
     if ('failed' in terminalreporter.stats):
         all_tests = all_tests + terminalreporter.stats['failed']
     if ('passed' in terminalreporter.stats):
         all_tests = all_tests + terminalreporter.stats['passed']
 
-    #### Where is s.outcome determined?
-
     # First, calculate total scores
     total_max_score = 0
     for s in all_tests:
         total_max_score += s.max_score
     global_scaling_factor = 100.  / total_max_score 
+    print("GLOBAL FACTOR: ", global_scaling_factor)
 
     for s in all_tests:
         # Printed after each message
-        output = "" #'Nothing to output (debugging)'
+        output = "" 
         rescaled_score = 0
         score = s.max_score
 
@@ -68,7 +68,6 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
         # Include the clickable link in the output
         output += f"\nClick here to view the test: {clickable_link}"
         """
-        #output += f"\nExplanation: {s.explanation!s}"  # str()
 
         if True:
             if s.question_id is not None:
@@ -106,6 +105,8 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
             output = ''
             status = 'failed'
 
+        total_student_score += score 
+
         score = round(score, 2)
         rescaled_score = round(rescaled_score, 2)
         s.partial_score_frac = round(s.partial_score_frac, 2)
@@ -114,6 +115,8 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
         output += f"max_score: {s.max_score}\n"
         output += f"score: {score}\n"
         output += f"rescaled_score: {rescaled_score}\n"
+
+        print(f"'cor': {round(score * global_scaling_factor, 2)=}")
 
         json_results["tests"].append(
             {

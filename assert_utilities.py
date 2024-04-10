@@ -689,7 +689,7 @@ def check_structure_dict_string_set(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys):
+def check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]):
     """
     student answer: dictionary with keys:str, values: an NDArray
     instructor answer: dictionary with keys:str, values: a set of objects
@@ -699,11 +699,26 @@ def check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, k
     msg_list = []
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
+    nb_mismatched = 0
+    nb_total = len(keys)
+
+    # print("student_answer")
+    # pprint(student_answer)
+    # print("instructor_answer")
+    # pprint(instructor_answer)
 
     # Need an exception in case the student key is not found
     for k in keys:
         s_float = student_answer[k]
         i_float = instructor_answer[k]
+        status_, msg_ = check_float(s_float, i_float, rel_tol=1.e-2, abs_tol=1.e-6)
+        # print(f"{s_float=}, {i_float=}, {status_=}")
+        if status_ is False:
+            status = False
+            nb_mismatched += 1
+            msg_list.append(msg_)
+
+        """
         if math.fabs(i_float) < 1.0e-6:
             if math.fabs(s_float) > 1.0e-6:
                 status = False
@@ -712,6 +727,9 @@ def check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, k
         else:
             rel_err = math.fabs(s_float - i_float) / math.fabs(i_float)
             status *= rel_err < rel_tol
+        """
+    partial_score_frac[0] = 1. - nb_mismatched / nb_total
+
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -1190,7 +1208,7 @@ def check_structure_dict_int_list(student_answer, instructor_answer, keys=None):
 
 
 # ======================================================================
-def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol):
+def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol, partial_score_frac: list[float]):
     """
     Similar to check_answer_dict_string_NDArray
     list of floats (if not specified)
@@ -1208,7 +1226,11 @@ def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, re
     for k in keys:
         s_arr = student_answer[k]
         i_arr = instructor_answer[k]
+        status, msg_list = check_list_float(i_arr, s_arr, rel_tol=rel_tol, abs_tol=1.e-6, partial_score_frac=partial_score_frac)
+        """
         for ii, (i_el, s_el) in enumerate(zip(i_arr, s_arr)):
+            status, msg = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=1.e-6)
+            msg_list.append(msg)
             if math.fabs(i_el) <= 1.0e-6:
                 abs_err = math.fabs(i_el - s_el)
                 status = True if abs_err < 1.0e-5 else False
@@ -1219,8 +1241,39 @@ def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, re
                 msg_list.append(
                     f"Element {ii+1} not equal (instructor/student): {i_el}/{s_el}"
                 )
+        """
 
     return return_value(status, msg_list, student_answer, instructor_answer)
+
+def check_float(i_el, s_el, rel_tol=1.e-2, abs_tol=1.e-6):
+    status = True
+    msg = ""
+    if math.fabs(i_el) <= 1.0e-6:
+        abs_err = math.fabs(i_el - s_el)
+        status = True if abs_err < 1.0e-5 else False
+    elif math.fabs((i_el - s_el) / i_el) < rel_tol:
+        status = True
+    else:
+        status = False
+        msg = f"Student element {s_el} has rel error > {100*rel_tol}% relative to instructor element {i_el}"
+    return status, msg
+
+def check_list_float(i_arr, s_arr, rel_tol, abs_tol, partial_score_frac: list[float]):
+    msg_list = []
+    status = True
+    nb_mismatched = 0
+    nb_total = len(i_arr)
+
+    for ii, (i_el, s_el) in enumerate(zip(i_arr, s_arr)):
+        status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=1.e-6)
+        if status_ is False:
+            nb_mismatched += 1
+        msg_list.append(msg_)
+        if status is True and status_ is False:
+            status = False
+
+    partial_score_frac[0] = 1. - nb_mismatched / nb_total
+    return status, "\n".join(msg_list)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -1539,7 +1592,7 @@ def check_structure_function(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_list_list_float(student_answer, instructor_answer, tol):
+def check_answer_list_list_float(student_answer, instructor_answer, tol, partial_score_frac: list[float]):
     """
     Check two lists of lists of floats with each other
     """
@@ -1549,6 +1602,11 @@ def check_answer_list_list_float(student_answer, instructor_answer, tol):
     status = True
 
     for s_lst, i_lst in zip(student_answer, instructor_answer):
+        status_, msg_list_ = check_list_float(i_arr, s_arr, rel_tol=rel_tol, abs_tol=1.e-6, partial_score_frac=partial_score_frac)
+        msg_list.extend(msg_list)
+        if status is True:
+            status = status_
+        """
         lg_eq *= len(s_lst) == len(i_lst)
         for i, el in enumerate(s_lst):
             if i_lst[i] != 0.0:
@@ -1557,6 +1615,7 @@ def check_answer_list_list_float(student_answer, instructor_answer, tol):
                 rel_err = math.fabs(s_lst[i] - i_lst[i])
 
             status *= rel_err < tol
+        """
 
     msg_list.append(f"Answer correct if relative error < {tol*100} percent")
     return return_value(status, msg_list, student_answer, instructor_answer)
@@ -1565,7 +1624,7 @@ def check_answer_list_list_float(student_answer, instructor_answer, tol):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_list_list_float(student_answer, instructor_answer):
+def check_structure_list_list_float(student_answer, instructor_answer, partial_score_frac: list[float]):
     """
     Check structure of student_answer.
     instructor_answer: not used
@@ -1966,10 +2025,6 @@ def check_answer_list_string(student_answer, instructor_answer, exclude: list[in
     nb_mismatched = 0
     mismatched_strings = []
     nb_total = len(instructor_answer) - len(exclude)
-    # print("==> nb_total: ", nb_total)
-    # print("==> exclude: ", exclude)
-    # print("==> s_answ: ", normalized_s_answ)
-    # print("==> i_answ: ", normalized_i_answ)
 
     for i, i_a in enumerate(normalized_i_answ):
         if i in exclude: 
@@ -1978,7 +2033,7 @@ def check_answer_list_string(student_answer, instructor_answer, exclude: list[in
         if s_a != i_a:
             status = False
             nb_mismatched += 1
-            mismatched_strings.append(i_a)
+            mismatched_strings.append(s_a)
 
     partial_score_frac[0] = 1. - nb_mismatched / nb_total
 
