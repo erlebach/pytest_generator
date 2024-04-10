@@ -69,7 +69,8 @@ types:
 
   list[string]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_list_string(student_answer, instructor_answer)"
+    #  partial_score_frac_l: a one-element list with partial score fractiion, i.e. [0.75]
+    assert_answer: "assert_utilities.check_answer_list_string(student_answer, instructor_answer, exclude, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_string(student_answer, instructor_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 

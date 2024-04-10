@@ -7,12 +7,13 @@ def pytest_runtest_makereport(item):
     x = yield
     x._result.max_score = getattr(item._obj, 'max_score', 0)
     x._result.visibility = getattr(item._obj, 'visibility', 'visible')
-    x._result.partial_score = getattr(item._obj, 'partial_score', '0')
+    x._result.partial_score_frac = getattr(item._obj, 'partial_score_frac', '1')
     x._result.explanation = getattr(item._obj, 'explanation', None)
     x._result.answer_note = getattr(item._obj, 'answer_note', None)
     x._result.answer_type = getattr(item._obj, 'answer_type', None)
     x._result.question_id = getattr(item._obj, 'question_id', None)
     x._result.subquestion_id = getattr(item._obj, 'subquestion_id', None)
+    x._result.partial_score_frac = getattr(item._obj, 'partial_score_frac', None)
     x._result.note = getattr(item._obj, 'note', None)
     x._result.hide_errors = getattr(item._obj, 'hide_errors', None)
 
@@ -30,7 +31,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
         'note': '',
         'answer_note': '',
         'hide_errors': '',
-        'partial_score': 0,
+        'partial_score_frac': 1,
         'extra_data': {},
         'tests': []
     }
@@ -50,7 +51,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
     for s in all_tests:
         total_max_score += s.max_score
         if s.outcome == 'passed':
-            total_obtained_score += s.max_score
+            total_obtained_score += s.max_score  # NOT USED
 
     for s in all_tests:
         # Printed after each message
@@ -109,7 +110,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
                 'question_id': s.question_id,
                 'subquestion_id': s.subquestion_id,
                 'score': rescaled_score,
-                'partial_score': s.partial_score,
+                'partial_score_frac': s.partial_score_frac,
                 'non-scaled_score': score,
                 'max_score': s.max_score,
                 'answer_type': s.answer_type,

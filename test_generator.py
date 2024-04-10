@@ -20,6 +20,7 @@ with open("generator_config.yaml", "r") as f:
     config = yaml.safe_load(f)
     answer_type = config.get("all_tests").get("type", "float")
     tol = config.get("types", {}).get("float", {}).get("tol", 0.01)
+    exclude = config.get("types", {}).get("list[string]", {}).get("exclude", [])
 
 # How to access an element of config dict and set to default value for non-existent key?
 gen_config = config['test_answers']
@@ -41,7 +42,7 @@ with open('type_handlers.yaml', 'r') as f:
 
 
 def generate_test_answers_code(questions_data, sim_type, output_file='test_answers.py'):
-    global tol
+    global tol, exclude
 
     module_ = questions_data["module"]
     test_code = function_header_str
@@ -101,6 +102,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
             else:
                 test_code += f"def {function_name}():\n"
 
+            test_code += f"    function_name = {function_name}\n"
+
             is_fixture = fixture is not None and isinstance(fixture_args, list) and len(fixture_args) > 0
             is_instructor_file = questions_data.get('i_answer_source', 'yaml_file') == "instructor_file"
             is_student_file = questions_data.get('s_answer_source', 'yaml_file') == "student_file"
@@ -125,7 +128,10 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
             if part_type in types_list: 
                 import_file = f"type_handlers['types']['{part_type}']['import']"
                 tol = part.get('tol', tol)
+                # indices to exclude from grading for list[float]
+                exclude = part.get('exclude', exclude)
                 test_code += f"    tol = {tol}\n"
+                test_code += f"    exclude = {exclude}\n"
                 assertion_answer = eval(f"type_handlers['types']['{part_type}']['assert_answer']")  # Only difference
                 assertion_structure = eval(f"type_handlers['types']['{part_type}']['assert_structure']")  # Only difference
                 keys = part.get('keys', None) ### <<<< different: optional keys to consider (temporary)
@@ -139,7 +145,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                 # Check answers
                 test_code += f"    msg_answer = \"{assertion_answer}\"\n"
 
-                test_code +=  "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys}\n"
+                test_code +=  "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys, 'exclude':exclude}\n"
 
                 local_vars_dict = part.get('locals', None)
                 if local_vars_dict:
@@ -159,20 +165,25 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                 note = part.get('note', None)
                 if sim_type == 'answers' and note is not None:
                     test_code += f"    note = {repr(note)}\n"
-                    test_code += f"    {function_name}.note = note\n"
+                    test_code +=  "    function_name.note = note\n"
 
                 explanation = part.get('explanation', None)
                 if sim_type == 'answers' and  explanation is not None:
                     test_code += f"    answer_note = {repr(explanation)}\n"
-                    test_code += f"    {function_name}.answer_note = answer_note\n"
+                    test_code +=  "    function_name.answer_note = answer_note\n"
 
                 test_code += f"    answer_type = {repr(part_type)}\n"
-                test_code += f"    {function_name}.answer_type = answer_type\n"
 
                 test_code += f"    question_id = {repr(part_question_id)}\n"
                 test_code += f"    subquestion_id = {repr(part_id)}\n"
-                test_code += f"    {function_name}.question_id = question_id\n"
-                test_code += f"    {function_name}.subquestion_id = subquestion_id\n"
+
+                test_code += f"    partial_score_frac_l = [1.]\n"  # FIGURE OUT HOW TO HANDLE THIS
+                test_code +=  "    local_namespace['partial_score_frac_l'] = partial_score_frac_l\n"
+
+                test_code +=  "    function_name.answer_type = answer_type\n"
+                test_code +=  "    function_name.question_id = question_id\n"
+                test_code +=  "    function_name.subquestion_id = subquestion_id\n"
+                test_code +=  "    function_name.partial_score_frac = partial_score_frac_l[0]\n"
 
                 #keys = part.get('keys', [])
                 #print("keys: ", keys)
@@ -192,6 +203,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
                     test_code +=  "        explanation_answer = 'Failed structural tests, No grade for answer component\\n.' \n"
                     test_code +=  "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
                     test_code +=  "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
+                    test_code +=  "    function_name.partial_score_frac = partial_score_frac_l[0]\n"
 
                 if sim_type == 'answers': 
                     test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure, '==Answer tests==:', explanation_answer])\n"

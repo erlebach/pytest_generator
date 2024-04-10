@@ -1942,17 +1942,42 @@ def check_structure_bool(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_list_string(student_answer, instructor_answer):
-    # Normalize and compare the two lists
+def check_answer_list_string(student_answer, instructor_answer, exclude: list[int], partial_score_frac: list[float]):
+    """
+    Normalize and compare the two lists
+    These lists are of fixed length. Element should not be added to it, 
+    unlike dictionaries. . 
+    """
+
     msg_list = []
     status = True
+
     normalized_s_answ = [s.lower().strip() for s in student_answer]
     normalized_i_answ = [s.lower().strip() for s in instructor_answer]
 
-    for s_a, i_a in zip(normalized_s_answ, normalized_i_answ):
+    # TODO: partial scoring
+
+    nb_mismatched = 0
+    nb_total = len(instructor_answer) - len(exclude)
+    print("==> nb_total: ", nb_total)
+    print("==> exclude: ", exclude)
+    print("==> s_answ: ", normalized_s_answ)
+    print("==> i_answ: ", normalized_i_answ)
+
+    for i, i_a in enumerate(normalized_i_answ):
+        if i in exclude: 
+            continue
+        s_a = normalized_s_answ[i]
         if s_a != i_a:
             status = False
-            msg_list += ["Mismatched strings"]
+            nb_mismatched += 1
+
+    print("===> nb mismatched: ", nb_mismatched)
+    print("===> nb total: ", nb_total)
+    partial_score_frac[0] = 1. - nb_mismatched / nb_total
+    print("==> partial_score_frac: ", partial_score_frac[0])
+
+    msg_list += [f"{nb_mismatched} strings"]
 
     return return_value(status, msg_list, normalized_s_answ, normalized_i_answ)
 

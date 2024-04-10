@@ -1,5 +1,8 @@
 all_tests:
   type: float
+  # By default, there is no score penalty
+  # Multiply max_score by partial_score_frac
+  partial_score_frac: 1.
 
 test_structure:
   # set all tests to fail
@@ -24,6 +27,8 @@ types:
     tol: 2.e-2
   explain_string:
     max_nb_words: 5
+  list[string]:
+    exclude: []
 
 imports:
   - assert_utilities
