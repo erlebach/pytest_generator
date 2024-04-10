@@ -1,6 +1,8 @@
 import pytest
 import json
 
+# TODO: Limit scores to 2 significant digits <<<< 
+
 
 @pytest.mark.hookwrapper
 def pytest_runtest_makereport(item):
@@ -96,14 +98,23 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
                 output += f"{error_message}\n"
 
         if (s.outcome == 'failed'):
-            score = 0
+            partial_score = s.max_score * s.partial_score_frac
+            score = partial_score
+            rescaled_score = (partial_score / (total_max_score+.01)) * 100
             status = 'failed'  # not sure if needed
         elif (s.outcome == 'passed'):
+            score = s.max_score
             rescaled_score = (s.max_score / (total_max_score+.01)) * 100
             status = 'passed'
         else:
             output = ''
             status = 'failed'
+
+        print("=======  1. score: ", score)
+        score = round(score, 2)
+        rescaled_score = round(rescaled_score, 2)
+        s.partial_score_frac = round(s.partial_score_frac, 2)
+        print("=======  2 .score: ", score)
 
         json_results["tests"].append(
             {
@@ -111,7 +122,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
                 'subquestion_id': s.subquestion_id,
                 'score': rescaled_score,
                 'partial_score_frac': s.partial_score_frac,
-                'non-scaled_score': score,
+                'partial_score': score,
                 'max_score': s.max_score,
                 'answer_type': s.answer_type,
                 'name': s.location[2],
@@ -125,3 +136,4 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
     with open('results.json', 'w') as results:
         #print(json_results)
         results.write(json.dumps(json_results, indent=4))
+
