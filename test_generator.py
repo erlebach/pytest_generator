@@ -1,4 +1,4 @@
-
+from pprint import pprint
 import re
 import yaml
 import pytest
@@ -125,7 +125,10 @@ def generate_test_answers_code(questions_data, sim_type, output_file='test_answe
             test_code = evaluate_answers(questions_data, question['id'], test_code, is_fixture, is_instructor_file, is_student_file, 
                                          decode_i_call_str, decode_s_call_str, fixture, part, function_name)
 
+            print("part_type: ", part_type)
+            pprint(types_list)
             if part_type in types_list: 
+                print("=== in types_list")
                 import_file = f"type_handlers['types']['{part_type}']['import']"
                 tol = part.get('tol', tol)
                 # indices to exclude from grading for list[float]

@@ -5,20 +5,33 @@ import random
 import math
 import numpy as np
 import yaml
-from pprint import pprint
-import matplotlib.pyplot as plt
 
-def init_partial_score_dict():
-    return  {
-        'nb_mismatches': 0,
-        'nb_total': 0, 
-        'partial_score_frac': 0
-    }
+# from pprint import pprint
+# import matplotlib.pyplot as plt
+
+
+def init_partial_score_dict() -> dict[str, float | int]:
+    return {"nb_mismatches": 0, "nb_total": 0, "partial_score_frac": 0}
+
+
 # ----------------------------------------------------------------------
-def check_float(i_el, s_el, rel_tol=1.e-2, abs_tol=1.e-5):
+
+
+def check_missing_keys(missing_keys, msg_list):
+    if len(missing_keys) > 0:
+        status = False
+        msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
+    else:
+        status = True
+        msg_list.append("- No missing keys")
+    return status, msg_list
+
+
+# ----------------------------------------------------------------------
+def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
-    if math.fabs(i_el) <= 1.0e-6:
+    if math.fabs(i_el) <= abs_tol:
         abs_err = math.fabs(i_el - s_el)
         status = True if abs_err < 1.0e-5 else False
     elif math.fabs((i_el - s_el) / i_el) < rel_tol:
@@ -28,7 +41,9 @@ def check_float(i_el, s_el, rel_tol=1.e-2, abs_tol=1.e-5):
         msg = f"Student element {s_el} has rel error > {100*rel_tol}% relative to instructor element {i_el}"
     return status, msg
 
+
 # ----------------------------------------------------------------------
+
 
 def check_int(i_el, s_el):
     status = True
@@ -38,97 +53,157 @@ def check_int(i_el, s_el):
         msg = f"Student element {s_el} != instructor element {i_el}"
     return status, msg
 
+
 # ----------------------------------------------------------------------
 
 
-def check_list_float(i_arr, s_arr, rel_tol, abs_tol, ps_dict: dict[str, float]):
+def check_list_float(i_arr, s_arr, rel_tol, abs_tol, ps_dict: dict[str, float | int]):
     """
-    ps_dict : partial_score_dict 
+    ps_dict : partial_score_dict
     """
     msg_list = []
     status = True
-    ps_dict['nb_total'] += len(i_arr)
+    ps_dict["nb_total"] += len(i_arr)
 
-    for ii, (i_el, s_el) in enumerate(zip(i_arr, s_arr)):
-        status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=1.e-6)
+    for i_el, s_el in zip(i_arr, s_arr):
+        status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=abs_tol)
         if status_ is False:
             status = False
             msg_list.append(msg_)
-            ps_dict['nb_mismatched'] += 1
+            ps_dict["nb_mismatches"] += 1
     return status, "\n".join(msg_list)
+
 
 # ----------------------------------------------------------------------
 
-def check_list_int(i_arr, s_arr, ps_dict: dict[str, float]):
+
+def check_list_int(i_arr, s_arr, ps_dict: dict[str, float | int]):
+    """ """
     msg_list = []
     status = True
-    ps_dict['nb_total'] += len(i_arr)
+    ps_dict["nb_total"] += len(i_arr)
 
-    for (i_el, s_el) in zip(i_arr, s_arr):
+    for i_el, s_el in zip(i_arr, s_arr):
         status_, msg_ = check_int(i_el, s_el)
         if status_ is False:
             status = False
             msg_list.append(msg_)
-            ps_dict['nb_mismatched'] += 1
-    partial_score_frac[0] = 1. - nb_mismatched / nb_total
+            ps_dict["nb_mismatches"] += 1
     return status, "\n".join(msg_list)
+
+
 # ----------------------------------------------------------------------
-def check_list_str(i_list, s_list, ps_dict: dict[str, float]):
+
+
+def check_set_int(i_set: set[int], s_set: set[int], ps_dict: dict[str, float | int]):
+    """ """
+    msg_list = []
+    ps_dict["nb_total"] += len(i_set)
+
+    # Elements in the instructor set not in the student set
+    el_unique_to_i = i_set - s_set
+    el_unique_to_s = s_set - i_set
+
+    # Partial credits for sets
+    # If the student has less elements than the teacher, subtrace the difference
+    nb_deficit = len(el_unique_to_i)  # will be zero if the sets are equal
+
+    # Number of student elements not in the instructor set are errors.
+    nb_s_errors = len(el_unique_to_s)
+
+    ps_dict["nb_mismatches"] += nb_deficit + nb_s_errors
+    ps_dict["partial_score_frac"] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+
+    if nb_deficit + nb_s_errors > 0:
+        status = False
+        msg_list.append(f"Student has {nb_deficit} fewer elements than the instructor")
+        msg_list.append(f"Student has {nb_s_errors} elements not in the instructor set")
+    else:
+        status = True
+        msg_list.append("Student set is correct")
+
+    return status, msg_list
+
+
+# ----------------------------------------------------------------------
+def check_list_str(i_list, s_list, ps_dict: dict[str, float | int]):
     msg_list = []
     status = True
-    ps_dict['nb_total'] += len(i_list)
+    ps_dict["nb_total"] += len(i_list)
 
     for i_el, s_el in zip(i_list, s_list):
         status_, msg_ = check_str(i_el, s_el)
         if status_ is False:
             status = False
             msg_list.append(msg_)
-            ps_dict['nb_mismatched'] += 1
+            ps_dict["nb_mismatches"] += 1
     return status, msg_list
-#----------------------------------------------------------------------
-def check_dict_str(i_dict: dict[str, str], s_dict: dict[str, str], ps_dict: dict[str, float]):
+
+
+# ----------------------------------------------------------------------
+def check_dict_str(
+    i_dict: dict[str, str], s_dict: dict[str, str], ps_dict: dict[str, float | int]
+):
+    """
+    Note: dict[str, ???], ??? == str
+    """
     status = True
     msg_list = []
-    for k, in i_dict.keys():
+    ps_dict["nb_total"] += len(i_dict)
+    for k in i_dict.keys():
         status_, msg_ = check_str(i_dict[k], s_dict[k])
         if status_ is False:
             status = False
             msg_list.append(msg_)
+            ps_dict["nb_mismatches"] += 1
+    update_score(ps_dict)
     return status, msg_list
-#----------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------
+def update_score(ps_dict: dict[str, float | int]) -> None:
+    """ """
+    ps_dict["partial_frac_score"] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+
+
+# ----------------------------------------------------------------------
 def check_str(i_str, s_str):
     status = True
     if clean_str_answer(i_str) != clean_str_answer(s_str):
         status = False
         msg = f"String element mismatch. Instructor: {i_str}, Student: {s_str}"
-    return status, "\n".join(msg_list)
+    return status, [msg]
+
 
 # ----------------------------------------------------------------------
 
-def check_dict_str_float(keys, i_dict, s_dict, rel_tol, abs_tol, ps_dict: dict[str, float]):
+
+def check_dict_str_float(
+    keys, i_dict, s_dict, rel_tol, abs_tol, ps_dict: dict[str, float | int]
+):
     msg_list = []
     status = True
-    ps_dict['nb_total'] += len(i_arr)
 
     for k in keys():
         i_el = i_dict.get(k, None)
         s_el = s_dict.get(k, None)
         if i_el is None or s_el is None:
             continue
-        status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=1.e-6)
+        status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=abs_tol)
         if status_ is False:
             msg_list.append(msg_)
             status = False
-            ps_dict['nb_mismatched'] += 1
+            ps_dict["nb_mismatches"] += 1
 
     return status, "\n".join(msg_list)
 
+
 # ----------------------------------------------------------------------
 
-def check_dict_int(keys, i_dict, s_dict, ps_dict: dict[str, float]):
+
+def check_dict_int(keys, i_dict, s_dict, ps_dict: dict[str, float | int]):
     msg_list = []
     status = True
-    ps_dict['nb_total'] += len(i_arr)
 
     for k in keys():
         i_el = i_dict.get(k, None)
@@ -139,9 +214,11 @@ def check_dict_int(keys, i_dict, s_dict, ps_dict: dict[str, float]):
         if status_ is False:
             msg_list.append(msg_)
             status = False
-            ps_dict['nb_mismatched'] += 1
+            ps_dict["nb_mismatches"] += 1
 
     return status, "\n".join(msg_list)
+
+
 # ......................................................................
 
 
@@ -172,14 +249,10 @@ def load_yaml_file(file_path):
     return questions_data
 
 
-config_dict = load_yaml_file("generator_config.yaml")
-max_nb_words = config_dict["test_structure"]["max_nb_words"]
-
-
 def extract_config_dict():
     dct = {}
-    config_dict = load_yaml_file("generator_config.yaml")
-    test_structure = config_dict.get("test_structure", None)
+    config_dict_ = load_yaml_file("generator_config.yaml")
+    test_structure = config_dict_.get("test_structure", None)
     dct["max_nb_words"] = (
         test_structure.get("max_nb_words", 10) if test_structure else 10
     )
@@ -237,18 +310,20 @@ def are_sets_equal(set1, set2, rtol=1e-5, atol=1e-6):
 
 
 # ======================================================================
-def check_answer_float(student_answer, instructor_answer, rel_tol):
+def check_answer_float(student_answer, instructor_answer, rel_tol, abs_tol):
     """
     Check answer correctness. Assume the structure is correct.
     """
-    status, msg = check_float(instructor_answer, student_answer, rel_tol=1.e-2, abs_tol=1.e-6)
+    status, msg = check_float(
+        instructor_answer, student_answer, rel_tol=rel_tol, abs_tol=abs_tol
+    )
     return return_value(status, [msg], student_answer, instructor_answer)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_float(student_answer, instructor_answer):
+def check_structure_float(student_answer):
     if isinstance(student_answer, float):
         status = True
         msg_list = ["Answer is of type float as expected."]
@@ -275,21 +350,21 @@ def check_answer_eval_float(
     random_values = {}
     local_dct = {}
 
-    for i, _ in enumerate(range(3)):
+    nb_evals = 3
+    for _ in range(nb_evals):
         for var, (lower, upper) in local_vars_dict.items():
             random_values[var] = random.uniform(lower, upper)
             local_dct[var] = random_values[var]
         s_float = eval(s_answ, config_dict["local_namespaces"], local_dct)
         i_float = eval(i_answ, config_dict["local_namespaces"], local_dct)
-        status, msg = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.e-5)
+        status, msg = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.0e-5)
         msg_list.append(msg)
         if status is False:
             return return_value(status, msg_list, s_answ, i_answ)
 
+
 # ======================================================================
-def check_structure_eval_float(
-    student_answer, instructor_answer, local_vars_dict, rel_tol
-):
+def check_structure_eval_float(student_answer):
     if not isinstance(student_answer, str):
         return (
             False,
@@ -306,32 +381,43 @@ def check_structure_eval_float(
 # ======================================================================
 
 
-def check_answer_dict_string_dict_str_list(student_answer, instructor_answer):
-    """
-    The type is a dict[str, dict[str, list]]
-    """
-    print(">>> assert_utilities ==> not handled")
-    return False, f"type {repr(dict_string_dict_str_list)} not handled!"
+# def check_answer_dict_string_dict_str_list(student_answer, instructor_answer):
+#     """
+#     The type is a dict[str, dict[str, list]]
 
-    status = True
-    msg_list = []
-    ps_dict = init_partial_score_dict()
+#     TODO: add exclusion keys for the outer dictionary
+#     TODO: add exclusion keys for the inner dictionary. Establish notations
 
-    for k, v in student_answer.items():
-        if not (isinstance(k, str) and isinstance(v, dict)):
-            return False
+#     str_list of what? float? int? str? Or mixed types?
+#     TODO: IDEA: for each element of the list, check the type and call the appropriate function
+#     """
+#     print(">>> assert_utilities ==> not handled")
+#     return False, "Type 'dict_string_dict_str_list' NOT HANDLED!"
 
-        for inner_k, inner_v in v.items():
-            if not (isinstance(inner_k, str) and isinstance(inner_v, list)):
-                return False
+#     status = True
+#     msg_list = []
+#     ps_dict = init_partial_score_dict()
 
-    return True
+#     for k in instructor_answer.keys():
+#         if not (isinstance(k, str) and isinstance(v, dict)):
+#             return False
 
+#         for inner_k, inner_v in v.items():
+#             if not (isinstance(inner_k, str) and isinstance(inner_v, list)):
+#                 return False
+
+#     return True
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
 def check_structure_dict_string_dict_str_list(student_answer, instructor_answer):
+    """
+    Check answer for type dict[str, dict[str, list]].
+    Not handled because a list in itself should have a type
+    Check against instructor keys.
+    TODO: add inclusion and exclusion keys
+    """
     msg_list = []
     status = True
     i_ans = instructor_answer
@@ -364,7 +450,9 @@ def check_structure_dict_string_dict_str_list(student_answer, instructor_answer)
 
 
 # ======================================================================
-def check_answer_dict_str_dict_str_float(student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]):
+def check_answer_dict_str_dict_str_float(
+    student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
+):
     """
     The type is a dict[str, dict[str, list]]
     """
@@ -376,18 +464,23 @@ def check_answer_dict_str_dict_str_float(student_answer, instructor_answer, rel_
     if not isinstance(student_answer, dict):
         return False
 
-    for k, v in student_answer.items():
-        if not (isinstance(k, str) and isinstance(v, dict)):
-            return False
+    for k, v in instructor_answer.items():
+        # if not (isinstance(k, str) and isinstance(v, dict)):
+        # return False
 
-        status_, msg_list_ = check_dict_str_float(instructor_answer[k], v, rel_tol, 1.e-5, ps_dict)
+        # I should have a keys argument
+        keys = instructor_answer.keys()
+        # def check_dict_str_float(keys, i_dict, s_dict, rel_tol, abs_tol, ps_dict: dict[str, float | int]):
+        status_, msg_list_ = check_dict_str_float(
+            keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
+        )
 
         if status_ is False:
             status = status_
             msg_list.extend(msg_list_)
 
-    partial_score_frac[0] = 1. - ps_dict['nb_mismatched'] / ps_dict['nb_total']
-    return status, msg_list
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -408,9 +501,9 @@ def check_structure_dict_str_dict_str_float(student_answer, instructor_answer):
     if len(missing_keys) > 0:
         return False, f"- Missing keys: {[repr(k) for k in missing_keys]}."
 
-    #print("answer keys: ", list(student_answer.keys()))
-    #for k, v in instructor_answer.items():
-        #print(f"key: {k}, value: {v}")
+    # print("answer keys: ", list(student_answer.keys()))
+    # for k, v in instructor_answer.items():
+    # print(f"key: {k}, value: {v}")
 
     for k, v in instructor_answer.items():
         if not isinstance(v, dict):
@@ -433,15 +526,9 @@ def check_structure_dict_str_dict_str_float(student_answer, instructor_answer):
 
 # ======================================================================
 
-
+'''
 def check_answer_dict(student_answer, instructor_answer):
     # This function must be thoroughly debugged. I don't trust it.
-    """
-    Uses recursive calls. Can return status, but how to return msg_list?
-    """
-    msg_list = []
-    s_dict = student_answer
-    i_dict = instructor_answer
     """
     Compares two generic dictionaries for equality down to two levels.
     ### NOT TESTED. Written by GPT-4, modified by GE
@@ -452,8 +539,12 @@ def check_answer_dict(student_answer, instructor_answer):
 
     Returns:
         True if the dictionaries are equal down to two levels, False otherwise.
-    """
 
+    Uses recursive calls. Can return status, but how to return msg_list?
+    """
+    msg_list = []
+    s_dict = student_answer
+    i_dict = instructor_answer
     print("Assert_utilitites: Type dict NOT HANDLED")
     return False, ""
 
@@ -476,6 +567,7 @@ def check_answer_dict(student_answer, instructor_answer):
                 return False
 
     return return_value(status, msg_list, student_answer, instructor_answer)
+'''
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -557,15 +649,15 @@ def check_structure_dict(student_answer, instructor_answer):
 
 
 def check_answer_string(student_answer, instructor_answer):
-    status, msg =  check_str(instructor_answer, student_answer)
-    return return_value(status, [msg], s_answ, i_answ)
+    status, msg = check_str(instructor_answer, student_answer)
+    return return_value(status, [msg], student_answer, instructor_answer)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
 # MUST FIX
-def check_structure_string(student_answer, instructor_answer, choices):
+def check_structure_string(student_answer, choices):
     """
     choices: list of strings
     """
@@ -608,7 +700,7 @@ def check_answer_explain_string(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_explain_string(student_answer, instructor_answer):
+def check_structure_explain_string(student_answer):
     """
     The type is an explain_string
     The string should have a minimum number of words stored in "type_handlers.yaml"
@@ -641,7 +733,10 @@ def check_structure_explain_string(student_answer, instructor_answer):
 # IMPLEMENT partial_scoring. Add option in yaml file to turn it off. On by default .
 # NOT DONE
 
-def check_answer_set_string(student_answer, instructor_answer, partial_score_frac: list[float], choices=None):
+
+def check_answer_set_string(
+    student_answer, instructor_answer, partial_score_frac: list[float], choices=None
+):
     """
     s_answ: student answer: set of strings
     i_answ: instructor answer: set of strings
@@ -649,21 +744,31 @@ def check_answer_set_string(student_answer, instructor_answer, partial_score_fra
     """
     msg_list = []
     status = True
-
+    ps_dict = init_partial_score_dict()
+    if choices is None:
+        choices = []
 
     s_answ = {i.lower().strip() for i in student_answer}
     i_answ = {i.lower().strip() for i in instructor_answer}
 
+    # TODO: How to compare two sets with strings for equality?
+
+    # Only consider elements in choices
+    # Each choice[i] is a list (of alternatives?)
+    print("3 ===> choices: ", choices)
     if choices and isinstance(choices[0], list):
-        # print("===> choices: ", choices)
         choices = [set(c) for c in choices]
+
+    # TODO: do not consider elements in `exclude_list`
+    # TODO: only consider elements in `include_list`
+    # TODO: I should use **kwargs to simplify code
 
     # print("===> set_string, after set, choices: ", choices)
 
     if choices and isinstance(choices[0], set):
-        # print("===> choices= ", choices)
+        print("2 ===> choices= ", choices)
         for i, a_set in enumerate(choices):
-            choices[i] = {el.lower().strip() for el in a_set}
+            choices[i] = {clean_str_answer(el) for el in a_set}
 
     if choices and isinstance(choices[0], set):
         status = True if s_answ in choices else False
@@ -679,7 +784,7 @@ def check_answer_set_string(student_answer, instructor_answer, partial_score_fra
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_set_string(student_answer, instructor_answer):
+def check_structure_set_string(student_answer):
     """ """
     msg_list = []
     status = True
@@ -719,14 +824,13 @@ def check_answer_dict_string_set(student_answer, instructor_answer):
     print("AssertUtilities: type dict_string_set NOT HANDLED")
     return False, ""
 
-    msg_list = []
-    status = True
-    for k in instructor_answer.keys():
-        s_val = student_answer[k]
-        i_val = instructor_answer[k]
-        status *= set(s_val) == set(i_val)
-
-    return return_value(status, msg_list, student_answer, instructor_answer)
+    # msg_list = []
+    # status = True
+    # for k in instructor_answer.keys():
+    #     s_val = student_answer[k]
+    #     i_val = instructor_answer[k]
+    #     status *= set(s_val) == set(i_val)
+    #  return return_value(status, msg_list, student_answer, instructor_answer
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -779,7 +883,58 @@ def check_structure_dict_string_set(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]):
+def check_answer_dict_str_set_int(student_answer, instructor_answer, keys=None):
+    """ """
+    msg_list = []
+    status = True
+    ps_dict = init_partial_score_dict()
+    status, msg_list = check_set_int(
+        set(student_answer), set(instructor_answer), ps_dict
+    )
+    print("===> 2 msg_list= ", msg_list)
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
+def check_structure_dict_str_set_int(student_answer, instructor_answer, keys=None):
+    """
+    TODO: provide a list of keys to check as an argument keys (default None)
+    Check that the outer dict keys are correct
+    keys: only check the keys in the keys argument
+    """
+    status = True
+    msg_list = []
+
+    print("====> string_set_int structure")
+
+    if not isinstance(student_answer, dict):
+        msg_list.append("Answer should be of type 'dict'.")
+    else:
+        msg_list.append("Type 'dict' is correct.")
+
+    # Not clear that instructor should be an argument to the function
+    keys = set(instructor_answer.keys()) if keys is None else keys
+
+    student_keys = set(student_answer.keys())
+    missing_keys = keys - student_keys
+    status, msg_list = check_missing_keys(missing_keys, msg_list)
+
+    if status:
+        for k in keys:
+            if isinstance(student_answer[k], int):
+                msg_list.append("All set elements must be type 'int'.")
+
+    return status, "\n".join(msg_list)
+
+
+# ======================================================================
+
+
+def check_answer_dict_string_float(
+    student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]
+):
     """
     student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
@@ -790,28 +945,26 @@ def check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, k
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
-    ps_dict['nb_total'] = len(keys)
+    ps_dict["nb_total"] = len(keys)
 
     # Need an exception in case the student key is not found
     for k in keys:
         s_float = student_answer[k]
         i_float = instructor_answer[k]
-        status_, msg_ = check_float(s_float, i_float, rel_tol=1.e-2, abs_tol=1.e-6)
+        status_, msg_ = check_float(s_float, i_float, rel_tol=rel_tol, abs_tol=1.0e-6)
         if status_ is False:
-            status = False 
-            nb_mismatched += 1
+            status = False
+            ps_dict["nb_mismatches"] += 1
             msg_list.append(msg_)
 
-    partial_score_frac[0] = 1. - ps_dict['nb_mismatched'] / ps_dict['nb_total']
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_string_float(
-    student_answer, instructor_answer, rel_tol, keys=None
-):
+def check_structure_dict_string_float(student_answer, instructor_answer, keys=None):
     """
     student answer: dictionary with keys:str, values: float
     instructor answer: dictionary with keys:str, values: a set of objects
@@ -820,10 +973,6 @@ def check_structure_dict_string_float(
     """
     status = True
     msg_list = []
-
-    if not isinstance(instructor_answer, dict):
-        msg_list += ["Instructor answer should be a dict"]
-        status = False
 
     if status and not isinstance(student_answer, dict):
         msg_list += ["Student answer should be a dict"]
@@ -863,7 +1012,9 @@ def check_structure_dict_string_float(
 # ======================================================================
 
 
-def check_answer_dict_string_ndarray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]):
+def check_answer_dict_string_ndarray(
+    student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]
+):
     """
     student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
@@ -876,31 +1027,23 @@ def check_answer_dict_string_ndarray(student_answer, instructor_answer, rel_tol,
 
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
-    ps_dict['nb_total'] = len(keys)
-
-    nb_mismatched = 0
-    nb_total = len(keys)
+    ps_dict["nb_total"] = len(keys)
 
     # Need an exception in case the student key is not found
-    i_norms = {}
-    s_norms = {}
-    for k in keys:
-        s_arr = student_answer[k]
-        i_arr = instructor_answer[k]
-        s_norms[k] = np.linalg.norm(s_arr)
-        i_norms[k] = np.linalg.norm(i_arr)
+    i_norms = {np.linalg.norm(instructor_answer[k]) for k in keys}
+    s_norms = {np.linalg.norm(student_answer[k]) for k in keys}
 
-    status, msg_list = check_dict_str_float(keys, i_norms, s_norms, rel_tol, 1.e-5, ps_dict)
-    partial_score_frac[0] = 1. - ps_dict['nb_mismatched'] / ps_dict['nb_total']
-    return return_value(status, msg_list, s_norm, i_norm)
+    status, msg_list = check_dict_str_float(
+        keys, i_norms, s_norms, rel_tol, 1.0e-5, ps_dict
+    )
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    return return_value(status, msg_list, s_norms, i_norms)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_string_ndarray(
-    student_answer, instructor_answer, keys=None
-):
+def check_structure_dict_string_ndarray(student_answer, instructor_answer, keys=None):
     """
     student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
@@ -958,9 +1101,8 @@ def check_answer_dict_tuple_int_ndarray(
     instructor answer: dictionary with keys:str, values: a set of objects
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
-    partial_score_frac: [float] 
+    partial_score_frac: [float]
     """
-
 
     msg_list = ["Check array norms"]
     status = True
@@ -969,11 +1111,11 @@ def check_answer_dict_tuple_int_ndarray(
     keys = list(instructor_answer.keys()) if keys is None else keys
     sub_instructor_answer = {k: instructor_answer[k] for k in keys}
 
-    print("Assert_utilities, type dict_tuple_int_ndarray NOT HANDLED")
-    return False, ""
+    # print("Assert_utilities, type dict_tuple_int_ndarray NOT HANDLED")
+    # return False, ""
 
     ps_dict = init_partial_score_dict()
-    ps_dict['total_nb'] = len(sub_instructor_answer)
+    ps_dict["total_nb"] = len(sub_instructor_answer)
 
     # Need an exception in case the student key is not found
     for k in sub_instructor_answer.keys():
@@ -990,12 +1132,12 @@ def check_answer_dict_tuple_int_ndarray(
             )
         i_dict_norm[k] = s_norm = np.linalg.norm(s_arr)
         s_dict_norm[k] = i_norm = np.linalg.norm(i_arr)
-        status_, msg = check_float(i_norm, s_norm, rel_tol, abs_err=1.e-5)
+        status_, msg = check_float(i_norm, s_norm, rel_tol, abs_tol=1.0e-5)
         if status_ is False:
             status = False
-            msg_list.append([msg])
+            msg_list.append(msg)
 
-    partial_score_frac[0] = 1. - nb_mismatched / nb_total
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -1082,8 +1224,10 @@ def check_answer_dict_int_ndarray(student_answer, instructor_answer, rel_tol, ke
     s_dict_norm = {}
     keys = list(instructor_answer.keys()) if keys is None else keys
 
-    print("Assert_utilities, type dict_int_ndarray NOT HANDLED")
-    return False, ""
+    # print("Assert_utilities, type dict_int_ndarray NOT HANDLED")
+    # return False, ""
+
+    msg_list.append(f"We are comparing array norms with a {rel_tol} relative accuracy.")
 
     # Need an exception in case the student key is not found
     for k in keys:
@@ -1094,6 +1238,7 @@ def check_answer_dict_int_ndarray(student_answer, instructor_answer, rel_tol, ke
             msg_list.append(
                 f"key: {k}, incorrect shape {s_arr.shape}, should be {i_arr.shape}."
             )
+            continue
         s_norm = np.linalg.norm(s_arr)
         i_norm = np.linalg.norm(i_arr)
         i_dict_norm[k] = i_norm
@@ -1118,9 +1263,7 @@ def check_answer_dict_int_ndarray(student_answer, instructor_answer, rel_tol, ke
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_int_ndarray(
-    student_answer, instructor_answer, rel_tol, keys=None
-):
+def check_structure_dict_int_ndarray(student_answer, instructor_answer, keys=None):
     """
     student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
@@ -1252,7 +1395,7 @@ def check_structure_dict_int_list(student_answer, instructor_answer, keys=None):
     if status:
         # some keys are filtered. Student is allowed to have
         # keys not in the instructor set
-        for k, v in instructor_answer.items():
+        for k in instructor_answer.keys():
             key = student_answer.get(k, None)
             if key is None:
                 status = False
@@ -1282,7 +1425,9 @@ def check_structure_dict_int_list(student_answer, instructor_answer, keys=None):
 
 
 # ======================================================================
-def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol, partial_score_frac: list[float]):
+def check_answer_dict_int_list_float(
+    student_answer, instructor_answer, keys, rel_tol, partial_score_frac: list[float]
+):
     """
     Similar to check_answer_dict_string_ndarray
     list of floats (if not specified)
@@ -1296,19 +1441,22 @@ def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, re
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
-    ps_dict['nb_total'] = len(keys)
+    ps_dict["nb_total"] = len(keys)
 
     # Need an exception in case the student key is not found
     for k in keys:
         s_arr = student_answer[k]
         i_arr = instructor_answer[k]
-        status_, msg_list_ = check_list_float(i_arr, s_arr, rel_tol=rel_tol, abs_tol=1.e-6, partial_score_dict=ps_dict)
+        status_, msg_list_ = check_list_float(
+            i_arr, s_arr, rel_tol=rel_tol, abs_tol=1.0e-6, ps_dict=ps_dict
+        )
         if status_ is False:
             status = False
             msg_list.extend(msg_list_)
 
-    partial_score_frac[0] = 1. - ps_dict['nb_mismatched'] / ps_dict['nb_total']
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
+
 
 # ======================================================================
 
@@ -1345,7 +1493,7 @@ def check_structure_dict_int_list_float(student_answer, instructor_answer, keys=
     if status:
         # some keys are filtered. Student is allowed to have
         # keys not in the instructor set
-        for k, v in sub_instructor_answer.items():
+        for k in sub_instructor_answer.keys():
             key = student_answer.get(k, None)
             if key is None:
                 status = False
@@ -1377,7 +1525,9 @@ def check_structure_dict_int_list_float(student_answer, instructor_answer, keys=
 # ======================================================================
 
 
-def check_answer_list_int(student_answer, instructor_answer, partial_score_frac: list[float]):
+def check_answer_list_int(
+    student_answer, instructor_answer, partial_score_frac: list[float]
+):
     """
     tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
@@ -1386,16 +1536,17 @@ def check_answer_list_int(student_answer, instructor_answer, partial_score_frac:
     status = True
     answ_eq_len = len(student_answer) == len(instructor_answer)
     ps_dict = init_partial_score_dict()
-    ps_dict['nb_total'] = len(instructor_answer)
+    ps_dict["nb_total"] = len(instructor_answer)
 
     if answ_eq_len:
         status, msg_list_ = check_list_int(student_answer, instructor_answer, ps_dict)
         msg_list.extend(msg_list_)
+        print("===> msg_list= ", msg_list)
 
     if not status:
         msg_list.append("Some elements are incorrect")
 
-    partial_score_frac[0] = 1. - ps_dict['nb_mismatch'] / ps_dict['nb_total']
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatch"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -1423,13 +1574,16 @@ def check_structure_list_int(student_answer, instructor_answer):
         if len(student_answer) != len(instructor_answer):
             status = False
             msg_list.append(
-                f"- The length of your list is incorrect. Your list length is {len(student_answer)}. The length should be {len(instructor_answer)}."
+                [
+                    f"- The length of your list is incorrect. Your list length is {len(student_answer)}.",
+                    "The length should be {len(instructor_answer)}.",
+                ]
             )
         else:
             msg_list.append("- The length of the list is correct.")
 
     if status:
-        for i, s_arr in enumerate(instructor_answer):
+        for s_arr in instructor_answer:
             if not isinstance(s_arr, int):
                 status = False
                 msg_list.append("- Element {i} of your list should be of type 'int'.")
@@ -1443,7 +1597,9 @@ def check_structure_list_int(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]):
+def check_answer_list_ndarray(
+    student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
+):
     """
     tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
@@ -1454,7 +1610,7 @@ def check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, partia
     i_norm_list = []
     s_norm_list = []
     ps_dict = init_partial_score_dict()
-    ps_dict['nb_total'] = len(instructor_answer)
+    ps_dict["nb_total"] = len(instructor_answer)
 
     if answ_eq_len:
         for s_arr, i_arr in zip(student_answer, instructor_answer):
@@ -1462,17 +1618,19 @@ def check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, partia
             i_norm = np.linalg.norm(i_arr)
             i_norm_list.append(i_norm)
             s_norm_list.append(s_norm)
-            print("IMPROVE: could first create a list of norms, and call check_list_float")
-            status_, msg = check_float(i_norm, s_norm, rel_tol, abs_err=1.e-5)
+            print(
+                "IMPROVE: could first create a list of norms, and call check_list_float"
+            )
+            status_, msg = check_float(i_norm, s_norm, rel_tol, abs_tol=1.0e-5)
             if status_ is False:
                 status = False
                 msg_list.append([msg])
-                ps_dict['nb_mismatched'] += 1
+                ps_dict["nb_mismatches"] += 1
 
     if not status:
         msg_list.append("Replace the arrays by their norms")
 
-    partial_score_frac[0] = 1. - ps_dict['nb_mismatched'] / ps_dict['nb_total']
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, s_norm_list, i_norm_list)
 
 
@@ -1499,14 +1657,18 @@ def check_structure_list_ndarray(student_answer, instructor_answer):
     if status:
         if len(student_answer) != len(instructor_answer):
             status = False
-            msg_list.append(
-                f"- The length of your list is incorrect. Your list length is {len(student_answer)}. The length should be {len(instructor_answer)}."
+            msg_list.extend(
+                [
+                    "- The length of your list is incorrect.",
+                    f"Your list length is {len(student_answer)}.",
+                    "The length should be {len(instructor_answer)}.",
+                ]
             )
         else:
             msg_list.append("- The length of the list is correct.")
 
     if status:
-        for i, s_arr in enumerate(instructor_answer):
+        for s_arr in instructor_answer:
             if not isinstance(s_arr, type(np.zeros(1))):
                 status = False
                 msg_list.append(
@@ -1523,41 +1685,38 @@ def check_structure_list_ndarray(student_answer, instructor_answer):
 
 
 # <<<<<<< NOT IN type_handlers >>>>>>
-def check_answer_set_ndarray(student_answer, instructor_answer, rel_tol):
-    """
-    tol: max relative error on the L2 norm
-    Check that all elements in the list have matching norms. Order does not
-    matter. So create a set of norms and match them.
-    """
-    status = True
-    msg_list = []
+# def check_answer_set_ndarray(student_answer, instructor_answer, rel_tol):
+#     """
+#     tol: max relative error on the L2 norm
+#     Check that all elements in the list have matching norms. Order does not
+#     matter. So create a set of norms and match them.
+#     """
+#     status = True
+#     msg_list = []
 
-    print("Assert_utilities, type set_ndarray NOT HANDLED")
-    return False, ""
+#     s_answ = list(student_answer)
+#     i_answ = list(instructor_answer)
 
-    s_answ = list(student_answer)
-    i_answ = list(instructor_answer)
+#     for i, arr in enumerate(s_answ):
+#         s_answ[i] = np.linalg.norm(arr)
+#     for i, arr in enumerate(i_answ):
+#         i_answ[i] = np.linalg.norm(arr)
 
-    for i, arr in enumerate(s_answ):
-        s_answ[i] = np.linalg.norm(arr)
-    for i, arr in enumerate(i_answ):
-        i_answ[i] = np.linalg.norm(arr)
+#     s_answ = set(s_answ)
+#     i_answ = set(i_answ)
 
-    s_answ = set(s_answ)
-    i_answ = set(i_answ)
+#     status = are_sets_equal(s_answ, i_answ, rtol=rel_tol)
+#     if not status:
+#         msg_list.append("The arrays can be in any order")
 
-    status = are_sets_equal(s_answ, i_answ, rtol=rel_tol)
-    if not status:
-        msg_list.append("The arrays can be in any order")
-
-    return return_value(status, msg_list, s_answ, i_answ)
+#     return return_value(status, msg_list, s_answ, i_answ)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_set_ndarray(student_answer, instructor_answer):
-    return True
+# def check_structure_set_ndarray(student_answer):
+#     return Tr
 
 
 # ======================================================================
@@ -1574,12 +1733,12 @@ def check_answer_ndarray(student_answer, instructor_answer, rel_tol):
     i_norm = np.linalg.norm(instructor_answer)
 
     # Can i_norm be zero?
-    status, msg_ = check_float(i_norm, s_norm, rel_tol, 1.e-5)
+    status, msg_ = check_float(i_norm, s_norm, rel_tol, 1.0e-5)
 
     if not status:
         msg_list.append(msg_)
         msg_list.append("For comparison, the array was replaced by its norm")
-        msg_list.append(f"The norms have relative error > {tol}")
+        msg_list.append(f"The norms have relative error > {rel_tol}")
 
     return return_value(status, msg_list, s_norm, i_norm)
 
@@ -1587,13 +1746,13 @@ def check_answer_ndarray(student_answer, instructor_answer, rel_tol):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_ndarray(student_answer, instructor_answer):
+def check_structure_ndarray(student_answer):
     """
     Check that all elements in the list have matching norms
     instructor_answer: not used
     """
-    #print(f"===> {type(np.zeros([1]))=}")
-    #print(f"===> {type(student_answer)=}")
+    # print(f"===> {type(np.zeros([1]))=}")
+    # print(f"===> {type(student_answer)=}")
     if not isinstance(student_answer, type(np.zeros([1]))):
         return (
             False,
@@ -1626,8 +1785,7 @@ def check_answer_function(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_function(student_answer, instructor_answer):
-    #print(f"==> inside function: {type(student_answer)=}")
+def check_structure_function(student_answer):
     if not isinstance(student_answer, type(lambda: None)):
         return False, "- Answer should be a Python function."
     return True, "Type 'function' is correct."
@@ -1636,23 +1794,23 @@ def check_structure_function(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_list_list_float(student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]):
+def check_answer_list_list_float(
+    student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
+):
     """
     Check two lists of lists of floats with each other
     """
-    msg_list = []
-
-    lg_eq = True
     status = True
+    msg_list = []
     ps_dict = init_partial_score_dict()
 
     for s_lst, i_lst in zip(student_answer, instructor_answer):
-        status_, msg_list_ = check_list_float(i_lst, s_lst, rel_tol, 1.e-6, ps_dict)
-        msg_list.extend(msg_list)
+        status_, msg_list_ = check_list_float(i_lst, s_lst, rel_tol, 1.0e-5, ps_dict)
+        msg_list.extend(msg_list_)
         if status is True:
             status = status_
 
-    partial_score_frac[0] = 1. - ps_dict['nb_mismatched'] / ps_dict['nb_total']
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     msg_list.append(f"Answer correct if relative error < {rel_tol*100} percent")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -1708,17 +1866,17 @@ def check_answer_list_set(student_answer, instructor_answer):
     msg_list = []
     status = True
     print("Assert_utilities, type list_set NOT HANDLED")
-    return False, ""
+    return False, "\n".join(msg_list)
 
-    for s_lst, i_lst in zip(student_answer, instructor_answer):
-        s_set = set(s_lst)
-        i_set = set(i_lst)
-        status = True if i_set == s_set else False
+    # for s_lst, i_lst in zip(student_answer, instructor_answer):
+    #     s_set = set(s_lst)
+    #     i_set = set(i_lst)
+    #     status = True if i_set == s_set else False
 
-    msg_list.append(
-        "Answer is a list of sets; sets can be replaced by lists or tuples."
-    )
-    return return_value(status, msg_list, student_answer, instructor_answer)
+    # msg_list.append(
+    #     "Answer is a list of sets; sets can be replaced by lists or tuples."
+    # )
+    # return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # ======================================================================
@@ -1760,7 +1918,7 @@ def check_answer_set_set(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_set_set(student_answer, instructor_answer):
+def check_structure_set_set(student_answer):
     """
     Created by GPT-4, modified by GE, 2024-03-06
     Both student answer and instructor answer should be a set of sets or a structure
@@ -1786,7 +1944,6 @@ def check_structure_set_set(student_answer, instructor_answer):
 
     # If outer structures are sequences, check each inner structure
     if status:
-        # print("====> seq_s: ", seq_s)
         for i, seq in enumerate(seq_s, start=1):
             if not is_sequence_but_not_string(seq):
                 msg_list.append(
@@ -1808,55 +1965,50 @@ def check_structure_set_set(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_dict_string_tuple_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]):
+def check_answer_dict_string_tuple_ndarray(
+    student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
+):
     """
     GE original function restructed by GPT-4 (2024-03-06)
     student_answer: dictionary with keys:str, values: tuple of ndarrays
     instructor_answer: dictionary with keys:str, values: a set of objects
     rel_tol: tolerance on the matrix norm
+
+    I should be able to use 'tuple' or 'list'. 
+    Structural checks insist on 'tuple'
     """
     msg_list = []
     status = True  # Assuming correct until proven otherwise
     ps_dict = init_partial_score_dict()
-    #print("Assert_utilities, type dict_string_tuple_ndarray NOT HANDLED")
-    #return False, ""
+    msg_list.append("Only compare the norms of the arrays")
 
     # Dictionaries to hold norms for student and instructor answers
-    student_norms = {}
-    instructor_norms = {}
+    s_norms = {}
+    i_norms = {}
 
     for k in instructor_answer.keys():
-        # Initialize norms list for current key in both dicts
-        student_norms[k] = []
-        instructor_norms[k] = []
+        s_norms[k] = []
+        i_norms[k] = []
+        i_list = list(instructor_answer[k])
+        s_list = list(student_answer.get(k, None))
 
-        try:
-            s_tuple = student_answer[k]
-        except KeyError:
-            msg_list.append(f"Error: key {repr(k)} is missing")
+        if s_list is None: 
+            msg_list.append(f"Error: key {repr(k)} is missing from student answer.")
+            ps_dict['nb_mismatches'] += 1
             continue
 
-        i_tuple = instructor_answer[k]
-        for s_arr, i_arr in zip(s_tuple, i_tuple):
-            # Calculate norms
-            s_norm = np.linalg.norm(s_arr)
-            i_norm = np.linalg.norm(i_arr)
-
-            # Store norms
-            student_norms[k].append(s_norm)
-            instructor_norms[k].append(i_norm)
-
-            # Check relative error against tolerance
-            rel_err = (
-                math.fabs(s_norm - i_norm) / math.fabs(i_norm)
-                if i_norm != 0
-                else s_norm
-            )
-            status *= rel_err <= rel_tol
-
-    partial_score_frac[0] = 1. - ps_dict['nb_mismatched'] / ps_dict['nb_total']
-    msg_list.append("Only print the norms of the arrays")
-    return return_value(status, msg_list, student_norms, instructor_norms)
+        for s_arr, i_arr in zip(s_list, i_list):
+            # Calculate norms and store in list
+            s_norms[k] += [np.linalg.norm(s_arr)]
+            i_norms[k] += [np.linalg.norm(i_arr)]
+    
+        status_, msg_list_ = check_list_float(
+            i_norms[k], s_norms[k], rel_tol, abs_tol=1.e-5, ps_dict=ps_dict
+        )
+        msg_list.append(msg_list_)
+        if status_ is False:
+            status = False
+    return return_value(status, msg_list, s_norms, i_norms)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -1921,18 +2073,19 @@ def check_answer_dendrogram(student_dendro, instructor_dendro, rel_tol):
         status = False
 
     # Optional: Color comparison
-    """
-    if 'color_list' in dend1 and 'color_list' in dend2:
-        if not all(np.array_equal(c1, c2) for c1, c2 in zip(dend1['color_list'], dend2['color_list'])):
+    if "color_list" in dend1 and "color_list" in dend2:
+        if not all(
+            np.array_equal(c1, c2)
+            for c1, c2 in zip(dend1["color_list"], dend2["color_list"])
+        ):
             return False
-    """
     return return_value(status, msg_list, student_dendro, instructor_dendro)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dendrogram(student_dendro, instructor_dendro):
+def check_structure_dendrogram(student_dendro):
     """
     Checks if the structure and types of the student's dendrogram dictionary match
     the expected structure from scipy's dendrogram function.
@@ -1985,8 +2138,7 @@ def check_structure_dendrogram(student_dendro, instructor_dendro):
 
 
 def check_answer_int(student_answer, instructor_answer):
-    """
-    """
+    """ """
     status, msg = check_int(instructor_answer, student_answer)
     return return_value(status, [msg], student_answer, instructor_answer)
 
@@ -1994,7 +2146,7 @@ def check_answer_int(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_int(student_answer, instructor_answer):
+def check_structure_int(student_answer):
     """ """
     if not isinstance(student_answer, int):
         status = False
@@ -2030,7 +2182,7 @@ def check_answer_bool(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_bool(student_answer, instructor_answer):
+def check_structure_bool(student_answer):
     if not isinstance(student_answer, bool):
         status = False
         msg_list = [
@@ -2046,34 +2198,41 @@ def check_structure_bool(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_list_string(student_answer, instructor_answer, exclude: list[int], partial_score_frac: list[float]):
+def check_answer_list_string(
+    student_answer,
+    instructor_answer,
+    exclude: list[int],
+    partial_score_frac: list[float],
+):
     """
     Normalize and compare the two lists
-    These lists are of fixed length. Element should not be added to it, 
-    unlike dictionaries. . 
+    These lists are of fixed length. Element should not be added to it,
+    unlike dictionaries.
     """
 
     msg_list = []
     status = True
-    ps_dict = init_partial_score_dict()
-    ps_dict['nb_total'] = len(instructor_answer) - len(exclude)
-
-    normalized_s_answ = [s.lower().strip() for s in student_answer]
-    normalized_i_answ = [s.lower().strip() for s in instructor_answer]
     mismatched_strings = []
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(instructor_answer) - len(exclude)
+
+    normalized_s_answ = [clean_str_answer(s) for s in student_answer]
+    normalized_i_answ = [clean_str_answer(s) for s in instructor_answer]
 
     for i, i_a in enumerate(normalized_i_answ):
-        if i in exclude: 
+        if i in exclude:
             continue
         s_a = normalized_s_answ[i]
         if s_a != i_a:
             status = False
-            nb_mismatched += 1
+            ps_dict["nb_mismatches"] += 1
             mismatched_strings.append(s_a)
 
-    partial_score_frac[0] = 1. - ps_dict['nb_mismatched'] / ps_dict['nb_total']
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     msg_list += [f"List elements in position()s {exclude} is/are not graded.\n"]
-    msg_list += [f"There is/are {nb_mismatched} mismatched string(s): ({mismatched_strings})."]
+    msg_list += [
+        f"There is/are {len(mismatched_strings)} mismatched string(s): ({mismatched_strings})."
+    ]
 
     return return_value(status, msg_list, normalized_s_answ, normalized_i_answ)
 
@@ -2081,7 +2240,7 @@ def check_answer_list_string(student_answer, instructor_answer, exclude: list[in
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_list_string(student_answer, instructor_answer):
+def check_structure_list_string(student_answer):
     msg_list = []
 
     # Function to check if an object is a list of strings
@@ -2121,7 +2280,7 @@ def check_answer_lineplot(student_answer, instructor_answer, rel_tol):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_lineplot(student_answer, instructor_answer, choices):
+def check_structure_lineplot(student_answer):
     """
     Assume use of Matplotlib
     Lineplots generated by matlab. Check one or multiple lines.
@@ -2129,21 +2288,25 @@ def check_structure_lineplot(student_answer, instructor_answer, choices):
     Check the number of curves
     Check presence of axis labels and title
     Check presence of grid in x and y
+
+    # I might need intructor answer to check the number of plots. Alternatively,
+    # include options to allow specified checking, via kwargs. In that way,
+    # I can check the instructor answer AND the student answer structurally
     """
     status = True
     msg_list = []
 
-    #print("==> check structure lineplot")
+    # print("==> check structure lineplot")
     # get axis object
-    #print(f"{student_answer=}")
+    # print(f"{student_answer=}")
     s_ax = student_answer[0].gca()
     i_ax = student_answer[0].gca()
-    #print(f"{dir(s_ax)=}")
-    #print(f"{type(s_ax).__name__=}")
+    # print(f"{dir(s_ax)=}")
+    # print(f"{type(s_ax).__name__=}")
     # s_ax = s_ax.gcf().get_axes()
     # i_ax = instructor_answer[0].gcf().get_axes()
 
-    #print(f"==> {s_ax=}")
+    # print(f"==> {s_ax=}")
 
     if len(s_ax) != len(i_ax):
         msg_list.append(f"There should only be {len(i_ax)} plot(s)!")
@@ -2172,10 +2335,12 @@ def check_structure_lineplot(student_answer, instructor_answer, choices):
         msg_list.append("The title is missing")
         status = False
 
+    """ USE LATER
     s_xgrid_vis = any(line.getvisible() for line in s_ax.xaxis.get_gridlines())
     i_xgrid_vis = any(line.getvisible() for line in i_ax.xaxis.get_gridlines())
     s_ygrid_vis = any(line.getvisible() for line in s_ax.yaxis.get_gridlines())
     i_ygrid_vis = any(line.getvisible() for line in i_ax.yaxis.get_gridlines())
+    """
 
     """
     ax:  Axes3D
@@ -2201,7 +2366,8 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol):
     i_answ = instructor_answer
 
     # Check for equality
-    x, y, z = s_answ._offsets2d
+    # x, y, z = s_answ._offsets2d # protected
+    x, y, z = s_answ.get_offsets()
     s_x, s_y, s_z = x.data.astype(float), y.data.astype(float), z.astype(float)
 
     x, y, z = i_answ._offsets3d
@@ -2226,14 +2392,13 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_scatterplot2d(student_answer, instructor_answer, choices):
+def check_structure_scatterplot2d(student_answer):
     from matplotlib.collections import PathCollection
 
     status = True
     msg_list = []
 
     s_answ = student_answer
-    i_answ = instructor_answer
 
     if not isinstance(student_answer, PathCollection):
         status = False
@@ -2241,11 +2406,11 @@ def check_structure_scatterplot2d(student_answer, instructor_answer, choices):
             "The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'."
         )
 
-    x, y, z = s_answ._offsets2d
-    s_x, s_y, s_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+    x, y = s_answ.get_offsets()
+    s_x, s_y = x.data.astype(float), y.data.astype(float)
 
-    x, y, z = i_answ._offsets3d
-    i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+    # x, y, z = i_answ._offsets3d
+    # i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
 
     if i_x.shape == s_x.shape and i_y.shape == s_y.shape and i_z.shape == s_z.shape:
         status = False
@@ -2290,14 +2455,13 @@ def check_answer_scatterplot3d(student_answer, instructor_answer, rel_tol):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_scatterplot3d(student_answer, instructor_answer, choices):
+def check_structure_scatterplot3d(student_answer):
     from matplotlib.collections import PathCollection
 
     status = True
     msg_list = []
 
     s_answ = student_answer
-    i_answ = instructor_answer
 
     if not isinstance(student_answer, PathCollection):
         status = False
