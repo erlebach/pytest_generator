@@ -9,5 +9,6 @@ export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./
 #tests/test_answers_preprocessed_part3_expand.py \
 #tests/test_answers_preprocessed_part4_expand.py
 
-pytest -s     tests/test_answers_preprocessed_part1_expand.py
+#pytest -s     tests/test_answers_preprocessed_part1_expand.py
+pytest -s     tests/test_answers_preprocessed_part2_expand.py
 
