@@ -9,7 +9,7 @@ def pytest_runtest_makereport(item):
     x = yield
     x._result.max_score = getattr(item._obj, 'max_score', 0)
     x._result.visibility = getattr(item._obj, 'visibility', 'visible')
-    x._result.partial_score_frac = getattr(item._obj, 'partial_score_frac', '1')
+    x._result.partial_score_frac = getattr(item._obj, 'partial_score_frac', 1)
     x._result.explanation = getattr(item._obj, 'explanation', None)
     x._result.answer_note = getattr(item._obj, 'answer_note', None)
     x._result.answer_type = getattr(item._obj, 'answer_type', None)
@@ -50,7 +50,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
     for s in all_tests:
         total_max_score += s.max_score
     global_scaling_factor = 100.  / total_max_score 
-    print("GLOBAL FACTOR: ", global_scaling_factor)
+    #print("GLOBAL FACTOR: ", global_scaling_factor)
 
     for s in all_tests:
         # Printed after each message
@@ -109,6 +109,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
 
         score = round(score, 2)
         rescaled_score = round(rescaled_score, 2)
+        print(f"===> {type(s.partial_score_frac)=}")
         s.partial_score_frac = round(s.partial_score_frac, 2)
 
         output += f"partial_score_frac: {s.partial_score_frac}\n"
