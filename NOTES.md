@@ -160,3 +160,15 @@ TODO: if there is a compiler error in the code, I should catch it and let the st
 2024-03-30
 If local_vars_dict is not defined, I get an exception. Exceptions should not be possible. This implies the 
 need to write a yaml file tester. For each type, I should check that appropriate options are there. 
+----------------------------------------------------------------------
+2024-04-11_05:00
+Fix unhandled cases in AssertUtils.py
+  8 tests/test_answers_preprocessed_part1_expand.py Assert_utilities, type dict_string_Tuple_NDArray NOT HANDLED
+  9 F.AssertUtilities: type dict_string_set NOT HANDLED   **** dict_string_set (OF WHAT?) 
+ 12 tests/test_answers_preprocessed_part3_expand.py F....Assert_utilities, type list_set NOT HANDLED (set OF WHAT)
+ 14 tests/test_answers_preprocessed_part4_expand.py Assert_utilities, type dict_string_Tuple_NDArray NOT HANDLED
+
+ Note: there are 11 Assert errors. 
+
+ I implemented partial grading on my types involving dict and str.  Not yet set. 
+----------------------------------------------------------------------

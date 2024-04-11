@@ -1,11 +1,11 @@
 # print('type dict NOT HANDLED!')
 # print('type set[set] NOT HANDLED!')
 types:
-  NDArray: 
+  ndarray: 
     import: "" #"numpy as np"
     #assert: "isinstance({answer_var}, type(np.zeros(1)))"
-    assert_answer: "assert_utilities.check_answer_NDArray(student_answer, instructor_answer, rel_tol)"
-    assert_structure: "assert_utilities.check_structure_NDArray(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_ndarray(student_answer, instructor_answer, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_ndarray(student_answer, instructor_answer)"
       #answer_msg: "Correct answer: \n Matrix shapes, type, and norms"
 
   function: 
@@ -57,10 +57,10 @@ types:
     assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_list_float(student_answer, instructor_answer)"
  
-  list[NDArray]:
+  list[ndarray]:
     import: "" #"numpy as np"
-    assert_answer: "assert_utilities.check_answer_list_NDArray(student_answer, instructor_answer, rel_tol)"
-    assert_structure: "assert_utilities.check_structure_list_NDArray(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_list_ndarray(student_answer, instructor_answer)"
 
   list[int]:
     import: "" 
@@ -82,7 +82,7 @@ types:
 
   set[string]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_set_string(student_answer, instructor_answer, choices)"
+    assert_answer: "assert_utilities.check_answer_set_string(student_answer, instructor_answer, partial_score_frac_l, choices)"
     assert_structure: "assert_utilities.check_structure_set_string(student_answer, instructor_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
@@ -130,7 +130,7 @@ types:
 
   dict[str,dict[str,float]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_dict_str_float(student_answer, instructor_answer)"
 
   explain_string:
@@ -161,32 +161,32 @@ types:
     assert_answer: "assert_utilities.check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
 
-  dict[string,NDArray]:
+  dict[string,ndarray]:
     import: "" #"numpy as np"
     #assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"
     # Test that the norms of the matrix are within a tolerance
     # I should be able to test the length against the expected length, either from the instructor answer
     #    or from the answer specified in the yaml file, or against a length specified in the yaml file. NOT DONE.
-    assert_answer: "assert_utilities.check_answer_dict_string_NDArray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_dict_string_NDArray(student_answer, instructor_answer, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_string_ndarray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_string_ndarray(student_answer, instructor_answer, keys)"
 
-  dict[int,NDArray]:
+  dict[int,ndarray]:
     import: "" 
-    assert_answer: "assert_utilities.check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
-    assert_structure: "assert_utilities.check_structure_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_int_ndarray(student_answer, instructor_answer, rel_tol, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_int_ndarray(student_answer, instructor_answer, rel_tol, keys)"
 
-  dict[tuple[int],NDArray]:
+  dict[tuple[int],ndarray]:
     import: "" 
-    assert_answer: "assert_utilities.check_answer_dict_tuple_int_NDArray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_dict_tuple_int_NDArray(student_answer, instructor_answer, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_tuple_int_ndarray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_tuple_int_ndarray(student_answer, instructor_answer, keys)"
 
-  dict[string,Tuple[NDArray]]:
+  dict[string,tuple[ndarray]]:
     import: "" #"numpy as np"
     # Not implemented correctly
     #assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"  
     # The instructor answer is useful to check key values
-    assert_answer: "assert_utilities.check_answer_dict_string_Tuple_NDArray(student_answer, instructor_answer, rel_tol)"
-    assert_structure: "assert_utilities.check_structure_dict_string_Tuple_NDArray(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_dict_string_tuple_ndarray(student_answer, instructor_answer, rel_tol)"
+    assert_structure: "assert_utilities.check_structure_dict_string_tuple_ndarray(student_answer, instructor_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
   dict_str_list:
