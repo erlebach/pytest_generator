@@ -781,7 +781,7 @@ def check_structure_dict_string_set(student_answer, instructor_answer):
 
 def check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]):
     """
-    student answer: dictionary with keys:str, values: an NDArray
+    student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
@@ -863,9 +863,9 @@ def check_structure_dict_string_float(
 # ======================================================================
 
 
-def check_answer_dict_string_NDArray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]):
+def check_answer_dict_string_ndarray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]):
     """
-    student answer: dictionary with keys:str, values: an NDArray
+    student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
@@ -898,11 +898,11 @@ def check_answer_dict_string_NDArray(student_answer, instructor_answer, rel_tol,
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_string_NDArray(
+def check_structure_dict_string_ndarray(
     student_answer, instructor_answer, keys=None
 ):
     """
-    student answer: dictionary with keys:str, values: an NDArray
+    student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
     keys: None if all keys should be considered
     """
@@ -940,21 +940,21 @@ def check_structure_dict_string_NDArray(
                 status = False
 
         if status:
-            msg_list.append("- All elements are of type NDArray as expected.")
+            msg_list.append("- All elements are of type ndarray as expected.")
 
     if status:
-        msg_list.append("Type 'dict[str, NDArray]' is correct")
+        msg_list.append("Type 'dict[str, ndarray]' is correct")
 
     return status, "\n".join(msg_list)
 
 
 # ======================================================================
-def check_answer_dict_tuple_int_NDArray(
+def check_answer_dict_tuple_int_ndarray(
     student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]
 ):
     """
-    Similar to check_answer_dict_string_NDArray
-    student answer: dictionary with keys:str, values: an NDArray
+    Similar to check_answer_dict_string_ndarray
+    student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
@@ -969,7 +969,7 @@ def check_answer_dict_tuple_int_NDArray(
     keys = list(instructor_answer.keys()) if keys is None else keys
     sub_instructor_answer = {k: instructor_answer[k] for k in keys}
 
-    print("Assert_utilities, type dict_tuple_int_NDArray NOT HANDLED")
+    print("Assert_utilities, type dict_tuple_int_ndarray NOT HANDLED")
     return False, ""
 
     ps_dict = init_partial_score_dict()
@@ -1003,7 +1003,7 @@ def check_answer_dict_tuple_int_NDArray(
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_tuple_int_NDArray(student_answer, instructor_answer, keys):
+def check_structure_dict_tuple_int_ndarray(student_answer, instructor_answer, keys):
     """ """
     status = True
     msg_list = []
@@ -1056,11 +1056,11 @@ def check_structure_dict_tuple_int_NDArray(student_answer, instructor_answer, ke
 
         if status:
             msg_list.append(
-                "- All keys are tuples of ints and values are of type NDArray as expected."
+                "- All keys are tuples of ints and values are of type ndarray as expected."
             )
 
     if status:
-        msg_list.append("Type 'dict[tuple[int], NDArray]' is correct")
+        msg_list.append("Type 'dict[tuple[int], ndarray]' is correct")
 
     return status, "\n".join(msg_list)
 
@@ -1068,10 +1068,10 @@ def check_structure_dict_tuple_int_NDArray(student_answer, instructor_answer, ke
 # ----------------------------------------------------------------------
 
 
-def check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, keys):
+def check_answer_dict_int_ndarray(student_answer, instructor_answer, rel_tol, keys):
     """
-    Similar to check_answer_dict_string_NDArray
-    student answer: dictionary with keys:str, values: an NDArray
+    Similar to check_answer_dict_string_ndarray
+    student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
@@ -1082,7 +1082,7 @@ def check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, ke
     s_dict_norm = {}
     keys = list(instructor_answer.keys()) if keys is None else keys
 
-    print("Assert_utilities, type dict_int_NDArray NOT HANDLED")
+    print("Assert_utilities, type dict_int_ndarray NOT HANDLED")
     return False, ""
 
     # Need an exception in case the student key is not found
@@ -1118,11 +1118,11 @@ def check_answer_dict_int_NDArray(student_answer, instructor_answer, rel_tol, ke
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_int_NDArray(
+def check_structure_dict_int_ndarray(
     student_answer, instructor_answer, rel_tol, keys=None
 ):
     """
-    student answer: dictionary with keys:str, values: an NDArray
+    student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
     rel_tol: tolerance on the matrix norm
     keys: None if all keys in the instructor_answer should be considered (list of ints)
@@ -1169,10 +1169,10 @@ def check_structure_dict_int_NDArray(
                 status = False
 
         if status:
-            msg_list.append("- All elements are of type NDArray as expected.")
+            msg_list.append("- All elements are of type ndarray as expected.")
 
     if status:
-        msg_list.append("Type 'dict[str, NDArray]' is correct")
+        msg_list.append("Type 'dict[str, ndarray]' is correct")
 
     return status, "\n".join(msg_list)
 
@@ -1180,9 +1180,9 @@ def check_structure_dict_int_NDArray(
 # ======================================================================
 def check_answer_dict_int_list(student_answer, instructor_answer, keys):
     """
-    Similar to check_answer_dict_string_NDArray
+    Similar to check_answer_dict_string_ndarray
     list of floats (if not specified)
-    student answer: dictionary with keys:str, values: an NDArray
+    student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
     keys: None if all keys should be considered
 
@@ -1228,7 +1228,7 @@ def check_answer_dict_int_list(student_answer, instructor_answer, keys):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 def check_structure_dict_int_list(student_answer, instructor_answer, keys=None):
     """
-    student answer: dictionary with keys:str, values: an NDArray
+    student answer: dictionary with keys:str, values: an ndarray
     list of floats (if not specified)
     instructor answer: dictionary with keys:str, values: a set of objects
     keys: None if all keys in the instructor_answer should be considered (list of ints)
@@ -1246,7 +1246,7 @@ def check_structure_dict_int_list(student_answer, instructor_answer, keys=None):
 
     # I am not handling the keys argument yet <<<<<<
     # Check the length of the lists (NOT DONE) <<<<<
-    # I could convert list to NDArray and call the function with NDARRAY for checking.
+    # I could convert list to ndarray and call the function with NDARRAY for checking.
     # If the list cannot be converted, it has the wrong format. So use an try/except.
 
     if status:
@@ -1284,9 +1284,9 @@ def check_structure_dict_int_list(student_answer, instructor_answer, keys=None):
 # ======================================================================
 def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol, partial_score_frac: list[float]):
     """
-    Similar to check_answer_dict_string_NDArray
+    Similar to check_answer_dict_string_ndarray
     list of floats (if not specified)
-    student answer: dictionary with keys:str, values: an NDArray
+    student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
     keys: None if all keys should be considered
 
@@ -1318,7 +1318,7 @@ def check_answer_dict_int_list_float(student_answer, instructor_answer, keys, re
 
 def check_structure_dict_int_list_float(student_answer, instructor_answer, keys=None):
     """
-    student answer: dictionary with keys:str, values: an NDArray
+    student answer: dictionary with keys:str, values: an ndarray
     list of floats (if not specified)
     instructor answer: dictionary with keys:str, values: a set of objects
     keys: None if all keys in the instructor_answer should be considered (list of ints)
@@ -1339,7 +1339,7 @@ def check_structure_dict_int_list_float(student_answer, instructor_answer, keys=
 
     # I am not handling the keys argument yet <<<<<<
     # Check the length of the lists (NOT DONE) <<<<<
-    # I could convert list to NDArray and call the function with NDARRAY for checking.
+    # I could convert list to ndarray and call the function with NDARRAY for checking.
     # If the list cannot be converted, it has the wrong format. So use an try/except.
 
     if status:
@@ -1404,9 +1404,9 @@ def check_answer_list_int(student_answer, instructor_answer, partial_score_frac:
 
 def check_structure_list_int(student_answer, instructor_answer):
     """
-    Check that elements in the list are NDArrays
+    Check that elements in the list are ndarrays
     """
-    # print("==>  structure check_structure_list_NDArray....")
+    # print("==>  structure check_structure_list_ndarray....")
     status = True
     msg_list = []
 
@@ -1443,7 +1443,7 @@ def check_structure_list_int(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_list_NDArray(student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]):
+def check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]):
     """
     tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
@@ -1479,11 +1479,11 @@ def check_answer_list_NDArray(student_answer, instructor_answer, rel_tol, partia
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_list_NDArray(student_answer, instructor_answer):
+def check_structure_list_ndarray(student_answer, instructor_answer):
     """
-    Check that elements in the list are NDArrays
+    Check that elements in the list are ndarrays
     """
-    # print("==>  structure check_structure_list_NDArray....")
+    # print("==>  structure check_structure_list_ndarray....")
     status = True
     msg_list = []
 
@@ -1514,7 +1514,7 @@ def check_structure_list_NDArray(student_answer, instructor_answer):
                 )
 
     if status:
-        msg_list.append("- All list elements are type NDArray.")
+        msg_list.append("- All list elements are type ndarray.")
 
     return status, "\n".join(msg_list)
 
@@ -1523,7 +1523,7 @@ def check_structure_list_NDArray(student_answer, instructor_answer):
 
 
 # <<<<<<< NOT IN type_handlers >>>>>>
-def check_answer_set_NDArray(student_answer, instructor_answer, rel_tol):
+def check_answer_set_ndarray(student_answer, instructor_answer, rel_tol):
     """
     tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms. Order does not
@@ -1532,7 +1532,7 @@ def check_answer_set_NDArray(student_answer, instructor_answer, rel_tol):
     status = True
     msg_list = []
 
-    print("Assert_utilities, type set_NDArray NOT HANDLED")
+    print("Assert_utilities, type set_ndarray NOT HANDLED")
     return False, ""
 
     s_answ = list(student_answer)
@@ -1556,14 +1556,14 @@ def check_answer_set_NDArray(student_answer, instructor_answer, rel_tol):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_set_NDArray(student_answer, instructor_answer):
+def check_structure_set_ndarray(student_answer, instructor_answer):
     return True
 
 
 # ======================================================================
 
 
-def check_answer_NDArray(student_answer, instructor_answer, rel_tol):
+def check_answer_ndarray(student_answer, instructor_answer, rel_tol):
     """
     tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
@@ -1587,7 +1587,7 @@ def check_answer_NDArray(student_answer, instructor_answer, rel_tol):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_NDArray(student_answer, instructor_answer):
+def check_structure_ndarray(student_answer, instructor_answer):
     """
     Check that all elements in the list have matching norms
     instructor_answer: not used
@@ -1599,7 +1599,7 @@ def check_structure_NDArray(student_answer, instructor_answer):
             False,
             f"- Answer should be a numpy array rather than {type(student_answer)}",
         )
-    return True, "Type 'NDArray' is correct."
+    return True, "Type 'ndarray' is correct."
 
 
 # ======================================================================
@@ -1808,17 +1808,17 @@ def check_structure_set_set(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_dict_string_Tuple_NDArray(student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]):
+def check_answer_dict_string_tuple_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]):
     """
     GE original function restructed by GPT-4 (2024-03-06)
-    student_answer: dictionary with keys:str, values: tuple of NDArrays
+    student_answer: dictionary with keys:str, values: tuple of ndarrays
     instructor_answer: dictionary with keys:str, values: a set of objects
     rel_tol: tolerance on the matrix norm
     """
     msg_list = []
     status = True  # Assuming correct until proven otherwise
     ps_dict = init_partial_score_dict()
-    #print("Assert_utilities, type dict_string_Tuple_NDArray NOT HANDLED")
+    #print("Assert_utilities, type dict_string_tuple_ndarray NOT HANDLED")
     #return False, ""
 
     # Dictionaries to hold norms for student and instructor answers
@@ -1862,7 +1862,7 @@ def check_answer_dict_string_Tuple_NDArray(student_answer, instructor_answer, re
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_string_Tuple_NDArray(student_answer, instructor_answer):
+def check_structure_dict_string_tuple_ndarray(student_answer, instructor_answer):
     status = True
     msg_list = []
     for k, v in instructor_answer.items():
@@ -1881,7 +1881,7 @@ def check_structure_dict_string_Tuple_NDArray(student_answer, instructor_answer)
                 status = False
 
     if status:
-        msg_list.append("Type 'dict[str, tuple(NDArray)]' is correct.")
+        msg_list.append("Type 'dict[str, tuple(ndarray)]' is correct.")
 
     return status, "\n".join(msg_list)
 
