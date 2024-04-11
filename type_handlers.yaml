@@ -167,8 +167,8 @@ types:
     # Test that the norms of the matrix are within a tolerance
     # I should be able to test the length against the expected length, either from the instructor answer
     #    or from the answer specified in the yaml file, or against a length specified in the yaml file. NOT DONE.
-    assert_answer: "assert_utilities.check_answer_dict_string_NDArray(student_answer, instructor_answer, rel_tol, keys)"
-    assert_structure: "assert_utilities.check_structure_dict_string_NDArray(student_answer, instructor_answer, rel_tol, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_string_NDArray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_string_NDArray(student_answer, instructor_answer, keys)"
 
   dict[int,NDArray]:
     import: "" 
@@ -177,7 +177,7 @@ types:
 
   dict[tuple[int],NDArray]:
     import: "" 
-    assert_answer: "assert_utilities.check_answer_dict_tuple_int_NDArray(student_answer, instructor_answer, rel_tol, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_tuple_int_NDArray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_tuple_int_NDArray(student_answer, instructor_answer, keys)"
 
   dict[string,Tuple[NDArray]]:
