@@ -124,7 +124,7 @@ def check_answer_float(student_answer, instructor_answer, rel_tol):
         # the relative error can be computed
         rel_err = (student_answer - instructor_answer) / instructor_answer
         rel_err = math.fabs(rel_err)
-        print(f"{rel_err=}, {student_answer=}, {instructor_answer}, {rel_tol=}")
+        #print(f"{rel_err=}, {student_answer=}, {instructor_answer}, {rel_tol=}")
         if rel_err > rel_tol:
             status = False
             #print("==> (rel_err > rel_tol) {status=}") 
@@ -133,7 +133,7 @@ def check_answer_float(student_answer, instructor_answer, rel_tol):
             status = True
             msg_list = [f"Answer is correct to within relative error: {100*rel_tol}%"]
 
-    print(f"return: {status=}") 
+    #print(f"return: {status=}") 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -301,9 +301,9 @@ def check_structure_dict_str_dict_str_float(student_answer, instructor_answer):
     if len(missing_keys) > 0:
         return False, f"- Missing keys: {[repr(k) for k in missing_keys]}."
 
-    print("answer keys: ", list(student_answer.keys()))
-    for k, v in instructor_answer.items():
-        print(f"key: {k}, value: {v}")
+    #print("answer keys: ", list(student_answer.keys()))
+    #for k, v in instructor_answer.items():
+        #print(f"key: {k}, value: {v}")
 
     for k, v in instructor_answer.items():
         if not isinstance(v, dict):
@@ -836,8 +836,8 @@ def check_structure_dict_string_NDArray(
     msg_list = []
 
     # print(f"arg: {keys=}")
-    print(f"===> {instructor_answer=}")
-    print(f"===> {student_answer=}")
+    #print(f"===> {instructor_answer=}")
+    #print(f"===> {student_answer=}")
 
     if not isinstance(instructor_answer, dict):
         msg_list += ["Instructor answer should be a dict"]
@@ -1514,7 +1514,7 @@ def check_structure_set_NDArray(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_NDArray(student_answer, instructor_answer, tol):
+def check_answer_NDArray(student_answer, instructor_answer, rel_tol):
     """
     tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
@@ -1531,7 +1531,7 @@ def check_answer_NDArray(student_answer, instructor_answer, tol):
             status = False
             msg_list.append("Student answer has an absolute error > 1.e-5")
     else:
-        status *= (s_norm - i_norm) / i_norm <= tol
+        status *= (s_norm - i_norm) / i_norm <= rel_tol
 
     if not status:
         msg_list.append("For comparison, the array was replaced by its norm")
@@ -1548,8 +1548,8 @@ def check_structure_NDArray(student_answer, instructor_answer):
     Check that all elements in the list have matching norms
     instructor_answer: not used
     """
-    print(f"===> {type(np.zeros([1]))=}")
-    print(f"===> {type(student_answer)=}")
+    #print(f"===> {type(np.zeros([1]))=}")
+    #print(f"===> {type(student_answer)=}")
     if not isinstance(student_answer, type(np.zeros([1]))):
         return (
             False,
@@ -1583,7 +1583,7 @@ def check_answer_function(student_answer, instructor_answer):
 
 
 def check_structure_function(student_answer, instructor_answer):
-    print(f"==> inside function: {type(student_answer)=}")
+    #print(f"==> inside function: {type(student_answer)=}")
     if not isinstance(student_answer, type(lambda: None)):
         return False, "- Answer should be a Python function."
     return True, "Type 'function' is correct."
@@ -1592,7 +1592,7 @@ def check_structure_function(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_list_list_float(student_answer, instructor_answer, tol, partial_score_frac: list[float]):
+def check_answer_list_list_float(student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]):
     """
     Check two lists of lists of floats with each other
     """
@@ -1602,8 +1602,9 @@ def check_answer_list_list_float(student_answer, instructor_answer, tol, partial
     status = True
 
     for s_lst, i_lst in zip(student_answer, instructor_answer):
-        status_, msg_list_ = check_list_float(i_arr, s_arr, rel_tol=rel_tol, abs_tol=1.e-6, partial_score_frac=partial_score_frac)
+        status_, msg_list_ = check_list_float(i_lst, s_lst, rel_tol=rel_tol, abs_tol=1.e-6, partial_score_frac=partial_score_frac)
         msg_list.extend(msg_list)
+        #print(f"==> {partial_score_frac=}")
         if status is True:
             status = status_
         """
@@ -1617,14 +1618,14 @@ def check_answer_list_list_float(student_answer, instructor_answer, tol, partial
             status *= rel_err < tol
         """
 
-    msg_list.append(f"Answer correct if relative error < {tol*100} percent")
+    msg_list.append(f"Answer correct if relative error < {rel_tol*100} percent")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_list_list_float(student_answer, instructor_answer, partial_score_frac: list[float]):
+def check_structure_list_list_float(student_answer, instructor_answer):
     """
     Check structure of student_answer.
     instructor_answer: not used
@@ -2098,17 +2099,17 @@ def check_structure_lineplot(student_answer, instructor_answer, choices):
     status = True
     msg_list = []
 
-    print("==> check structure lineplot")
+    #print("==> check structure lineplot")
     # get axis object
-    print(f"{student_answer=}")
+    #print(f"{student_answer=}")
     s_ax = student_answer[0].gca()
     i_ax = student_answer[0].gca()
-    print(f"{dir(s_ax)=}")
-    print(f"{type(s_ax).__name__=}")
+    #print(f"{dir(s_ax)=}")
+    #print(f"{type(s_ax).__name__=}")
     # s_ax = s_ax.gcf().get_axes()
     # i_ax = instructor_answer[0].gcf().get_axes()
 
-    print(f"==> {s_ax=}")
+    #print(f"==> {s_ax=}")
 
     if len(s_ax) != len(i_ax):
         msg_list.append(f"There should only be {len(i_ax)} plot(s)!")
