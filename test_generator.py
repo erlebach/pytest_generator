@@ -31,7 +31,7 @@ function_header_str = f"""
 from pytest_utils.decorators import max_score, visibility, hide_errors
 import assert_utilities  # <<< SHOULD be specified in config
 from {fixture_import_file} import *   
-import {fixture_import_file}
+#import {fixture_import_file}
 import numpy as np
 import yaml
 # pytest might change the python path. Make sure to import it last. 

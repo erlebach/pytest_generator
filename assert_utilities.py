@@ -1901,8 +1901,6 @@ def check_answer_set_set_int(student_answer, instructor_answer):
     """
     status = True
     msg_list = []
-    print("Assert_utilities, type list_set NOT HANDLED")
-    return False, ""
 
     seq_s = student_answer
     seq_i = instructor_answer
