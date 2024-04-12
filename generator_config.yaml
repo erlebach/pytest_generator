@@ -39,16 +39,18 @@ test_answers:
 
   # List of element indices to include for structure and answer checks. 
   # Default: include all the indices found in the instructor answerw.
-  include: []
+  include_indices: []
 
   # List of element indices to exclude for structure and answer checks. 
   # Default: do not exclude any elements from consideration
-  exclude: []
+  exclude_indices: []
 
   # Alternative choices for outer dictionary keys
+  # ???
   outer_key_choices: {}
  
   # Alternative choices for inner dictionary keys
+  # ???
   inner_key_choices: {}
  
   # Alternative choices for string values associated with dictionary keys
@@ -56,8 +58,7 @@ test_answers:
   # outer_key_choices: {'a': ['word1', 'word2'], 'b': ['word3', 'word4']}
   str_value_choices: {}
  
-  # Alternative choices for string values associated with dictionary keys
-  # Assume a dictionary with keys: 'a', 'b'
+  # Alternative choices for string values, which applies to the 'str' answer type.
   # str_choices: ['word1', 'word2']
   str_choices: []
 
@@ -93,7 +94,10 @@ types:
   dict[tuple[int]:ndarray]: {}
   list[list[float]]: {}
   list[ndarray]: {}
+
+  # Supports ['include_indices', 'exclude_indices']
   list[str]: {}
+
   list[int]: {}
   set[set[int]]: {}
   set[ndarray]: {}
@@ -102,7 +106,10 @@ types:
   function: {}
   explain_string:  {}
   integer: {}
+
+  # Support ['str_choices']
   str: {}
+
   float: {}
   ndarray: {}
   scatterplot3d: {}

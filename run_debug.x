@@ -13,9 +13,7 @@ tests/test_answers_preprocessed_part2_expand.py \
 tests/test_answers_preprocessed_part3_expand.py \
 tests/test_answers_preprocessed_part4_expand.py
 
-#pytest -s     tests/test_answers_preprocessed_part1_expand.py
-
 #pytest --import-mode='append' -s tests/test_answers_preprocessed_part1_expand.py
-#pytest --import-mode='append' -s tests/test_answers_preprocessed_part2_expand.py::test_answers_compute_2C_colon_SSE_plot_list_lbrack_list_lbrack_float_rbrack_rbrack
+#pytest --import-mode='append' -s tests/test_answers_preprocessed_part2_expand.py
 #pytest --import-mode='append' -s tests/test_answers_preprocessed_part3_expand.py
-#pytest --import-mode='append' -s tests/test_answers_preprocessed_part4_expand.py::test_answers_compute_4A_colon_datasets_dict_lbrack_string_comma_tuple_lbrack_ndarray_rbrack_rbrack
+#pytest --import-mode='append' -s tests/test_answers_preprocessed_part4_expand.py
