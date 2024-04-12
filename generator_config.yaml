@@ -39,10 +39,12 @@ test_answers:
 
   # List of element indices to include for structure and answer checks. 
   # Default: include all the indices found in the instructor answerw.
+  # Applies to type list[str]
   include_indices: []
 
   # List of element indices to exclude for structure and answer checks. 
   # Default: do not exclude any elements from consideration
+  # Applies to type list[str]
   exclude_indices: []
 
   # Alternative choices for outer dictionary keys
@@ -55,7 +57,7 @@ test_answers:
  
   # Alternative choices for string values associated with dictionary keys
   # Assume a dictionary with keys: 'a', 'b'
-  # outer_key_choices: {'a': ['word1', 'word2'], 'b': ['word3', 'word4']}
+  # str_value_choices: {'a': ['word1', 'word2'], 'b': ['word3', 'word4']}
   str_value_choices: {}
  
   # Alternative choices for string values, which applies to the 'str' answer type.
@@ -81,10 +83,10 @@ types:
     #types: []    # NO idea what this is
   float: {}
   explain_string: {}
-  list[str]:
-  dict[str:dict[str:float]]:
-  dict[str:tuple[ndarray]]: 
-  dict[str:ndarray]: 
+  list[str]: {}
+  dict[str:dict[str:float]]: {}
+  dict[str:tuple[ndarray]]: {}
+  dict[str:ndarray]: {}
   dict[str:float]: {}
   dict[str:set[int]]: {}
   dict[str:float]: {}
@@ -107,7 +109,7 @@ types:
   explain_string:  {}
   integer: {}
 
-  # Support ['str_choices']
+  # Supports ['str_choices']
   str: {}
 
   float: {}
@@ -123,13 +125,26 @@ types:
 imports:
   - assert_utilities
 
-student_code:
+student_code: {}
 
-instructor_code:
+instructor_code: {}
 
-fixtures: 
+fixtures:  {}
 
-mocks:
+mocks: {}
 
-modules:
+modules: {}
 
+types_per_option:
+  rel_tol: ['eval_float', 'float', 'dict[str:dict[str:float]]', 'dict[str:float]', 'dict[str:float]',
+              'dict[int:list[float]]', 'list[list[float]]', 'eval_float']
+
+  abs_tol: ['eval_float', 'float', 'dict[str:dict[str:float]]', 'dict[str:float]', 'dict[str:float]',
+              'dict[int:list[float]]', 'list[list[float]]', 'eval_float']
+
+  exclude_indices: ['list[str]']
+  include_indices: ['list[str]']
+
+  str_choices: ['list[str]']
+
+# I am stil not clear on how these data structures will be used. 

@@ -29,6 +29,8 @@ with open("generator_config.yaml", "r") as f:
     include_indices = (
         config.get("types", {}).get("list[string]", {}).get("include_indices", [])
     )
+    outer_key_choices = []   # default
+    str_choices = []
 
 # How to access an element of config dict and set to default value for non-existent key?
 gen_config = config["test_answers"]
