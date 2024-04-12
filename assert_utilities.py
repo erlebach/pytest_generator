@@ -1,4 +1,6 @@
-
+"""
+Module to handle different answer types
+"""
 import ast
 import re
 import inspect  # <<<<
