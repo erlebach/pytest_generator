@@ -172,3 +172,10 @@ Fix unhandled cases in AssertUtils.py
 
  I implemented partial grading on my types involving dict and str.  Not yet set. 
 ----------------------------------------------------------------------
+2024-04-11_19:05
+I changed NDArray to ndarray to satisfy snake notation. 
+I get the error that check_structure_list_ndarray is not found in assert_utilities.opy . That is not  
+possible. I have applied `chmod 000` to all instances of `assert_utilities.py` to guard against 
+inaccurate paths. 
+- IMPORTANT: make sure to import pytest last! This module somehow modifies the order of paths. 
+----------------------------------------------------------------------

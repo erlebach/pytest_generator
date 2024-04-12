@@ -23,7 +23,7 @@ types_list = [
     "eval_float",
     "dendrogram", 
     "function",
-    "set[set]",
+    "set[set[int]]",
     "ndarray", 
     "integer",
     "string",

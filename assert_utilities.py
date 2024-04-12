@@ -169,10 +169,11 @@ def update_score(ps_dict: dict[str, float | int]) -> None:
 # ----------------------------------------------------------------------
 def check_str(i_str, s_str):
     status = True
+    msg = ""
     if clean_str_answer(i_str) != clean_str_answer(s_str):
         status = False
         msg = f"String element mismatch. Instructor: {i_str}, Student: {s_str}"
-    return status, [msg]
+    return status, msg
 
 
 # ----------------------------------------------------------------------
@@ -183,8 +184,9 @@ def check_dict_str_float(
 ):
     msg_list = []
     status = True
+    ps_dict["nb_total"] += len(keys)
 
-    for k in keys():
+    for k in keys:
         i_el = i_dict.get(k, None)
         s_el = s_dict.get(k, None)
         if i_el is None or s_el is None:
@@ -195,6 +197,7 @@ def check_dict_str_float(
             status = False
             ps_dict["nb_mismatches"] += 1
 
+    ps_dict['partial_score_frac'] = 1. - ps_dict['nb_mismatches'] / ps_dict['nb_total']
     return status, "\n".join(msg_list)
 
 
@@ -1027,15 +1030,15 @@ def check_answer_dict_string_ndarray(
 
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
-    ps_dict["nb_total"] = len(keys)
 
     # Need an exception in case the student key is not found
-    i_norms = {np.linalg.norm(instructor_answer[k]) for k in keys}
-    s_norms = {np.linalg.norm(student_answer[k]) for k in keys}
+    i_norms = {k: np.linalg.norm(instructor_answer[k]) for k in keys}
+    s_norms = {k: np.linalg.norm(student_answer[k]) for k in keys}
 
-    status, msg_list = check_dict_str_float(
+    status, msg_list_ = check_dict_str_float(
         keys, i_norms, s_norms, rel_tol, 1.0e-5, ps_dict
     )
+    msg_list += msg_list_
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, s_norms, i_norms)
 
@@ -1557,7 +1560,6 @@ def check_structure_list_int(student_answer, instructor_answer):
     """
     Check that elements in the list are ndarrays
     """
-    # print("==>  structure check_structure_list_ndarray....")
     status = True
     msg_list = []
 
@@ -1635,7 +1637,6 @@ def check_answer_list_ndarray(
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 
 def check_structure_list_ndarray(student_answer, instructor_answer):
     """
@@ -1892,7 +1893,8 @@ def convert_to_set_of_sets(input_sequence):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_answer_set_set(student_answer, instructor_answer):
+# TODO: FIX method
+def check_answer_set_set_int(student_answer, instructor_answer):
     """
     Both student answer and instructor answer should be a set of sets or a structure
     that can be converted to a set of setsr
@@ -1918,7 +1920,8 @@ def check_answer_set_set(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_set_set(student_answer):
+# TODO: FIX method
+def check_structure_set_set_int(student_answer):
     """
     Created by GPT-4, modified by GE, 2024-03-06
     Both student answer and instructor answer should be a set of sets or a structure

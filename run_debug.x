@@ -10,5 +10,8 @@ export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./
 #tests/test_answers_preprocessed_part4_expand.py
 
 #pytest -s     tests/test_answers_preprocessed_part1_expand.py
-pytest -s     tests/test_answers_preprocessed_part2_expand.py
 
+#pytest -s tests/test_answers_preprocessed_part2_expand.py
+#pytest --import-mode='append' -s tests/test_answers_preprocessed_part2_expand.py
+#pytest --import-mode='append' -s tests/test_answers_preprocessed_part1_expand.py
+pytest --import-mode='append' -s tests/test_answers_preprocessed_part3_expand.py::test_answers_compute_3E_colon_clusters_set_lbrack_set_lbrack_int_rbrack_rbrack

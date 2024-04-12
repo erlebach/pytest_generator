@@ -45,10 +45,10 @@ types:
     assert_structure: "assert_utilities.check_structure_list_set(student_answer, instructor_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
-  set[set]:
+  set[set[int]]:
     import: "" #"numpy as np"
-    assert_answer: "assert_utilities.check_answer_set_set(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_set_set(student_answer)"
+    assert_answer: "assert_utilities.check_answer_set_set_int(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_set_set_int(student_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
   list[list[float]]:
@@ -59,7 +59,7 @@ types:
  
   list[ndarray]:
     import: "" #"numpy as np"
-    assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol)"
+    assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_ndarray(student_answer, instructor_answer)"
 
   list[int]:
@@ -210,7 +210,7 @@ types:
   string:
     import: ""
     assert_answer: "assert_utilities.check_answer_string(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_string(student_answer, instructor_answer, choices)"
+    assert_structure: "assert_utilities.check_structure_string(student_answer, choices)"
 
   # Evaluate to a float
   eval_float:
