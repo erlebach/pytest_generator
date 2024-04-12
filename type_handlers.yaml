@@ -1,5 +1,3 @@
-# print('type dict NOT HANDLED!')
-# print('type set[set] NOT HANDLED!')
 types:
   ndarray: 
     import: "" #"numpy as np"
@@ -23,27 +21,6 @@ types:
     assert_answer: "assert_utilities.check_answer_int(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_int(student_answer)"
     # aliases: integer  (not yet implemented)
-
-  integer:
-    import: ""
-    assert_answer: "assert_utilities.check_answer_int(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_int(student_answer, instructor_answer)"
-
-  list:
-    import: ""
-    assert: "isinstance({answer_var}, list)"
-    struct_msg: Answer should be a list. 
-
-  list[list]:
-    import: "" #"numpy as np"
-    assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], list)"
-    struct_msg: Answer should be a list of lists of floats
-
-  list[set]:
-    import: "" #"numpy as np"
-    assert_answer: "assert_utilities.check_answer_list_set(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_list_set(student_answer, instructor_answer)"
-    #answer_msg: "Correct answer: {instructor_answer}"
 
   set[set[int]]:
     import: "" #"numpy as np"
@@ -108,25 +85,10 @@ types:
     assert_answer: "assert_utilities.check_answer_dict(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_dict(student_answer, instructor_answer)"
 
-  dict_str_str:
-    import: ""
-    assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in {answer_var}.items())"
-    struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
-
-  dict[int,list]:
-    import: ""
-    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer, keys)"
-    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer, keys)"
-
   dict[int,list[float]]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_int_list_float(student_answer, instructor_answer, keys)"
-
-  dict[str,dict[str,list]]:
-    import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_list(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_dict_str_dict_str_list(student_answer, instructor_answer)"
 
   dict[str,dict[str,float]]:
     import: ""
@@ -138,11 +100,6 @@ types:
     assert_answer: "assert_utilities.check_answer_explain_str(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_explain_str(student_answer)"
     min_words: 10  # Should be in the configuration file
-
-  dict[str,list]:
-    import: ""
-    assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
-    struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
 
   dict[str,set[int]]:
     import: ""
@@ -159,11 +116,6 @@ types:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, insructor_answer, keys)"
-
-  dict[str,float]:
-    import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, instructor_answer, rel_tol, keys)"
 
   dict[str,ndarray]:
     import: "" #"numpy as np"
@@ -191,21 +143,10 @@ types:
     assert_answer: "assert_utilities.check_answer_dict_str_tuple_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_tuple_ndarray(student_answer, instructor_answer)"
 
-  dict_str_list:
-    import: ""
-    assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
-    truct_msg: "Answer should be dictionary, specifically: dict[str, str]."
-
-
   dict_str_dict_str_float:
     import: ""
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, dict) and all(isinstance(sub_k, str) and isinstance(sub_v, float) for sub_k, sub_v in v.items()) for k, v in {answer_var}.items())"
     struct_msg: "Answer should be dictionary, specifically: dict[str, dict[str, float]]."
-
-  str:
-    import: ""
-    assert_answer: "assert_utilities.check_answer_str(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_str(student_answer, choices)"
 
   str:
     import: ""
@@ -251,3 +192,43 @@ types:
     #answer_msg: "Correct answer: {instructor_answer}"
     assert_structure: "assert_utilities.check_structure_dendrogram(student_answer)"
 
+  list:
+    import: ""
+    assert: "isinstance({answer_var}, list)"
+    struct_msg: Answer should be a list. 
+
+  list[list]:
+    import: "" #"numpy as np"
+    assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], list)"
+    struct_msg: Answer should be a list of lists of floats
+
+  list[set]:
+    import: "" #"numpy as np"
+    assert_answer: "assert_utilities.check_answer_list_set(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_list_set(student_answer, instructor_answer)"
+    #answer_msg: "Correct answer: {instructor_answer}"
+
+  dict_str_str:
+    import: ""
+    assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in {answer_var}.items())"
+    struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
+
+  dict[int,list]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer, keys)"
+
+  dict[str,dict[str,list]]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_list(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_dict_str_dict_str_list(student_answer, instructor_answer)"
+
+  dict[str,list]:
+    import: ""
+    assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
+    struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
+
+  dict_str_list:
+    import: ""
+    assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
+    truct_msg: "Answer should be dictionary, specifically: dict[str, str]."
