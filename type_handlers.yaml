@@ -67,11 +67,11 @@ types:
     assert_answer: "assert_utilities.check_answer_list_int(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_list_int(student_answer, instructor_answer)"
 
-  list[string]:
+  list[str]:
     import: ""
     #  partial_score_frac_l: a one-element list with partial score fractiion, i.e. [0.75]
-    assert_answer: "assert_utilities.check_answer_list_string(student_answer, instructor_answer, exclude, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_list_string(student_answer)"
+    assert_answer: "assert_utilities.check_answer_list_str(student_answer, instructor_answer, exclude, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_list_str(student_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
   set:
@@ -80,10 +80,10 @@ types:
     struct_msg: Answer should be of type set. 
     note: a set of objects (any type, mostly strings), TBD
 
-  set[string]:
+  set[str]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_set_string(student_answer, instructor_answer, partial_score_frac_l, choices)"
-    assert_structure: "assert_utilities.check_structure_set_string(student_answer)"
+    assert_answer: "assert_utilities.check_answer_set_str(student_answer, instructor_answer, partial_score_frac_l, choices)"
+    assert_structure: "assert_utilities.check_structure_set_str(student_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
   bool:
@@ -123,23 +123,23 @@ types:
     assert_answer: "assert_utilities.check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_int_list_float(student_answer, instructor_answer, keys)"
 
-  dict[string,dict[str,list]]:
+  dict[str,dict[str,list]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_string_dict_str_list(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_dict_string_dict_str_list(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_list(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_dict_str_dict_str_list(student_answer, instructor_answer)"
 
   dict[str,dict[str,float]]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_dict_str_float(student_answer, instructor_answer)"
 
-  explain_string:
+  explain_str:
     import: ""
-    assert_answer: "assert_utilities.check_answer_explain_string(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_explain_string(student_answer)"
+    assert_answer: "assert_utilities.check_answer_explain_str(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_explain_str(student_answer)"
     min_words: 10  # Should be in the configuration file
 
-  dict[string,list]:
+  dict[str,list]:
     import: ""
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
     struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
@@ -149,30 +149,30 @@ types:
     assert_answer: "assert_utilities.check_answer_dict_str_set_int(student_answer, instructor_answer, keys)"
     assert_structure: "assert_utilities.check_structure_dict_str_set_int(student_answer, instructor_answer, keys)"
 
-  dict[string,set]:
+  dict[str,set]:
     import: ""
     # a set of non-strings
-    assert_answer: "assert_utilities.check_answer_dict_string_set(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_dict_string_set(student_answer, instructor_answer)"
-
-  dict[string,float]:
-    import: ""
-    assert_answer: "assert_utilities.check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_dict_string_float(student_answer, insructor_answer, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_str_set(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_dict_str_set(student_answer, instructor_answer)"
 
   dict[str,float]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_string_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_dict_string_float(student_answer, instructor_answer, rel_tol, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, insructor_answer, keys)"
 
-  dict[string,ndarray]:
+  dict[str,float]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, instructor_answer, rel_tol, keys)"
+
+  dict[str,ndarray]:
     import: "" #"numpy as np"
     #assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"
     # Test that the norms of the matrix are within a tolerance
     # I should be able to test the length against the expected length, either from the instructor answer
     #    or from the answer specified in the yaml file, or against a length specified in the yaml file. NOT DONE.
-    assert_answer: "assert_utilities.check_answer_dict_string_ndarray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_dict_string_ndarray(student_answer, instructor_answer, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_str_ndarray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_str_ndarray(student_answer, instructor_answer, keys)"
 
   dict[int,ndarray]:
     import: "" 
@@ -184,12 +184,12 @@ types:
     assert_answer: "assert_utilities.check_answer_dict_tuple_int_ndarray(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_tuple_int_ndarray(student_answer, instructor_answer, keys)"
 
-  dict[string,tuple[ndarray]]:
+  dict[str,tuple[ndarray]]:
     import: "" #"numpy as np"
     # assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"  
     # The instructor answer is useful to check key values
-    assert_answer: "assert_utilities.check_answer_dict_string_tuple_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_dict_string_tuple_ndarray(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_dict_str_tuple_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_str_tuple_ndarray(student_answer, instructor_answer)"
 
   dict_str_list:
     import: ""
@@ -204,13 +204,13 @@ types:
 
   str:
     import: ""
-    assert_answer: "assert_utilities.check_answer_string(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_string(student_answer, choices)"
+    assert_answer: "assert_utilities.check_answer_str(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_str(student_answer, choices)"
 
-  string:
+  str:
     import: ""
-    assert_answer: "assert_utilities.check_answer_string(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_string(student_answer, choices)"
+    assert_answer: "assert_utilities.check_answer_str(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_str(student_answer, choices)"
 
   # Evaluate to a float
   eval_float:

@@ -75,16 +75,16 @@ types:
   eval_float:
     local_namespaces: {'math': math}
     locals: {}
-  string:
+  str:
     choices: []
     #types: []    # NO idea what this is
   float: {}
   explain_string: {}
-  list[string]:
+  list[str]:
   dict[str:dict[str:float]]:
-  dict[string:tuple[ndarray]]: 
-  dict[string:ndarray]: 
-  dict[string:float]: {}
+  dict[str:tuple[ndarray]]: 
+  dict[str:ndarray]: 
+  dict[str:float]: {}
   dict[str:set[int]]: {}
   dict[str:float]: {}
   dict[str:ndarray]: {}
@@ -93,24 +93,24 @@ types:
   dict[tuple[int]:ndarray]: {}
   list[list[float]]: {}
   list[ndarray]: {}
-  list[string]: {}
+  list[str]: {}
   list[int]: {}
   set[set[int]]: {}
   set[ndarray]: {}
-  set[string]: {}
+  set[str]: {}
   eval_float: {}
   function: {}
   explain_string:  {}
   integer: {}
-  string: {}
+  str: {}
   float: {}
   ndarray: {}
   scatterplot3d: {}
   scatterplot2d: {}
   lineplot: {}
   # dict: {}
-  # dict[string:set]: {}
-  # dict[string:dict[str:list]]: {}
+  # dict[str:set]: {}
+  # dict[str:dict[str:list]]: {}
   # dict[int:list]: {}
 
 imports:

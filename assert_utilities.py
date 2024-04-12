@@ -386,7 +386,7 @@ def check_structure_eval_float(student_answer):
 # ======================================================================
 
 
-# def check_answer_dict_string_dict_str_list(student_answer, instructor_answer):
+# def check_answer_dict_str_dict_str_list(student_answer, instructor_answer):
 #     """
 #     The type is a dict[str, dict[str, list]]
 
@@ -416,7 +416,7 @@ def check_structure_eval_float(student_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_string_dict_str_list(student_answer, instructor_answer):
+def check_structure_dict_str_dict_str_list(student_answer, instructor_answer):
     """
     Check answer for type dict[str, dict[str, list]].
     Not handled because a list in itself should have a type
@@ -653,7 +653,7 @@ def check_structure_dict(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_string(student_answer, instructor_answer):
+def check_answer_str(student_answer, instructor_answer):
     status, msg = check_str(instructor_answer, student_answer)
     return return_value(status, [msg], student_answer, instructor_answer)
 
@@ -662,7 +662,7 @@ def check_answer_string(student_answer, instructor_answer):
 
 
 # MUST FIX
-def check_structure_string(student_answer, choices):
+def check_structure_str(student_answer, choices):
     """
     choices: list of strings
     """
@@ -696,7 +696,7 @@ def check_structure_string(student_answer, choices):
 # ======================================================================
 
 
-def check_answer_explain_string(student_answer, instructor_answer):
+def check_answer_explain_str(student_answer, instructor_answer):
     msg_list = []
     status = True
     return return_value(status, msg_list, student_answer, instructor_answer)
@@ -705,7 +705,7 @@ def check_answer_explain_string(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_explain_string(student_answer):
+def check_structure_explain_str(student_answer):
     """
     The type is an explain_string
     The string should have a minimum number of words stored in "type_handlers.yaml"
@@ -739,7 +739,7 @@ def check_structure_explain_string(student_answer):
 # NOT DONE
 
 
-def check_answer_set_string(
+def check_answer_set_str(
     student_answer, instructor_answer, partial_score_frac: list[float], choices=None
 ):
     """
@@ -789,7 +789,7 @@ def check_answer_set_string(
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_set_string(student_answer):
+def check_structure_set_str(student_answer):
     """ """
     msg_list = []
     status = True
@@ -819,7 +819,7 @@ def check_structure_set_string(student_answer):
 # ======================================================================
 
 
-def check_answer_dict_string_set(student_answer, instructor_answer):
+def check_answer_dict_str_set(student_answer, instructor_answer):
     """
     student answer: dictionary with keys:str, values: a set of objects
     instructor answer: dictionary with keys:str, values: a set of objects
@@ -841,7 +841,7 @@ def check_answer_dict_string_set(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_string_set(student_answer, instructor_answer):
+def check_structure_dict_str_set(student_answer, instructor_answer):
     """
     TODO: provide a list of keys to check as an argument keys (default None)
     """
@@ -937,7 +937,7 @@ def check_structure_dict_str_set_int(student_answer, instructor_answer, keys=Non
 # ======================================================================
 
 
-def check_answer_dict_string_float(
+def check_answer_dict_str_float(
     student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]
 ):
     """
@@ -969,7 +969,7 @@ def check_answer_dict_string_float(
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_string_float(student_answer, instructor_answer, keys=None):
+def check_structure_dict_str_float(student_answer, instructor_answer, keys=None):
     """
     student answer: dictionary with keys:str, values: float
     instructor answer: dictionary with keys:str, values: a set of objects
@@ -1017,7 +1017,7 @@ def check_structure_dict_string_float(student_answer, instructor_answer, keys=No
 # ======================================================================
 
 
-def check_answer_dict_string_ndarray(
+def check_answer_dict_str_ndarray(
     student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]
 ):
     """
@@ -1048,7 +1048,7 @@ def check_answer_dict_string_ndarray(
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_string_ndarray(student_answer, instructor_answer, keys=None):
+def check_structure_dict_str_ndarray(student_answer, instructor_answer, keys=None):
     """
     student answer: dictionary with keys:str, values: an ndarray
     instructor answer: dictionary with keys:str, values: a set of objects
@@ -1925,11 +1925,11 @@ def check_structure_set_set_int(student_answer):
     seq_s = student_answer
 
     # Function to check if an object is a sequence but not a string
-    def is_sequence_but_not_string(obj):
+    def is_sequence_but_not_str(obj):
         return isinstance(obj, (list, tuple, set)) and not isinstance(obj, str)
 
     # Check if the outer structures are sequences
-    if not is_sequence_but_not_string(seq_s):
+    if not is_sequence_but_not_str(seq_s):
         msg_list.append(
             "- The outer structure is not a sequence (list or set or tuple)."
         )
@@ -1940,7 +1940,7 @@ def check_structure_set_set_int(student_answer):
     # If outer structures are sequences, check each inner structure
     if status:
         for i, seq in enumerate(seq_s, start=1):
-            if not is_sequence_but_not_string(seq):
+            if not is_sequence_but_not_str(seq):
                 msg_list.append(
                     "Element {i} of the outer set is not compatible with a set and has type {seq}."
                 )
@@ -1960,7 +1960,7 @@ def check_structure_set_set_int(student_answer):
 # ======================================================================
 
 
-def check_answer_dict_string_tuple_ndarray( 
+def check_answer_dict_str_tuple_ndarray( 
     student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
 ):
     """
@@ -2011,7 +2011,7 @@ def check_answer_dict_string_tuple_ndarray(
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_string_tuple_ndarray(student_answer, instructor_answer):
+def check_structure_dict_str_tuple_ndarray(student_answer, instructor_answer):
     status = True
     msg_list = []
     for k, v in instructor_answer.items():
@@ -2195,7 +2195,7 @@ def check_structure_bool(student_answer):
 # ======================================================================
 
 
-def check_answer_list_string(
+def check_answer_list_str(
     student_answer,
     instructor_answer,
     exclude: list[int],
@@ -2237,7 +2237,7 @@ def check_answer_list_string(
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_list_string(student_answer):
+def check_structure_list_str(student_answer):
     msg_list = []
 
     # Function to check if an object is a list of strings
