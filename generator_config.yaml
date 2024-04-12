@@ -1,6 +1,6 @@
 all_tests:
   type: float
-  # By default, there is no score penalty
+  # By default: there is no score penalty
   # Multiply max_score by partial_score_frac
   partial_score_frac: 1.
 
@@ -10,12 +10,65 @@ test_structure:
   max_nb_words: 5
   fixture_import_file: my_fixtures
 
+# list of options that apply to all types. Sometimes
+# an option will not be used. They can be overridden
+# below in each type, individually. 
+# These options can also be overriden in the homework yaml files. 
+
 test_answers:
   # set all tests to fail
   assert_false: False
   fixture_import_file: my_fixtures
+
   # Allow partial scoring
   partial_scoring: True
+
+  # Relative error tolerance
+  rel_tol: 0.01
+
+  # Absolute error tolerance
+  abs_tol: 1.e-5
+
+  # List of keys to exclude for structure and answer checks. 
+  # Default: do not exclude any keys from consideration.
+  exclude_keys: []
+
+  # List of keys to include for structure and answer checks.
+  # Default: include all keys from the instructor answer.
+  include_keys: []
+
+  # List of element indices to include for structure and answer checks. 
+  # Default: include all the indices found in the instructor answerw.
+  include: []
+
+  # List of element indices to exclude for structure and answer checks. 
+  # Default: do not exclude any elements from consideration
+  exclude: []
+
+  # Alternative choices for outer dictionary keys
+  outer_key_choices: {}
+ 
+  # Alternative choices for inner dictionary keys
+  inner_key_choices: {}
+ 
+  # Alternative choices for string values associated with dictionary keys
+  # Assume a dictionary with keys: 'a', 'b'
+  # outer_key_choices: {'a': ['word1', 'word2'], 'b': ['word3', 'word4']}
+  str_value_choices: {}
+ 
+  # Alternative choices for string values associated with dictionary keys
+  # Assume a dictionary with keys: 'a', 'b'
+  # str_choices: ['word1', 'word2']
+  str_choices: []
+
+  # local_namespaces: required for use to call the functions in type_handlers.py
+  local_namespaces: {}
+
+  # locals: local variables for use in eval_float()
+  locals: {}
+
+  # The minimum number of words required in an answer that is explanatory.
+  mix_nb_words: 5
 
 # Options related to type
 types:
@@ -24,13 +77,41 @@ types:
     locals: {}
   string:
     choices: []
-    types: []
-  float:
-    tol: 2.e-2
-  explain_string:
-    max_nb_words: 5
+    #types: []    # NO idea what this is
+  float: {}
+  explain_string: {}
   list[string]:
-    exclude: []
+  dict[str:dict[str:float]]:
+  dict[string:tuple[ndarray]]: 
+  dict[string:ndarray]: 
+  dict[string:float]: {}
+  dict[str:set[int]]: {}
+  dict[str:float]: {}
+  dict[str:ndarray]: {}
+  dict[int:ndarray]: {}
+  dict[int:list[float]]: {}
+  dict[tuple[int]:ndarray]: {}
+  list[list[float]]: {}
+  list[ndarray]: {}
+  list[string]: {}
+  list[int]: {}
+  set[set[int]]: {}
+  set[ndarray]: {}
+  set[string]: {}
+  eval_float: {}
+  function: {}
+  explain_string:  {}
+  integer: {}
+  string: {}
+  float: {}
+  ndarray: {}
+  scatterplot3d: {}
+  scatterplot2d: {}
+  lineplot: {}
+  # dict: {}
+  # dict[string:set]: {}
+  # dict[string:dict[str:list]]: {}
+  # dict[int:list]: {}
 
 imports:
   - assert_utilities

@@ -20,6 +20,7 @@ with open("generator_config.yaml", "r") as f:
     config = yaml.safe_load(f)
     answer_type = config.get("all_tests").get("type", "float")
     tol = config.get("types", {}).get("float", {}).get("tol", 0.01)
+    print("config= ", config)
     exclude = config.get("types", {}).get("list[string]", {}).get("exclude", [])
 
 # How to access an element of config dict and set to default value for non-existent key?

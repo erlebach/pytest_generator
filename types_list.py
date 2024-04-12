@@ -13,7 +13,6 @@ types_list = [
     "dict[tuple[int],ndarray]",
     "list[list[float]]", 
     "dict[string,set]",
-    "dict[str,set[int]]",
     "explain_string", 
     "list[ndarray]", 
     "list[string]",
