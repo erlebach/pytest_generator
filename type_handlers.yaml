@@ -1,6 +1,6 @@
 types:
   ndarray: 
-    import: "" #"numpy as np"
+    import: "" 
     #assert: "isinstance({answer_var}, type(np.zeros(1)))"
     assert_answer: "assert_utilities.check_answer_ndarray(student_answer, instructor_answer, rel_tol)"
     assert_structure: "assert_utilities.check_structure_ndarray(student_answer)"
@@ -23,7 +23,7 @@ types:
     # aliases: integer  (not yet implemented)
 
   set[set[int]]:
-    import: "" #"numpy as np"
+    import: "" 
     assert_answer: "assert_utilities.check_answer_set_set_int(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_set_set_int(student_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
@@ -35,7 +35,7 @@ types:
     assert_structure: "assert_utilities.check_structure_list_list_float(student_answer, instructor_answer)"
  
   list[ndarray]:
-    import: "" #"numpy as np"
+    import: ""
     assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_ndarray(student_answer, instructor_answer)"
 
@@ -118,7 +118,7 @@ types:
     assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, insructor_answer, keys)"
 
   dict[str,ndarray]:
-    import: "" #"numpy as np"
+    import: "" 
     #assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"
     # Test that the norms of the matrix are within a tolerance
     # I should be able to test the length against the expected length, either from the instructor answer
@@ -137,7 +137,7 @@ types:
     assert_structure: "assert_utilities.check_structure_dict_tuple_int_ndarray(student_answer, instructor_answer, keys)"
 
   dict[str,tuple[ndarray]]:
-    import: "" #"numpy as np"
+    import: "" 
     # assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"  
     # The instructor answer is useful to check key values
     assert_answer: "assert_utilities.check_answer_dict_str_tuple_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
@@ -198,12 +198,12 @@ types:
     struct_msg: Answer should be a list. 
 
   list[list]:
-    import: "" #"numpy as np"
+    import: "" 
     assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], list)"
     struct_msg: Answer should be a list of lists of floats
 
   list[set]:
-    import: "" #"numpy as np"
+    import: "" 
     assert_answer: "assert_utilities.check_answer_list_set(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_list_set(student_answer, instructor_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"

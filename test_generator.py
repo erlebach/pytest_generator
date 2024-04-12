@@ -175,10 +175,12 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 tol = part.get("tol", tol)
 
                 # indices to exclude from grading for list[float]
+                # Can only use exclude_indices OR include_indices. Not both. 
                 exclude_indices = part.get("exclude_indices", exclude_indices)
                 test_code += f"    exclude_indices = {exclude_indices}\n"
 
                 # indices to include from grading for list[float]
+                # Can only use exclude_indices OR include_indices. Not both. 
                 include_indices = part.get("include_indices", include_indices)
                 test_code += f"    exclude_indices = {include_indices}\n"
 
