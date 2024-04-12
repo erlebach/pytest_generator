@@ -21,8 +21,8 @@ def load_yaml_file(file_path):
 with open("generator_config.yaml", "r") as f:
     config = yaml.safe_load(f)
     answer_type = config.get("all_tests").get("type", "float")
-    tol = config.get("types", {}).get("float", {}).get("tol", 0.01)
-    print("config= ", config)
+    rel_tol = config.get("types", {}).get("float", {}).get("rel_tol", 0.01)
+    abs_tol = config.get("types", {}).get("float", {}).get("abs_tol", 0.01)
     exclude_indices = (
         config.get("types", {}).get("list[string]", {}).get("exclude_indices", [])
     )
@@ -51,7 +51,7 @@ with open('type_handlers.yaml', 'r') as f:
 
 
 def generate_test_answers_code(questions_data, sim_type, output_file="test_answers.py"):
-    global tol, exclude_indices, include_indices
+    global rel_tol, abs_tol, exclude_indices, include_indices
 
     module_ = questions_data["module"]
     test_code = function_header_str
@@ -170,21 +170,29 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             print("part_type: ", part_type)
             pprint(types_list)
             if part_type in types_list:
-                print("=== in types_list")
+                test_code += "    local_namespace = {}\n"
+
                 import_file = f"type_handlers['types']['{part_type}']['import']"
-                tol = part.get("tol", tol)
+                rel_tol = part.get("rel_tol", rel_tol)
+                abs_tol = part.get("abs_tol", abs_tol)
 
                 # indices to exclude from grading for list[float]
-                # Can only use exclude_indices OR include_indices. Not both. 
+                # Ignore index if in exclude list
                 exclude_indices = part.get("exclude_indices", exclude_indices)
                 test_code += f"    exclude_indices = {exclude_indices}\n"
+                test_code += f"    local_namespace['exclude_indices'] = exclude_indices\n"
 
                 # indices to include from grading for list[float]
-                # Can only use exclude_indices OR include_indices. Not both. 
+                # Ignore index if not in include list
                 include_indices = part.get("include_indices", include_indices)
-                test_code += f"    exclude_indices = {include_indices}\n"
+                test_code += f"    include_indices = {include_indices}\n"
+                test_code += f"    local_namespace['include_indices'] = include_indices\n"
 
-                test_code += f"    tol = {tol}\n"
+                test_code += f"    rel_tol = {rel_tol}\n"
+                test_code += f"    abs_tol = {abs_tol}\n"
+                test_code += f"    local_namespace['rel_tol'] = rel_tol\n"
+                test_code += f"    local_namespace['abs_tol'] = abs_tol\n"
+
                 assertion_answer = eval(
                     f"type_handlers['types']['{part_type}']['assert_answer']"
                 )  # Only difference
@@ -204,7 +212,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 # Check answers
                 test_code += f'    msg_answer = "{assertion_answer}"\n'
 
-                test_code += "    local_namespace={'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'rel_tol':tol, 'keys':keys, 'exclude_indices':exclude_indices}\n"
+                test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'keys':keys})\n"
 
                 local_vars_dict = part.get("locals", None)
                 if local_vars_dict:

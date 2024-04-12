@@ -1528,7 +1528,6 @@ def check_answer_list_int(
     student_answer, instructor_answer, partial_score_frac: list[float]
 ):
     """
-    tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
     """
     msg_list = []
@@ -1600,7 +1599,7 @@ def check_answer_list_ndarray(
     student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
 ):
     """
-    tol: max relative error on the L2 norm
+    rel_tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
     """
     msg_list = []
@@ -1723,7 +1722,7 @@ def check_structure_list_ndarray(student_answer, instructor_answer):
 
 def check_answer_ndarray(student_answer, instructor_answer, rel_tol):
     """
-    tol: max relative error on the L2 norm
+    rel_tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
     """
     msg_list = []
@@ -2205,35 +2204,43 @@ def check_structure_bool(student_answer):
 def check_answer_list_str(
     student_answer,
     instructor_answer,
-    exclude: list[int],
+    include_indices: list[int],
+    exclude_indices: list[int],
     partial_score_frac: list[float],
 ):
     """
     Normalize and compare the two lists
     These lists are of fixed length. Element should not be added to it,
     unlike dictionaries.
+    Either include_indices or exclude_indices must be non-empty lists
     """
 
     msg_list = []
     status = True
     mismatched_strings = []
     ps_dict = init_partial_score_dict()
-    ps_dict["nb_total"] = len(instructor_answer) - len(exclude)
 
     normalized_s_answ = [clean_str_answer(s) for s in student_answer]
     normalized_i_answ = [clean_str_answer(s) for s in instructor_answer]
 
     for i, i_a in enumerate(normalized_i_answ):
-        if i in exclude:
+        if exclude_indices != [] and include_indices == [] and i in exclude_indices:
             continue
+        if include_indices != [] and exclude_indices == [] and i not in include_indices:
+            continue
+
+        ps_dict["nb_total"] += 1
         s_a = normalized_s_answ[i]
+
         if s_a != i_a:
             status = False
             ps_dict["nb_mismatches"] += 1
             mismatched_strings.append(s_a)
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-    msg_list += [f"List elements in position()s {exclude} is/are not graded.\n"]
+    # TODO: Explicitly state the indices considered for grading. 
+    # msg_list += [f"List elements in position()s {exclude_indices} is/are not graded.\n"]
+    # msg_list += [f"Only list elements in position()s {include_indices} is/are not graded.\n"]
     msg_list += [
         f"There is/are {len(mismatched_strings)} mismatched string(s): ({mismatched_strings})."
     ]
