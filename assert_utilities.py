@@ -77,7 +77,6 @@ def check_list_float(i_arr, s_arr, rel_tol, abs_tol, ps_dict: dict[str, float | 
             msg_list.append(msg_)
             ps_dict["nb_mismatches"] += 1
 
-    #ps_dict['partial_score_frac'] = 1. - ps_dict['nb_mismatches'] / ps_dict['nb_total']
     return status, "\n".join(msg_list)
 
 
@@ -483,7 +482,7 @@ def check_answer_dict_str_dict_str_float(
 
         if status_ is False:
             status = status_
-            msg_list.extend(msg_list_)
+            msg_list.append(msg_list_)
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
@@ -1451,7 +1450,7 @@ def check_answer_dict_int_list_float(
         )
         if status_ is False:
             status = False
-            msg_list.extend(msg_list_)
+            msg_list.append(msg_list_)
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
@@ -1538,7 +1537,7 @@ def check_answer_list_int(
 
     if answ_eq_len:
         status, msg_list_ = check_list_int(student_answer, instructor_answer, ps_dict)
-        msg_list.extend(msg_list_)
+        msg_list.append(msg_list_)
         #print("===> msg_list= ", msg_list)
 
     if not status:
@@ -1802,7 +1801,7 @@ def check_answer_list_list_float(
 
     for s_lst, i_lst in zip(student_answer, instructor_answer):
         status_, msg_list_ = check_list_float(i_lst, s_lst, rel_tol, 1.0e-5, ps_dict)
-        msg_list.extend(msg_list_)
+        msg_list.append(msg_list_)
         if status is True:
             status = status_
 
