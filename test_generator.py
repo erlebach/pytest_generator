@@ -84,7 +84,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
         for part in question["parts"]:
             part_type = part.get("type", answer_type)
-            # print("==> part_type: ", part_type)
             if "fixture" in part:
                 fixture = part["fixture"]
                 fixture_name = fixture["name"]
@@ -169,8 +168,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 function_name,
             )
 
-            print("part_type: ", part_type)
-            pprint(types_list)
+            # pprint(types_list)
             if part_type in types_list:
                 test_code += "    local_namespace = {}\n"
 
@@ -248,7 +246,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += f"    question_id = {repr(part_question_id)}\n"
                 test_code += f"    subquestion_id = {repr(part_id)}\n"
 
-                test_code += f"    partial_score_frac_l = [0.]\n"  # FIGURE OUT HOW TO HANDLE THIS
+                test_code += f"    partial_score_frac_l = [0.]\n"
                 test_code += "    local_namespace['partial_score_frac_l'] = partial_score_frac_l\n"
 
                 test_code += "    function_name.answer_type = answer_type\n"
@@ -257,15 +255,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += (
                     "    function_name.partial_score_frac = partial_score_frac_l[0]\n"
                 )
-
-                # keys = part.get('keys', [])
-                # print("keys: ", keys)
-                # if keys == [] and (part_type == 'string' or part_ == 'str'):
-                # keys = []
-
-                # if keys is not None:
-                # test_code += f"    keys = {keys}\n"
-                # test_code +=  "    local_namespace['keys'] = keys\n"
 
                 test_code += "    is_success, explanation_structure = eval(msg_structure, {'__builtins__':{}}, local_namespace)\n"
 
@@ -288,7 +277,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 else:
                     test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure])\n"
 
-                # test_code +=  "    explanation = '\\n'.join(['Structure tests:', explanation_structure])\n"
                 test_code += f"    {function_name}.explanation = explanation\n"
                 test_code += f"    assert is_success\n"
 

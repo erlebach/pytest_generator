@@ -75,52 +75,97 @@ test_answers:
 
 # Options related to type
 types:
+  bool: {}
+  dendogram: {}
+  dict[int,list[float]]:
+    options:
+    - rel_tol
+    - abs_tol
+    - partial_score
+  dict[int,ndarray]:
+    options:
+    - rel_tol
+    - abs_tol
+  dict[str,dict[str,float]]:
+    options:
+    - rel_tol
+    - abs_tol
+    - partial_score
+  dict[str,float]:
+    options:
+    - rel_tol
+    - abs_tol
+    - partial_score
+  dict[str,ndarray]:
+    options:
+    - rel_tol
+    - abs_tol
+    - partial_score
+  dict[str,set[int]]: {}
+  dict[str,tuple[ndarray]]:
+    options:
+    - rel_tol
+    - abs_tol
+    - partial_score
+  dict[tuple[int],ndarray]: 
+    options:
+    - rel_tol
+    - abs_tol
+    - partial_score
   eval_float:
-    local_namespaces: {'math': math}
-    locals: {}
-  str:
-    choices: []
-    #types: []    # NO idea what this is
-  float: {}
-  explain_string: {}
-  list[str]: {}
-  dict[str:dict[str:float]]: {}
-  dict[str:tuple[ndarray]]: {}
-  dict[str:ndarray]: {}
-  dict[str:float]: {}
-  dict[str:set[int]]: {}
-  dict[str:float]: {}
-  dict[str:ndarray]: {}
-  dict[int:ndarray]: {}
-  dict[int:list[float]]: {}
-  dict[tuple[int]:ndarray]: {}
-  list[list[float]]: {}
-  list[ndarray]: {}
-
-  # Supports ['include_indices', 'exclude_indices']
-  list[str]: {}
-
-  list[int]: {}
-  set[set[int]]: {}
-  set[ndarray]: {}
-  set[str]: {}
-  eval_float: {}
+    options:
+    - local_namespaces: {'math': math}
+    - locals: {}
+    - rel_tol
+    - abs_tol
+  explain_string:
+    options:
+    - min_nb_words
+    - max_nb_words
+  float: 
+    options:
+    - rel_tol
+    - abs_tol
   function: {}
-  explain_string:  {}
-  integer: {}
-
-  # Supports ['str_choices']
-  str: {}
-
-  float: {}
-  ndarray: {}
+  int: {}
+  lineplot: {}
+  list[int]: {}
+  list[list[float]]: 
+    options:
+    - rel_tol
+    - abs_tol
+    - partial_score
+  list[ndarray]:
+    options:
+    - rel_tol
+    - abs_tol
+    - partial_score
+  list[str]: 
+    options:
+    - exclude_indices
+    - include_indices
+    - partial_score
+  ndarray:
+    options:
+    - rel_tol
+    - abs_tol
   scatterplot3d: {}
   scatterplot2d: {}
-  lineplot: {}
+  set[ndarray]:
+    options:
+    - rel_tol
+    - abs_tol
+  set[set[int]]: {}
+  set[str]:
+    options:
+    - partial_score
+  str: 
+    - str_choices
   # dict: {}
   # dict[str:set]: {}
   # dict[str:dict[str:list]]: {}
   # dict[int:list]: {}
+  # set
 
 imports:
   - assert_utilities
@@ -135,16 +180,7 @@ mocks: {}
 
 modules: {}
 
-types_per_option:
-  rel_tol: ['eval_float', 'float', 'dict[str:dict[str:float]]', 'dict[str:float]', 'dict[str:float]',
-              'dict[int:list[float]]', 'list[list[float]]', 'eval_float']
-
-  abs_tol: ['eval_float', 'float', 'dict[str:dict[str:float]]', 'dict[str:float]', 'dict[str:float]',
-              'dict[int:list[float]]', 'list[list[float]]', 'eval_float']
-
-  exclude_indices: ['list[str]']
-  include_indices: ['list[str]']
-
-  str_choices: ['list[str]']
-
-# I am stil not clear on how these data structures will be used. 
+more_options: 
+  - keys
+  - choices
+  - partial_score

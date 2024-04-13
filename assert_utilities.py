@@ -283,7 +283,6 @@ def return_value(status, msg_list, s_answ, i_answ):
         msg_list.append("Answer is incorrect.")
     msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
     msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
-    # print(f"==> {msg_list=}")
 
     return status, "\n".join(msg_list)
 
@@ -614,7 +613,6 @@ def check_structure_dict(student_answer, instructor_answer):
         True if the key structures match down to two levels, False otherwise.
     """
 
-    # print("==> enter dict struct check")
     s_dict = s_answ = student_answer
     i_dict = i_answ = instructor_answer
 
@@ -755,7 +753,6 @@ def check_answer_set_str(
 
     # Only consider elements in choices
     # Each choice[i] is a list (of alternatives?)
-    print("3 ===> choices: ", choices)
     if choices and isinstance(choices[0], list):
         choices = [set(c) for c in choices]
 
@@ -890,7 +887,6 @@ def check_answer_dict_str_set_int(student_answer, instructor_answer, keys=None):
     status, msg_list = check_set_int(
         set(student_answer), set(instructor_answer), ps_dict
     )
-    print("===> 2 msg_list= ", msg_list)
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -905,8 +901,6 @@ def check_structure_dict_str_set_int(student_answer, instructor_answer, keys=Non
     """
     status = True
     msg_list = []
-
-    print("====> string_set_int structure")
 
     if not isinstance(student_answer, dict):
         msg_list.append("Answer should be of type 'dict'.")
@@ -1304,7 +1298,6 @@ def check_structure_dict_int_ndarray(student_answer, instructor_answer, keys=Non
         # some keys are filtered. Student is allowed to have
         # keys not in the instructor set
         for k, v in instructor_answer.items():
-            # print("==> key: ", k)
             vs = student_answer[k]
             if not isinstance(vs, type(np.zeros(1))):
                 msg_list.append(f"- answer[{repr(k)}] should be a numpy array.")
@@ -1539,7 +1532,6 @@ def check_answer_list_int(
     if answ_eq_len:
         status, msg_list_ = check_list_int(student_answer, instructor_answer, ps_dict)
         msg_list.extend(msg_list_)
-        print("===> msg_list= ", msg_list)
 
     if not status:
         msg_list.append("Some elements are incorrect")
@@ -1555,7 +1547,6 @@ def check_structure_list_int(student_answer, instructor_answer):
     """
     Check that elements in the list are ndarrays
     """
-    # print("==>  structure check_structure_list_ndarray....")
     status = True
     msg_list = []
 
@@ -1639,7 +1630,6 @@ def check_structure_list_ndarray(student_answer, instructor_answer):
     """
     Check that elements in the list are ndarrays
     """
-    # print("==>  structure check_structure_list_ndarray....")
     status = True
     msg_list = []
 
@@ -1749,8 +1739,6 @@ def check_structure_ndarray(student_answer):
     Check that all elements in the list have matching norms
     instructor_answer: not used
     """
-    # print(f"===> {type(np.zeros([1]))=}")
-    # print(f"===> {type(student_answer)=}")
     if not isinstance(student_answer, type(np.zeros([1]))):
         return (
             False,
@@ -1956,8 +1944,6 @@ def check_structure_set_set_int(student_answer):
             )
             msg_list.append("- Answer has the correct structure")
 
-    # print("======> student answer: ", student_answer)
-    # print("======> instructor answer: ", instructor_answer)
     return status, "\n".join(msg_list)
 
 
@@ -2177,8 +2163,6 @@ def check_answer_bool(student_answer, instructor_answer):
         status = True
         msg_list = ["Answer is correct."]
 
-    # print("==> bool msg_list= ", msg_list)
-
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -2316,8 +2300,6 @@ def check_structure_lineplot(student_answer):
     # print(f"{type(s_ax).__name__=}")
     # s_ax = s_ax.gcf().get_axes()
     # i_ax = instructor_answer[0].gcf().get_axes()
-
-    # print(f"==> {s_ax=}")
 
     if len(s_ax) != len(i_ax):
         msg_list.append(f"There should only be {len(i_ax)} plot(s)!")

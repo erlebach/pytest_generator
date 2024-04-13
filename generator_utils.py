@@ -78,7 +78,6 @@ def get_decoded_str(questions_data, part, answer_key, source_file):
 def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_instructor_file, is_student_file, 
                     decode_i_call_str, decode_s_call_str, fixture, part, function_name):
 
-    print(f"==> {questions_data=}")
     student_directory = questions_data['student_folder_name']
     instructor_directory = questions_data['instructor_folder_name']
 
