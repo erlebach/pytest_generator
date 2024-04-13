@@ -179,3 +179,9 @@ possible. I have applied `chmod 000` to all instances of `assert_utilities.py` t
 inaccurate paths. 
 - IMPORTANT: make sure to import pytest last! This module somehow modifies the order of paths. 
 ----------------------------------------------------------------------
+2024-04-12_21:52
+New branch: refactor_tests/
+Follow ideas suggested by GPT-4 regarding how to simplify the tests using helper functions. 
+I will write the functions manually first. Later, I might have a program just to create these functions. 
+New file: class_test_generator.py : class version of the test_generator.py program, motivated by GPT-4. 
+----------------------------------------------------------------------
