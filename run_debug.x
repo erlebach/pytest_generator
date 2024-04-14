@@ -7,14 +7,6 @@ export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./
 # 'append': Adds the root folder of the project to the end of the pythonpath
 # 'prepend' and default adds the root folder of the project to the beginning and end of the pythonpath
 
-pytest -s --import-mode='append' \
-tests/test_answers_preprocessed_part1_expand.py \
-tests/test_answers_preprocessed_part2_expand.py \
-tests/test_answers_preprocessed_part3_expand.py \
-tests/test_answers_preprocessed_part4_expand.py
-
-#pytest --import-mode='append' -s tests/test_answers_preprocessed_part1_expand.py
-#pytest --import-mode='append' -s tests/test_answers_preprocessed_part2_expand.py
-#pytest --import-mode='append' -s tests/test_answers_preprocessed_part3_expand.py
-#pytest --import-mode='append' -s tests/test_answers_preprocessed_part4_expand.py
-
+#pytest -s --import-mode='append'  tests/test_structure_preprocessed_hw5_expand.py::test_structure_question2_c_Weight_update_eval_float
+pytest -s --import-mode='append'  tests/test_structure_preprocessed_hw5_expand.py
+#pytest -s --import-mode='append'  tests/test_answers_preprocessed_hw5_expand.py::test_answers_question2_c_Weight_update_eval_float

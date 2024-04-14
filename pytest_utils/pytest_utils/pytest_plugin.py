@@ -49,7 +49,10 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
     total_max_score = 0
     for s in all_tests:
         total_max_score += s.max_score
-    global_scaling_factor = 100.  / total_max_score 
+    if total_max_score > 0:
+        global_scaling_factor = 100.  / total_max_score
+    else:
+        global_scaling_factor = 0.
     #print("GLOBAL FACTOR: ", global_scaling_factor)
 
     for s in all_tests:
@@ -117,6 +120,11 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
         output += f"score: {score}\n"
         output += f"rescaled_score: {rescaled_score}\n"
 
+        print(f"{score=}")
+        print(f"{total_max_score=}")
+        print(f"{s.partial_score_frac=}")
+        print(f"{global_scaling_factor=}")
+        print(f"{s.max_score=}")
         #print(f"'cor': {round(score * global_scaling_factor, 2)=}")
 
         json_results["tests"].append(
