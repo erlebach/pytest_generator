@@ -126,12 +126,17 @@ def check_set_int(i_set: set[int], s_set: set[int], ps_dict: dict[str, float | i
 
 
 # ----------------------------------------------------------------------
-def check_str(i_str, s_str, str_choices: list[str] | None =None):
+def check_str(i_str, s_str, str_choices: list[str] | None =None, remove_spaces: bool=None):
     status = True
     msg = ""
     str_choices = [clean_str_answer(s) for s in str_choices]
     i_str = clean_str_answer(i_str)
     s_str = clean_str_answer(s_str)
+
+    print("check_str: remove_spaces: ", remove_spaces)
+    if remove_spaces is True:
+        i_str = re.sub(r"\s+", "", i_str)
+        s_str = re.sub(r"\s+", "", s_str)
 
     if s_str in str_choices:
         print(f"s_str: {s_str} is in {str_choices=}")
@@ -654,12 +659,13 @@ def check_structure_dict(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_str(student_answer, instructor_answer, str_choices: list[str]):
+def check_answer_str(student_answer, instructor_answer, str_choices: list[str], remove_spaces):
     """
     Arguments:
     - str_choices: check that the answer is one of str_choices if str_choices is not None
     """
-    status, msg = check_str(instructor_answer, student_answer, str_choices)
+    print(f"check_answer_str, {remove_spaces=}")
+    status, msg = check_str(instructor_answer, student_answer, str_choices, remove_spaces=remove_spaces)
     return return_value(status, [msg], student_answer, instructor_answer)
 
 

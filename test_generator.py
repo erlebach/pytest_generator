@@ -20,11 +20,17 @@ def load_yaml_file(file_path):
 
 with open("generator_config.yaml", "r") as f:
     config = yaml.safe_load(f)
+    option_defaults = config.get('option_defaults', {})
+    types = config.get("types", {})
     config_dict = {}
     answer_type = config.get("all_tests").get("type", "float")
     config_dict['rel_tol'] = config.get("types", {}).get("float", {}).get("rel_tol", 0.01)
     config_dict['abs_tol'] = config.get("types", {}).get("float", {}).get("abs_tol", 0.01)
-    config_dict['str_choices'] = config.get("test_answers", []).get("str_choices", [])
+    str_choices = config.get("test_answers", {}).get("str_choices", [])
+    config_dict['str_choices'] = config.get("types", {}).get("str_choices", [])
+
+    config_dict['remove_spaces'] = config_dict.get("option_defaults", {}).get("remove_spaces", False)
+
     config_dict['exclude_indices'] = (
         config.get("types", {}).get("list[string]", {}).get("exclude_indices", [])
     )
@@ -179,9 +185,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 rel_tol = part.get("rel_tol", config_dict['rel_tol'])
                 abs_tol = part.get("abs_tol", config_dict['abs_tol'])
                 str_choices = part.get("str_choices", config_dict['str_choices'])
-                #print("str_choices: ", str_choices)
-                #print("part= ", part)
                 monotone_increasing = part.get("monotone_increasing", None)
+                remove_spaces = part.get("remove_spaces", question.get("remove_spaces", config_dict['remove_spaces']))
 
                 # indices to exclude from grading for list[float]
                 # Ignore index if in exclude list
@@ -205,6 +210,10 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 if str_choices is not None:
                     test_code += f"    str_choices = {str_choices}\n"
                     test_code += f"    local_namespace['str_choices'] = str_choices\n"
+
+                if part_type in ['str', 'dict[str,float]', 'list[str]']:
+                    test_code += f"    remove_spaces = {remove_spaces}\n"
+                    test_code += f"    local_namespace['remove_spaces'] = remove_spaces\n"
 
                 test_code += f"    local_namespace['rel_tol'] = rel_tol\n"
                 test_code += f"    local_namespace['abs_tol'] = abs_tol\n"

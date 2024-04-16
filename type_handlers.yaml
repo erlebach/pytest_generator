@@ -121,7 +121,7 @@ types:
   dict[str,float]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, insructor_answer, keys)"
+    assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, instructor_answer, keys)"
 
   dict[str,ndarray]:
     import: "" 
@@ -156,7 +156,7 @@ types:
 
   str:
     import: ""
-    assert_answer: "assert_utilities.check_answer_str(student_answer, instructor_answer, str_choices)"
+    assert_answer: "assert_utilities.check_answer_str(student_answer, instructor_answer, str_choices, remove_spaces)"
     assert_structure: "assert_utilities.check_structure_str(student_answer, choices)"
 
   # Evaluate to a float
