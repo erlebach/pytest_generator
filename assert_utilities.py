@@ -359,8 +359,7 @@ def check_answer_eval_float(
         i_float = eval(i_answ, config_dict["local_namespaces"], local_dct)
         status, msg = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.0e-5)
         msg_list.append(msg)
-        if status is False:
-            return return_value(status, msg_list, s_answ, i_answ)
+        return return_value(status, msg_list, s_answ, i_answ)
 
 
 # ======================================================================
