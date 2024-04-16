@@ -17,6 +17,7 @@ types_list = [
     "float", 
     "int",
     "lineplot",
+    "list[float]",
     "list[int]",
     "list[list[float]]", 
     "list[ndarray]", 

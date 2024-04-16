@@ -1540,6 +1540,8 @@ def check_answer_list_int(
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
+
+
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
@@ -1582,6 +1584,83 @@ def check_structure_list_int(student_answer, instructor_answer):
 
     return status, "\n".join(msg_list)
 
+# ======================================================================
+def check_answer_list_float(
+        student_answer, instructor_answer, rel_tol=rel_tol, monotone_increasing, ps_dict: list[float])
+):
+    """
+    Check that all elements in the list have matching norms
+    """
+    msg_list = []
+    status = True
+    answ_eq_len = len(student_answer) == len(instructor_answer) # checked in structure
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(instructor_answer)
+
+    if answ_eq_len and not monotone_increasing:
+        print("==> check_answer_list_float: ", check rel and abs errors)
+        status, msg_list_ = check_list_float(student_answer, instructor_answer, rel_tol=rel_tol, abs_tol=1.e-6, ps_dict=ps_dict)
+        msg_list.extend(msg_list_)
+    else if monotone_increasing is True:
+        # Check whether the list is monotone incrreasing. If not, fail. 
+        val = student_answer[0]
+        for el_val in student_answer[1:]:
+            if el_val >= val:
+                continue:
+            else:
+                status = False
+                msg_list.append("The answer is not monotonically increasing")
+
+    if not status:
+        msg_list.append("Some elements are incorrect")
+
+    if monotone_increasing: 
+        partial_score_frac[0] = 1.0
+    else:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatch"] / ps_dict["nb_total"]
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+def check_structure_list_float(student_answer, instructor_answer):
+    """
+    Check that elements in the list are ndarrays
+    """
+    status = True
+    msg_list = []
+
+    if not isinstance(student_answer, list):
+        status = False
+        msg_list.append(
+            f"- The answer should be of type 'list'; your type is {type(student_answer).__name__}"
+        )
+    else:
+        msg_list.append("- The answer is type list. Correct.")
+
+    # Check length of list
+    if status:
+        if len(student_answer) != len(instructor_answer):
+            status = False
+            msg_list.append(
+                [
+                    f"- The length of your list is incorrect. Your list length is {len(student_answer)}.",
+                    "The length should be {len(instructor_answer)}.",
+                ]
+            )
+        else:
+            msg_list.append("- The length of the list is correct.")
+
+    if status:
+        for s_arr in instructor_answer:
+            if not isinstance(s_arr, float):
+                status = False
+                msg_list.append("- Element {i} of your list should be of type 'float'.")
+
+    if status:
+        msg_list.append("- All list elements are type 'float'.")
+
+    return status, "\n".join(msg_list)
 
 # ======================================================================
 

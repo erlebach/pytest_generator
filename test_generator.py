@@ -175,6 +175,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 import_file = f"type_handlers['types']['{part_type}']['import']"
                 rel_tol = part.get("rel_tol", rel_tol)
                 abs_tol = part.get("abs_tol", abs_tol)
+                monotone_increasing = part.get("monotone_increasing", None)
 
                 # indices to exclude from grading for list[float]
                 # Ignore index if in exclude list
@@ -190,6 +191,11 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
                 test_code += f"    rel_tol = {rel_tol}\n"
                 test_code += f"    abs_tol = {abs_tol}\n"
+
+                if monotone_increasing is not None:
+                    test_code += f"    monotone_increasing = {monotone_increasing}\n"
+                    test_code += f"    local_namespace['monotone_increasing'] = monotone_increasing\n"
+
                 test_code += f"    local_namespace['rel_tol'] = rel_tol\n"
                 test_code += f"    local_namespace['abs_tol'] = abs_tol\n"
 

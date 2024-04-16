@@ -129,6 +129,14 @@ types:
   function: {}
   int: {}
   lineplot: {}
+  list[float]:
+    options:
+    # should be increasing or equal
+    - monotone_increasing
+    # should be decreasing or equal
+    - monotone_decreasing
+    # should be have a single mode (max)
+    - single_mode
   list[int]: {}
   list[list[float]]: 
     options:
