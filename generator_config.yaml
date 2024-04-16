@@ -63,6 +63,7 @@ test_answers:
   # Alternative choices for string values, which applies to the 'str' answer type.
   # str_choices: ['word1', 'word2']
   str_choices: []
+  remove_spaces: False
 
   # local_namespaces: required for use to call the functions in type_handlers.py
   local_namespaces: {}
@@ -169,6 +170,7 @@ types:
     - partial_score
   str: 
     - str_choices
+    - remove_spaces
   # dict: {}
   # dict[str:set]: {}
   # dict[str:dict[str:list]]: {}

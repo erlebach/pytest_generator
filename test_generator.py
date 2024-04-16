@@ -20,17 +20,19 @@ def load_yaml_file(file_path):
 
 with open("generator_config.yaml", "r") as f:
     config = yaml.safe_load(f)
+    config_dict = {}
     answer_type = config.get("all_tests").get("type", "float")
-    rel_tol = config.get("types", {}).get("float", {}).get("rel_tol", 0.01)
-    abs_tol = config.get("types", {}).get("float", {}).get("abs_tol", 0.01)
-    exclude_indices = (
+    config_dict['rel_tol'] = config.get("types", {}).get("float", {}).get("rel_tol", 0.01)
+    config_dict['abs_tol'] = config.get("types", {}).get("float", {}).get("abs_tol", 0.01)
+    config_dict['str_choices'] = config.get("test_answers", []).get("str_choices", [])
+    config_dict['exclude_indices'] = (
         config.get("types", {}).get("list[string]", {}).get("exclude_indices", [])
     )
-    include_indices = (
+    config_dict['include_indices'] = (
         config.get("types", {}).get("list[string]", {}).get("include_indices", [])
     )
-    outer_key_choices = []   # default
-    str_choices = []
+    config_dict['outer_key_choices'] = []   # default
+    config_dict['str_choices'] = []
 
 # How to access an element of config dict and set to default value for non-existent key?
 gen_config = config["test_answers"]
@@ -54,6 +56,7 @@ with open('type_handlers.yaml', 'r') as f:
 
 def generate_test_answers_code(questions_data, sim_type, output_file="test_answers.py"):
     global rel_tol, abs_tol, exclude_indices, include_indices
+    global str_choices
 
     module_ = questions_data["module"]
     test_code = function_header_str
@@ -77,6 +80,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             print("Question does not have an id")
             quit()
 
+        print("==> question_id: ", part_question_id)
         if "fixture" in question:
             fixture = question["fixture"]
             fixture_name = fixture["name"]
@@ -168,24 +172,26 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 function_name,
             )
 
-            # pprint(types_list)
             if part_type in types_list:
                 test_code += "    local_namespace = {}\n"
 
                 import_file = f"type_handlers['types']['{part_type}']['import']"
-                rel_tol = part.get("rel_tol", rel_tol)
-                abs_tol = part.get("abs_tol", abs_tol)
+                rel_tol = part.get("rel_tol", config_dict['rel_tol'])
+                abs_tol = part.get("abs_tol", config_dict['abs_tol'])
+                str_choices = part.get("str_choices", config_dict['str_choices'])
+                #print("str_choices: ", str_choices)
+                #print("part= ", part)
                 monotone_increasing = part.get("monotone_increasing", None)
 
                 # indices to exclude from grading for list[float]
                 # Ignore index if in exclude list
-                exclude_indices = part.get("exclude_indices", exclude_indices)
+                exclude_indices = part.get("exclude_indices", config_dict['exclude_indices'])
                 test_code += f"    exclude_indices = {exclude_indices}\n"
                 test_code += f"    local_namespace['exclude_indices'] = exclude_indices\n"
 
                 # indices to include from grading for list[float]
                 # Ignore index if not in include list
-                include_indices = part.get("include_indices", include_indices)
+                include_indices = part.get("include_indices", config_dict['include_indices'])
                 test_code += f"    include_indices = {include_indices}\n"
                 test_code += f"    local_namespace['include_indices'] = include_indices\n"
 
@@ -195,6 +201,10 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 if monotone_increasing is not None:
                     test_code += f"    monotone_increasing = {monotone_increasing}\n"
                     test_code += f"    local_namespace['monotone_increasing'] = monotone_increasing\n"
+
+                if str_choices is not None:
+                    test_code += f"    str_choices = {str_choices}\n"
+                    test_code += f"    local_namespace['str_choices'] = str_choices\n"
 
                 test_code += f"    local_namespace['rel_tol'] = rel_tol\n"
                 test_code += f"    local_namespace['abs_tol'] = abs_tol\n"

@@ -1,1 +1,1 @@
-generate_homework_tests.x hw5
+generate_homework_tests.x hw2

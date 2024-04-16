@@ -126,6 +126,25 @@ def check_set_int(i_set: set[int], s_set: set[int], ps_dict: dict[str, float | i
 
 
 # ----------------------------------------------------------------------
+def check_str(i_str, s_str, str_choices: list[str] | None =None):
+    status = True
+    msg = ""
+    str_choices = [clean_str_answer(s) for s in str_choices]
+    i_str = clean_str_answer(i_str)
+    s_str = clean_str_answer(s_str)
+
+    if s_str in str_choices:
+        print(f"s_str: {s_str} is in {str_choices=}")
+        s_str = i_str
+
+    if i_str != s_str:
+        status = False
+        msg = f"String element mismatch. Instructor: {i_str}, Student: {s_str}"
+
+    return status, msg
+
+
+# ----------------------------------------------------------------------
 def check_list_str(i_list, s_list, ps_dict: dict[str, float | int]):
     msg_list = []
     status = True
@@ -164,16 +183,6 @@ def check_dict_str_str(
 def update_score(ps_dict: dict[str, float | int]) -> None:
     """ """
     ps_dict["partial_frac_score"] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-
-
-# ----------------------------------------------------------------------
-def check_str(i_str, s_str):
-    status = True
-    msg = ""
-    if clean_str_answer(i_str) != clean_str_answer(s_str):
-        status = False
-        msg = f"String element mismatch. Instructor: {i_str}, Student: {s_str}"
-    return status, msg
 
 
 # ----------------------------------------------------------------------
@@ -645,8 +654,12 @@ def check_structure_dict(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_str(student_answer, instructor_answer):
-    status, msg = check_str(instructor_answer, student_answer)
+def check_answer_str(student_answer, instructor_answer, str_choices: list[str]):
+    """
+    Arguments:
+    - str_choices: check that the answer is one of str_choices if str_choices is not None
+    """
+    status, msg = check_str(instructor_answer, student_answer, str_choices)
     return return_value(status, [msg], student_answer, instructor_answer)
 
 
@@ -1585,10 +1598,12 @@ def check_structure_list_int(student_answer, instructor_answer):
 
 # ======================================================================
 def check_answer_list_float(
-        student_answer, instructor_answer, rel_tol=rel_tol, monotone_increasing, ps_dict: list[float])
+        student_answer, instructor_answer, rel_tol, monotone_increasing=None, ps_dict: list[float|None]=None
 ):
     """
     Check that all elements in the list have matching norms
+    Arguments: 
+    - monotone_increasing: True/False. Default: None (ignore it). 
     """
     msg_list = []
     status = True
@@ -1596,16 +1611,15 @@ def check_answer_list_float(
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(instructor_answer)
 
-    if answ_eq_len and not monotone_increasing:
-        print("==> check_answer_list_float: ", check rel and abs errors)
+    if answ_eq_len and (monotone_increasing is None or monotone_increasing is False):
         status, msg_list_ = check_list_float(student_answer, instructor_answer, rel_tol=rel_tol, abs_tol=1.e-6, ps_dict=ps_dict)
         msg_list.extend(msg_list_)
-    else if monotone_increasing is True:
+    elif monotone_increasing is True:
         # Check whether the list is monotone incrreasing. If not, fail. 
         val = student_answer[0]
         for el_val in student_answer[1:]:
             if el_val >= val:
-                continue:
+                continue
             else:
                 status = False
                 msg_list.append("The answer is not monotonically increasing")
