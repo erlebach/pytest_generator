@@ -8,4 +8,4 @@ export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./
 # 'prepend' and default adds the root folder of the project to the beginning and end of the pythonpath
 
 #pytest -s --import-mode='append'  tests/test_structure_preprocessed_hw2_expand.py
-pytest -s --import-mode='append'  tests/test_answers_preprocessed_hw2_expand.py::test_answers_question6_a_comma_level_2_comma_left_str
+pytest -s --import-mode='append'  tests/test_answers_preprocessed_hw2_expand.py

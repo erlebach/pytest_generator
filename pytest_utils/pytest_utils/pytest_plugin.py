@@ -120,11 +120,11 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
         output += f"score: {score}\n"
         output += f"rescaled_score: {rescaled_score}\n"
 
-        print(f"{score=}")
-        print(f"{total_max_score=}")
-        print(f"{s.partial_score_frac=}")
-        print(f"{global_scaling_factor=}")
-        print(f"{s.max_score=}")
+        #print(f"{score=}")
+        #print(f"{total_max_score=}")
+        #print(f"{s.partial_score_frac=}")
+        #print(f"{global_scaling_factor=}")
+        #print(f"{s.max_score=}")
         #print(f"'cor': {round(score * global_scaling_factor, 2)=}")
 
         json_results["tests"].append(

@@ -28,6 +28,7 @@ with open("generator_config.yaml", "r") as f:
     config_dict['abs_tol'] = config.get("types", {}).get("float", {}).get("abs_tol", 0.01)
     str_choices = config.get("test_answers", {}).get("str_choices", [])
     config_dict['str_choices'] = config.get("types", {}).get("str_choices", [])
+    config_dict['dict_float_choices'] = config.get("types", {}).get("dict_float_choices", {})
 
     config_dict['remove_spaces'] = config_dict.get("option_defaults", {}).get("remove_spaces", False)
 
@@ -38,7 +39,6 @@ with open("generator_config.yaml", "r") as f:
         config.get("types", {}).get("list[string]", {}).get("include_indices", [])
     )
     config_dict['outer_key_choices'] = []   # default
-    config_dict['str_choices'] = []
 
 # How to access an element of config dict and set to default value for non-existent key?
 gen_config = config["test_answers"]
@@ -62,7 +62,7 @@ with open('type_handlers.yaml', 'r') as f:
 
 def generate_test_answers_code(questions_data, sim_type, output_file="test_answers.py"):
     global rel_tol, abs_tol, exclude_indices, include_indices
-    global str_choices
+    global str_choices, dict_float_choices
 
     module_ = questions_data["module"]
     test_code = function_header_str
@@ -86,7 +86,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             print("Question does not have an id")
             quit()
 
-        print("==> question_id: ", part_question_id)
+        # print("==> question_id: ", part_question_id)
         if "fixture" in question:
             fixture = question["fixture"]
             fixture_name = fixture["name"]
@@ -185,6 +185,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 rel_tol = part.get("rel_tol", config_dict['rel_tol'])
                 abs_tol = part.get("abs_tol", config_dict['abs_tol'])
                 str_choices = part.get("str_choices", config_dict['str_choices'])
+                dict_float_choices = part.get("dict_float_choices", config_dict['dict_float_choices'])
                 monotone_increasing = part.get("monotone_increasing", None)
                 remove_spaces = part.get("remove_spaces", question.get("remove_spaces", config_dict['remove_spaces']))
 
@@ -210,6 +211,10 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 if str_choices is not None:
                     test_code += f"    str_choices = {str_choices}\n"
                     test_code += f"    local_namespace['str_choices'] = str_choices\n"
+
+                if part_type in ['dict[str,float]']:
+                    test_code += f"    dict_float_choices = {dict_float_choices}\n"
+                    test_code += f"    local_namespace['dict_float_choices'] = dict_float_choices\n"
 
                 if part_type in ['str', 'dict[str,float]', 'list[str]']:
                     test_code += f"    remove_spaces = {remove_spaces}\n"
@@ -295,7 +300,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                     test_code += "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
                     test_code += "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
                     test_code += "        function_name.partial_score_frac = partial_score_frac_l[0]\n"
-                    test_code += "        print(f'FAILURE, partial score: {function_name.partial_score_frac}')\n"
+                    # test_code += "        print(f'FAILURE, partial score: {function_name.partial_score_frac}')\n"
 
                 if sim_type == "answers":
                     test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure, '==Answer tests==:', explanation_answer])\n"
