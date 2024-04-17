@@ -26,8 +26,8 @@ def load_datasets(n_samples: int) -> dict[str, Any]:
         n_samples=n_samples, cluster_std=[1.0, 2.5, 0.5], random_state=random_state
     )
 
-    # blobs
-    data["b"] = datasets.make_blobs(n_samples=n_samples, random_state=8)
+    # blobs (I AM SUSPICIOUS
+    data["b"] = datasets.make_blobs(n_samples=n_samples, random_state=random_state)
 
     return data
 
