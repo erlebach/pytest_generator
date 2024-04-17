@@ -978,6 +978,8 @@ def check_answer_dict_str_float(
 
         if len(dict_float_choices) > 0 and k in dict_float_choices:
             for val in dict_float_choices[k]:
+                if val == 'i': # use instructor answer
+                    val = i_float
                 status_, msg_list_ = check_float(
                     s_float, val, rel_tol, 1.0e-5
                 )
