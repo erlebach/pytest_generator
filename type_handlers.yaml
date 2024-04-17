@@ -13,7 +13,7 @@ types:
 
   float:
     import: ""
-    assert_answer: "assert_utilities.check_answer_float(student_answer, instructor_answer, rel_tol)"
+    assert_answer: "assert_utilities.check_answer_float(student_answer, instructor_answer, rel_tol, abs_tol)"
     assert_structure: "assert_utilities.check_structure_float(student_answer)"
 
   int:
@@ -38,6 +38,12 @@ types:
     import: ""
     assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_ndarray(student_answer, instructor_answer)"
+
+  list[float]:
+    import: "" 
+    # monotone 
+    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, rel_tol, monotone_increasing, partial_score_frac)"
+    assert_structure: "assert_utilities.check_structure_list_float(student_answer, instructor_answer)"
 
   list[int]:
     import: "" 
@@ -92,7 +98,7 @@ types:
 
   dict[str,dict[str,float]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, rel_tol, dict_str_float, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_dict_str_float(student_answer, instructor_answer)"
 
   explain_str:
@@ -114,8 +120,9 @@ types:
 
   dict[str,float]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer, rel_tol, keys, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, insructor_answer, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer,
+                      rel_tol, keys, dict_float_choices, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, instructor_answer, keys)"
 
   dict[str,ndarray]:
     import: "" 
@@ -150,7 +157,7 @@ types:
 
   str:
     import: ""
-    assert_answer: "assert_utilities.check_answer_str(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_str(student_answer, instructor_answer, str_choices, remove_spaces)"
     assert_structure: "assert_utilities.check_structure_str(student_answer, choices)"
 
   # Evaluate to a float

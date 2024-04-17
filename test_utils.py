@@ -2,6 +2,7 @@ import yaml
 import base64
 import json
 import argparse
+import sys
 
 def encode_answer(answer):
     # Convert any non-string answer to string before encoding
@@ -25,11 +26,14 @@ def preprocess_yaml(input_file, output_file):
     print("output file: ", output_file)
     with open(input_file, 'r') as file:
         data = yaml.safe_load(file)
+
+    if data is None:
+        sys.exit(f"Error: Empty or incorrect {input_file}")
     
     for question in data.get('questions', []):
         parts = question.get('parts', [])
         for i, part in enumerate(parts):
-            print("part: ", part)
+            # print("part: ", part)
             # Encode all answers
             #part['answer'] = encode_answer(part['answer'])
             if 's_answers' in part and isinstance(part['s_answers'], list):

@@ -75,14 +75,14 @@ def print_captured_calls(captured_methods):
     Print details of captured method calls, with special handling for np.ndarray arguments.
     """
     for method_name, calls in captured_methods.items():
-        print(f"Method: {method_name}, Number of Calls: {len(calls)}")
+        # print(f"Method: {method_name}, Number of Calls: {len(calls)}")
         for i, call in enumerate(calls):
             args_str = ", ".join(_format_arg(arg) for arg in call.get("args", ()))
             kwargs_str = ", ".join(
                 f"{k}={_format_arg(v)}" for k, v in call.get("kwargs", {}).items()
             )
-            print(f"  Call {i+1}: args: ({args_str}), kwargs: {{{kwargs_str}}}")
-        print()  # For better separation between methods
+            # print(f"  Call {i+1}: args: ({args_str}), kwargs: {{{kwargs_str}}}")
+        # print()  # For better separation between methods
 
 
 def _format_arg(arg):
@@ -176,7 +176,7 @@ def load_dict(filenm, dct):
 
 
 def check_keys(correct_keys: list, student_keys: list, msg):
-    print(f"Check {msg}.keys()")
+    # print(f"Check {msg}.keys()")
     for k in correct_keys:
         assert k in student_keys, f"Key '{k}' is not in student keys ({student_keys})"
 
@@ -211,7 +211,7 @@ def encode_data(data):
     if isinstance(data, set):
         encoded = json.dumps({"type": "set", "data": list(data)})
     else:
-        print("data= ", data)
+        # print("data= ", data)
         encoded = json.dumps(data)  # Directly use JSON for other types
     return base64.b64encode(encoded.encode()).decode()
 

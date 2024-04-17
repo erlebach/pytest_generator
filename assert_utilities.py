@@ -31,6 +31,7 @@ def check_missing_keys(missing_keys, msg_list):
 def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
+
     if math.fabs(i_el) <= abs_tol:
         abs_err = math.fabs(i_el - s_el)
         status = True if abs_err < 1.0e-5 else False
@@ -126,6 +127,30 @@ def check_set_int(i_set: set[int], s_set: set[int], ps_dict: dict[str, float | i
 
 
 # ----------------------------------------------------------------------
+def check_str(i_str, s_str, str_choices: list[str] | None =None, remove_spaces: bool=None):
+    status = True
+    msg = ""
+    str_choices = [clean_str_answer(s) for s in str_choices]
+    i_str = clean_str_answer(i_str)
+    s_str = clean_str_answer(s_str)
+
+    #print("check_str: remove_spaces: ", remove_spaces)
+    if remove_spaces is True:
+        i_str = re.sub(r"\s+", "", i_str)
+        s_str = re.sub(r"\s+", "", s_str)
+
+    if s_str in str_choices:
+        #print(f"s_str: {s_str} is in {str_choices=}")
+        s_str = i_str
+
+    if i_str != s_str:
+        status = False
+        msg = f"String element mismatch. Instructor: {i_str}, Student: {s_str}"
+
+    return status, msg
+
+
+# ----------------------------------------------------------------------
 def check_list_str(i_list, s_list, ps_dict: dict[str, float | int]):
     msg_list = []
     status = True
@@ -164,16 +189,6 @@ def check_dict_str_str(
 def update_score(ps_dict: dict[str, float | int]) -> None:
     """ """
     ps_dict["partial_frac_score"] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-
-
-# ----------------------------------------------------------------------
-def check_str(i_str, s_str):
-    status = True
-    msg = ""
-    if clean_str_answer(i_str) != clean_str_answer(s_str):
-        status = False
-        msg = f"String element mismatch. Instructor: {i_str}, Student: {s_str}"
-    return status, msg
 
 
 # ----------------------------------------------------------------------
@@ -359,8 +374,7 @@ def check_answer_eval_float(
         i_float = eval(i_answ, config_dict["local_namespaces"], local_dct)
         status, msg = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.0e-5)
         msg_list.append(msg)
-        if status is False:
-            return return_value(status, msg_list, s_answ, i_answ)
+        return return_value(status, msg_list, s_answ, i_answ)
 
 
 # ======================================================================
@@ -451,7 +465,7 @@ def check_structure_dict_str_dict_str_list(student_answer, instructor_answer):
 
 # ======================================================================
 def check_answer_dict_str_dict_str_float(
-    student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
+    student_answer, instructor_answer, rel_tol, dict_float_choices, partial_score_frac: list[float]
 ):
     """
     The type is a dict[str, dict[str, list]]
@@ -470,8 +484,19 @@ def check_answer_dict_str_dict_str_float(
 
         # I should have a keys argument
         keys = instructor_answer.keys()
-        status_, msg_list_ = check_dict_str_float(
-            keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
+    
+        s_answ = student_answer[k]
+        if len(dict_float_choices) > 0 and k in dict_float_choices:
+            for val in dict_float_choices[k]:
+                status_, msg_list_ = check_dict_str_float(
+                    keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
+                )
+                if status_ is True:
+                    msg_list_.append(f"Student answer {student_answer[k]} is within rel error of {rel_tol*100}%% of one of the accepted answers ({val})")
+                    break
+        else:
+            status_, msg_list_ = check_dict_str_float(
+                keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
         )
 
         if status_ is False:
@@ -646,8 +671,13 @@ def check_structure_dict(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_str(student_answer, instructor_answer):
-    status, msg = check_str(instructor_answer, student_answer)
+def check_answer_str(student_answer, instructor_answer, str_choices: list[str], remove_spaces):
+    """
+    Arguments:
+    - str_choices: check that the answer is one of str_choices if str_choices is not None
+    """
+    #print(f"check_answer_str, {remove_spaces=}")
+    status, msg = check_str(instructor_answer, student_answer, str_choices, remove_spaces=remove_spaces)
     return return_value(status, [msg], student_answer, instructor_answer)
 
 
@@ -817,7 +847,7 @@ def check_answer_dict_str_set(student_answer, instructor_answer):
 
     Even if the student returns a dict[str] = list, the list is cast to a set
     """
-    print("AssertUtilities: type dict_str_set NOT HANDLED")
+    # print("AssertUtilities: type dict_str_set NOT HANDLED")
     return False, ""
 
     # msg_list = []
@@ -926,7 +956,7 @@ def check_structure_dict_str_set_int(student_answer, instructor_answer, keys=Non
 
 
 def check_answer_dict_str_float(
-    student_answer, instructor_answer, rel_tol, keys, partial_score_frac: list[float]
+    student_answer, instructor_answer, rel_tol, keys, dict_float_choices, partial_score_frac: list[float]
 ):
     """
     student answer: dictionary with keys:str, values: an ndarray
@@ -934,6 +964,7 @@ def check_answer_dict_str_float(
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
     """
+    # print("==> check_answer_dict_str_float")
     msg_list = []
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
@@ -944,7 +975,19 @@ def check_answer_dict_str_float(
     for k in keys:
         s_float = student_answer[k]
         i_float = instructor_answer[k]
-        status_, msg_ = check_float(s_float, i_float, rel_tol=rel_tol, abs_tol=1.0e-6)
+
+        if len(dict_float_choices) > 0 and k in dict_float_choices:
+            for val in dict_float_choices[k]:
+                if val == 'i': # use instructor answer
+                    val = i_float
+                status_, msg_list_ = check_float(
+                    s_float, val, rel_tol, 1.0e-5
+                )
+                if status_ is True:
+                    break
+        else:
+            status_, msg_ = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.e-6)
+
         if status_ is False:
             status = False
             ps_dict["nb_mismatches"] += 1
@@ -1327,7 +1370,7 @@ def check_answer_dict_int_list(student_answer, instructor_answer, keys):
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
 
-    print("Assert_utilities, type dict_int_list NOT HANDLED")
+    # print("Assert_utilities, type dict_int_list NOT HANDLED")
     return False, ""
 
     # Need an exception in case the student key is not found
@@ -1540,6 +1583,8 @@ def check_answer_list_int(
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
+
+
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
@@ -1582,6 +1627,84 @@ def check_structure_list_int(student_answer, instructor_answer):
 
     return status, "\n".join(msg_list)
 
+# ======================================================================
+def check_answer_list_float(
+        student_answer, instructor_answer, rel_tol, monotone_increasing=None, ps_dict: list[float|None]=None
+):
+    """
+    Check that all elements in the list have matching norms
+    Arguments: 
+    - monotone_increasing: True/False. Default: None (ignore it). 
+    """
+    msg_list = []
+    status = True
+    answ_eq_len = len(student_answer) == len(instructor_answer) # checked in structure
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(instructor_answer)
+
+    if answ_eq_len and (monotone_increasing is None or monotone_increasing is False):
+        status, msg_list_ = check_list_float(student_answer, instructor_answer, rel_tol=rel_tol, abs_tol=1.e-6, ps_dict=ps_dict)
+        msg_list.extend(msg_list_)
+    elif monotone_increasing is True:
+        # Check whether the list is monotone incrreasing. If not, fail. 
+        val = student_answer[0]
+        for el_val in student_answer[1:]:
+            if el_val >= val:
+                continue
+            else:
+                status = False
+                msg_list.append("The answer is not monotonically increasing")
+
+    if not status:
+        msg_list.append("Some elements are incorrect")
+
+    if monotone_increasing: 
+        partial_score_frac[0] = 1.0
+    else:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatch"] / ps_dict["nb_total"]
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+def check_structure_list_float(student_answer, instructor_answer):
+    """
+    Check that elements in the list are ndarrays
+    """
+    status = True
+    msg_list = []
+
+    if not isinstance(student_answer, list):
+        status = False
+        msg_list.append(
+            f"- The answer should be of type 'list'; your type is {type(student_answer).__name__}"
+        )
+    else:
+        msg_list.append("- The answer is type list. Correct.")
+
+    # Check length of list
+    if status:
+        if len(student_answer) != len(instructor_answer):
+            status = False
+            msg_list.append(
+                [
+                    f"- The length of your list is incorrect. Your list length is {len(student_answer)}.",
+                    "The length should be {len(instructor_answer)}.",
+                ]
+            )
+        else:
+            msg_list.append("- The length of the list is correct.")
+
+    if status:
+        for s_arr in instructor_answer:
+            if not isinstance(s_arr, float):
+                status = False
+                msg_list.append("- Element {i} of your list should be of type 'float'.")
+
+    if status:
+        msg_list.append("- All list elements are type 'float'.")
+
+    return status, "\n".join(msg_list)
 
 # ======================================================================
 
@@ -1607,9 +1730,9 @@ def check_answer_list_ndarray(
             i_norm = np.linalg.norm(i_arr)
             i_norm_list.append(i_norm)
             s_norm_list.append(s_norm)
-            print(
-                "IMPROVE: could first create a list of norms, and call check_list_float"
-            )
+            #print(
+            #   "IMPROVE: could first create a list of norms, and call check_list_float"
+            #)
             status_, msg = check_float(i_norm, s_norm, rel_tol, abs_tol=1.0e-5)
             if status_ is False:
                 status = False
@@ -1851,7 +1974,7 @@ def check_answer_list_set(student_answer, instructor_answer):
     """
     msg_list = []
     status = True
-    print("Assert_utilities, type list_set NOT HANDLED")
+    # print("Assert_utilities, type list_set NOT HANDLED")
     return False, "\n".join(msg_list)
 
     # for s_lst, i_lst in zip(student_answer, instructor_answer):
@@ -1893,8 +2016,8 @@ def check_answer_set_set_int(student_answer, instructor_answer):
     set_of_sets_s = convert_to_set_of_sets(seq_s)
     set_of_sets_i = convert_to_set_of_sets(seq_i)
 
-    print("set_of_sets_s= ", set_of_sets_s)
-    print("set_of_sets_i= ", set_of_sets_i)
+    #print("set_of_sets_s= ", set_of_sets_s)
+    #print("set_of_sets_i= ", set_of_sets_i)
 
     # Compare the sets of sets
     # What is actually compared?
@@ -1988,7 +2111,7 @@ def check_answer_dict_str_tuple_ndarray(
             s_norms[k].append(s_norm)
             i_norms[k].append(i_norm)
 
-        print(f"{i_norms=}, {s_norms=}")
+        # print(f"{i_norms=}, {s_norms=}")
         status_, msg_ = check_list_float(i_norms[k], s_norms[k], rel_tol, abs_tol=1.e-6, ps_dict=ps_dict)
 
         if status_ is False:

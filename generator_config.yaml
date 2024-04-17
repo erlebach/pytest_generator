@@ -63,6 +63,7 @@ test_answers:
   # Alternative choices for string values, which applies to the 'str' answer type.
   # str_choices: ['word1', 'word2']
   str_choices: []
+  remove_spaces: False
 
   # local_namespaces: required for use to call the functions in type_handlers.py
   local_namespaces: {}
@@ -129,6 +130,14 @@ types:
   function: {}
   int: {}
   lineplot: {}
+  list[float]:
+    options:
+    # should be increasing or equal
+    - monotone_increasing
+    # should be decreasing or equal
+    - monotone_decreasing
+    # should be have a single mode (max)
+    - single_mode
   list[int]: {}
   list[list[float]]: 
     options:
@@ -160,7 +169,9 @@ types:
     options:
     - partial_score
   str: 
+    options:
     - str_choices
+    - remove_spaces: False
   # dict: {}
   # dict[str:set]: {}
   # dict[str:dict[str:list]]: {}
@@ -184,3 +195,24 @@ more_options:
   - keys
   - choices
   - partial_score
+  - assert_utilities
+  - keys
+  - choices
+
+
+option_defaults:
+  - rel_tol: 1.e-3
+  - abs_tol: 1.e-5
+  - partial_score: True
+  - min_nb_words: 4
+  - max_nb_words: 100
+  - monotone_increasing: False
+  - monotone_decreasing: False
+  - single_mode: False
+  - exclude_indices: []
+  - include_indices: []
+  - str_choices: []
+  - dict_float_choices: {}
+  - remove_spaces: False
+
+
