@@ -138,6 +138,7 @@ def check_str(i_str, s_str, str_choices: list[str] | None =None, remove_spaces: 
     if remove_spaces is True:
         i_str = re.sub(r"\s+", "", i_str)
         s_str = re.sub(r"\s+", "", s_str)
+        str_choices = [re.sub(r"\s+", "", el) for el in str_choices]
 
     if s_str in str_choices:
         #print(f"s_str: {s_str} is in {str_choices=}")
