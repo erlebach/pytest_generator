@@ -58,7 +58,7 @@ def check_int(i_el, s_el):
 # ----------------------------------------------------------------------
 
 
-def check_list_float(i_arr, s_arr, rel_tol, abs_tol, ps_dict: dict[str, float | int]):
+def check_list_float(i_arr, s_arr, rel_tol, abs_tol, ps_dict: dict[str, float | int], exclude_indices: list[int]=[]):
     """
     ps_dict : partial_score_dict
     """
@@ -66,7 +66,10 @@ def check_list_float(i_arr, s_arr, rel_tol, abs_tol, ps_dict: dict[str, float | 
     status = True
     ps_dict["nb_total"] += len(i_arr)
 
-    for i_el, s_el in zip(i_arr, s_arr):
+    for i, (i_el, s_el) in enumerate(zip(i_arr, s_arr)):
+        if i in exclude_indices:
+            ps_dict["nb_total"] -= 1
+            continue
         status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=abs_tol)
         if status_ is False:
             status = False
@@ -300,6 +303,7 @@ def return_value(status, msg_list, s_answ, i_answ):
     msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
     msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
 
+    ### ADD ERROR MESSAGE if msg_list is not a list of strings <<<<<
     return status, "\n".join(msg_list)
 
 
@@ -1580,7 +1584,7 @@ def check_answer_list_int(
     if not status:
         msg_list.append("Some elements are incorrect")
 
-    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatch"] / ps_dict["nb_total"]
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -1630,7 +1634,7 @@ def check_structure_list_int(student_answer, instructor_answer):
 
 # ======================================================================
 def check_answer_list_float(
-        student_answer, instructor_answer, rel_tol, monotone_increasing=None, ps_dict: list[float|None]=None
+        student_answer, instructor_answer, rel_tol, exclude_indices: list[int], monotone_increasing=None, partial_score_frac: list[float]=0.
 ):
     """
     Check that all elements in the list have matching norms
@@ -1644,8 +1648,8 @@ def check_answer_list_float(
     ps_dict["nb_total"] = len(instructor_answer)
 
     if answ_eq_len and (monotone_increasing is None or monotone_increasing is False):
-        status, msg_list_ = check_list_float(student_answer, instructor_answer, rel_tol=rel_tol, abs_tol=1.e-6, ps_dict=ps_dict)
-        msg_list.extend(msg_list_)
+        status, msg_list_ = check_list_float(student_answer, instructor_answer, rel_tol=rel_tol, abs_tol=1.e-6, ps_dict=ps_dict, exclude_indices=exclude_indices)
+        msg_list.append(msg_list_)
     elif monotone_increasing is True:
         # Check whether the list is monotone incrreasing. If not, fail. 
         val = student_answer[0]
@@ -1659,10 +1663,11 @@ def check_answer_list_float(
     if not status:
         msg_list.append("Some elements are incorrect")
 
+    print(f"==> {monotone_increasing=}")
     if monotone_increasing: 
-        partial_score_frac[0] = 1.0
+        partial_score_frac[0] = 1.0   #### <<<< ERROR
     else:
-        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatch"] / ps_dict["nb_total"]
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -1670,7 +1675,7 @@ def check_answer_list_float(
 
 def check_structure_list_float(student_answer, instructor_answer):
     """
-    Check that elements in the list are ndarrays
+    Check that elements in the list are floats
     """
     status = True
     msg_list = []
@@ -1711,7 +1716,7 @@ def check_structure_list_float(student_answer, instructor_answer):
 
 
 def check_answer_list_ndarray(
-    student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
+    student_answer, instructor_answer, rel_tol, exclude_indices, partial_score_frac: list[float]
 ):
     """
     rel_tol: max relative error on the L2 norm
@@ -1726,24 +1731,29 @@ def check_answer_list_ndarray(
     ps_dict["nb_total"] = len(instructor_answer)
 
     if answ_eq_len:
-        for s_arr, i_arr in zip(student_answer, instructor_answer):
+        for i, (s_arr, i_arr) in enumerate(zip(student_answer, instructor_answer)):
+            print(f"===> outside if, {i=}, {exclude_indices=}")
+            if i in exclude_indices:
+                ps_dict["nb_total"] -= 1
+                continue
             s_norm = np.linalg.norm(s_arr)
             i_norm = np.linalg.norm(i_arr)
-            i_norm_list.append(i_norm)
             s_norm_list.append(s_norm)
+            i_norm_list.append(i_norm)
             #print(
             #   "IMPROVE: could first create a list of norms, and call check_list_float"
             #)
             status_, msg = check_float(i_norm, s_norm, rel_tol, abs_tol=1.0e-5)
             if status_ is False:
                 status = False
-                msg_list.append([msg])
+                msg_list.append(msg)
                 ps_dict["nb_mismatches"] += 1
 
     if not status:
         msg_list.append("Replace the arrays by their norms")
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    print("return_value, msg_list= ", msg_list)
     return return_value(status, msg_list, s_norm_list, i_norm_list)
 
 
@@ -1905,7 +1915,9 @@ def check_structure_function(student_answer):
 
 
 def check_answer_list_list_float(
-    student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
+    student_answer, instructor_answer, rel_tol,
+    exclude_indices: list[int],
+    partial_score_frac: list[float]
 ):
     """
     Check two lists of lists of floats with each other
@@ -1913,10 +1925,15 @@ def check_answer_list_list_float(
     status = True
     msg_list = []
     ps_dict = init_partial_score_dict()
+    print("==> exclude_indices: ", exclude_indices)
 
-    for s_lst, i_lst in zip(student_answer, instructor_answer):
+    for i, (s_lst, i_lst) in enumerate(zip(student_answer, instructor_answer)):
+        print("i= ", i)
+        # if exclude_indices != [] and i in exclude_indices:
+        if i in exclude_indices:
+            continue
         status_, msg_list_ = check_list_float(i_lst, s_lst, rel_tol, 1.0e-6, ps_dict)
-        msg_list.extend(msg_list_)
+        msg_list.append(msg_list_)
         if status is True:
             status = status_
 
@@ -1952,6 +1969,7 @@ def check_structure_list_list_float(student_answer, instructor_answer):
             continue
 
         for j, el in enumerate(s_list):
+            print("j, el= ", j, el)
             if not isinstance(float(el), float):
                 msg_list.append(
                     f"- answer[{i}][{j}] cannot be cast to a float. All elements must be castable to float."
@@ -2393,6 +2411,24 @@ def check_answer_lineplot(student_answer, instructor_answer, rel_tol):
     status = True
     msg_list = []
 
+    plot = student_answer
+
+    title = plot.get_text()
+    x_label = plot.gca().get_xlabel()
+    y_label = plot.gca().get_ylabel()
+    print("====> title: ", title)
+    print("x_label: ", x_label)
+    print("y_label: ", y_label)
+
+    for i, line in enumerate(lines):
+        xdata = line.get_xdata()
+        ydata = line.get_ydata()
+        print(f"Line {i+1}:")
+        print("X-data:", xdata)
+        print("Y-data:", ydata)
+
+
+
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -2418,6 +2454,7 @@ def check_structure_lineplot(student_answer):
     # print("==> check structure lineplot")
     # get axis object
     # print(f"{student_answer=}")
+    """
     s_ax = student_answer[0].gca()
     i_ax = student_answer[0].gca()
     # print(f"{dir(s_ax)=}")
@@ -2451,6 +2488,7 @@ def check_structure_lineplot(student_answer):
     if not s_title:
         msg_list.append("The title is missing")
         status = False
+    """
 
     """ USE LATER
     s_xgrid_vis = any(line.getvisible() for line in s_ax.xaxis.get_gridlines())
@@ -2481,6 +2519,26 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol):
 
     s_answ = student_answer
     i_answ = instructor_answer
+
+    s_plt = s_answer
+    i_plt = i_answer
+
+    plt.xlabel("X")
+    plt.ylabel("y")
+    title = plot_cluster.get_text()
+    print("title: ", title)
+    x_label = plt.gca().get_xlabel()
+    y_label = plt.gca().get_ylabel()
+    print("x_label: ", x_label)
+    print("y_label: ", y_label)
+    # Get the x and y data from the scatter plot
+    ax = plt.gca()
+    x_data = ax.collections[0].get_offsets()[:, 0]
+    y_data = ax.collections[0].get_offsets()[:, 1]
+    print("x_coords: ", x_data.shape)
+    print("y_coords: ", y_data.shape)
+
+
 
     # Check for equality
     # x, y, z = s_answ._offsets2d # protected
@@ -2519,15 +2577,19 @@ def check_structure_scatterplot2d(student_answer):
             "The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'."
         )
 
-    x, y = s_answ.get_offsets()
-    s_x, s_y = x.data.astype(float), y.data.astype(float)
+    xy = s_answ.get_offsets()
+    #x, y = s_answ.get_offsets()
+    #sxsy = x.data.astype(float), y.data.astype(float)
+    #s_x, s_y = x.data.astype(float), y.data.astype(float)
 
     # x, y, z = i_answ._offsets3d
     # i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
 
+    """
     if i_x.shape == s_x.shape and i_y.shape == s_y.shape and i_z.shape == s_z.shape:
         status = False
         msg_list.append(f"The number of points ({s_x.shape[0]}) is incorrect")
+    """
 
     return status, "\n".join(msg_list)
 

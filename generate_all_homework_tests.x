@@ -1,1 +1,4 @@
-generate_homework_tests.x hw5
+generate_homework_tests.x denclue
+generate_homework_tests.x spectral
+generate_homework_tests.x jarvis_patrick
+generate_homework_tests.x em

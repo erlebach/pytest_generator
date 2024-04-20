@@ -31,18 +31,18 @@ types:
   list[list[float]]:
     import: ""
     # Fix for structure
-    assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, rel_tol, exclude_indices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_list_float(student_answer, instructor_answer)"
  
   list[ndarray]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, exclude_indices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_ndarray(student_answer, instructor_answer)"
 
   list[float]:
     import: "" 
     # monotone 
-    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, rel_tol, monotone_increasing, partial_score_frac)"
+    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, rel_tol, exclude_indices, monotone_increasing, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_float(student_answer, instructor_answer)"
 
   list[int]:

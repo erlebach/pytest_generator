@@ -179,3 +179,16 @@ possible. I have applied `chmod 000` to all instances of `assert_utilities.py` t
 inaccurate paths. 
 - IMPORTANT: make sure to import pytest last! This module somehow modifies the order of paths. 
 ----------------------------------------------------------------------
+2024-04-19_23:10
+- When I have a list, where I am comparing mean and std, I should remove the std because it is not realistic 
+to compare std. 
+----------------------------------------------------------------------
+2024-04-20_09:34
+- Why are the confusion matrices fractional in the thousands. They should be ints or ints cast to floats. 
+  Because it is an average confusion matrix. I should not count this question until I can get more reliable
+  confusion matrices. 
+- I increased the errors allowed on various quantities like ARI, SSE, amplitudes, 
+  means, etc. mean values. Also disabled error metrics on standard deviations. 
+  In the actual tests, I can use a deterministic dataset and check that the results are accurate. <<<< TODO
+----------------------------------------------------------------------
+

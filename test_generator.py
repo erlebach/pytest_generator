@@ -29,8 +29,11 @@ with open("generator_config.yaml", "r") as f:
     str_choices = config.get("test_answers", {}).get("str_choices", [])
     config_dict['str_choices'] = config.get("types", {}).get("str_choices", [])
     config_dict['dict_float_choices'] = config.get("types", {}).get("dict_float_choices", {})
+    config_dict['partial_score_frac'] = config.get("all_tests", {}).get("partial_score_frac", {})
+    print(f"{config_dict['partial_score_frac']=}")
 
     config_dict['remove_spaces'] = config_dict.get("option_defaults", {}).get("remove_spaces", False)
+    config_dict['monotone_increasing'] = config_dict.get("monotone_increasing", {}).get("monotone_increasing", False)
 
     config_dict['exclude_indices'] = (
         config.get("types", {}).get("list[string]", {}).get("exclude_indices", [])
@@ -186,7 +189,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 abs_tol = part.get("abs_tol", config_dict['abs_tol'])
                 str_choices = part.get("str_choices", config_dict['str_choices'])
                 dict_float_choices = part.get("dict_float_choices", config_dict['dict_float_choices'])
-                monotone_increasing = part.get("monotone_increasing", None)
+                monotone_increasing = part.get("monotone_increasing", config_dict['monotone_increasing'])
                 remove_spaces = part.get("remove_spaces", question.get("remove_spaces", config_dict['remove_spaces']))
 
                 # indices to exclude from grading for list[float]
