@@ -191,4 +191,5 @@ to compare std.
   means, etc. mean values. Also disabled error metrics on standard deviations. 
   In the actual tests, I can use a deterministic dataset and check that the results are accurate. <<<< TODO
 ----------------------------------------------------------------------
-
+2024-04-20_16:20
+- ERROR: in spectral: there is no xi variable. Only sigma. 

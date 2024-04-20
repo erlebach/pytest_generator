@@ -7,7 +7,9 @@ import numpy as np
 import yaml
 
 # from pprint import pprint
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+
 
 
 def init_partial_score_dict() -> dict[str, float | int]:
@@ -2520,45 +2522,51 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol):
     s_answ = student_answer
     i_answ = instructor_answer
 
-    s_plt = s_answer
-    i_plt = i_answer
+    s_plt = s_answ
+    i_plt = i_answ
 
-    plt.xlabel("X")
-    plt.ylabel("y")
-    title = plot_cluster.get_text()
-    print("title: ", title)
-    x_label = plt.gca().get_xlabel()
-    y_label = plt.gca().get_ylabel()
-    print("x_label: ", x_label)
-    print("y_label: ", y_label)
-    # Get the x and y data from the scatter plot
-    ax = plt.gca()
-    x_data = ax.collections[0].get_offsets()[:, 0]
-    y_data = ax.collections[0].get_offsets()[:, 1]
-    print("x_coords: ", x_data.shape)
-    print("y_coords: ", y_data.shape)
+    s_fig = s_plt.figure
+    i_fig = i_plt.figure
+    # Assume only a single axis
+
+    def check_grid_status(ax):
+        # Check visibility of grid lines
+        # Get a list of booleans indicating the visibility status of each gridline
+        xgrid_visible = any([line.get_visible() for line in ax.xaxis.get_gridlines()])
+        ygrid_visible = any([line.get_visible() for line in ax.yaxis.get_gridlines()])
+        
+        # If any of the grid lines are visible, we consider the grid "on"
+        return xgrid_visible and ygrid_visible
 
 
+    def fig_dict(answ):
+        fig = answ.figure
+        ax = fig.axes[0]
+        coll = ax.collections[0]
+        xy = ax.collections[0].get_offsets()
+        path_collection = answ
+        face_colors = path_collection.get_facecolor() # RGBA
+        s_face_colors_readable = [mcolors.to_hex(c) for c in face_colors]
+        s_dict = {
+            'ax': ax,
+            'title': ax.get_title(),
+            'xlabel': ax.get_xlabel(),
+            'ylabel': ax.get_ylabel(),
+            'x': xy[:, 0],
+            'y': xy[:, 1],
+            'colors': np.unique(s_face_colors_readable)
+        }
+        return s_dict
 
-    # Check for equality
-    # x, y, z = s_answ._offsets2d # protected
-    x, y, z = s_answ.get_offsets()
-    s_x, s_y, s_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+    s_dict = fig_dict(s_answ)
+    i_dict = fig_dict(i_answ)
 
-    x, y, z = i_answ._offsets3d
-    i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+    s_grid = check_grid_status(s_dict['ax'])
+    i_grid = check_grid_status(s_dict['ax'])
 
-    # print(f"==> {i_x=}, {i_y=}, {i_z=}")
-    # print(f"==> {s_x=}, {s_y=}, {s_z=}")
-
-    sum_i = np.sum(i_x) + np.sum(i_y) + np.sum(i_z)
-    sum_s = np.sum(s_x) + np.sum(s_y) + np.sum(s_z)
-
-    status, msg = check_float(sum_i, sum_s, rel_tol=rel_tol, abs_tol=1.e-5)
-    msg_list.append(msg)
+    print(f"{s_grid=}, {i_grid=}")
 
     return return_value(status, msg_list, student_answer, instructor_answer)
-
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
