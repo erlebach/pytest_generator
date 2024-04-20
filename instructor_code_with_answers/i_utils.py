@@ -1,5 +1,57 @@
 import numpy as np
+#from sklearn.neighbors import NearestNeighbors
 
+
+def euclidean_distances(X, Y=None):
+    """
+    Compute the squared Euclidean distances between each point in X and Y.
+
+    Parameters:
+    - X (numpy.ndarray): An array of shape (n_samples_X, n_features) containing the dataset.
+    - Y (numpy.ndarray): An optional array of shape (n_samples_Y, n_features) containing another dataset.
+                         If None, Y is assumed to be the same as X.
+
+    Returns:
+    - distances (numpy.ndarray): An array of shape (n_samples_X, n_samples_Y) containing the squared distances.
+    """
+    if Y is None:
+        Y = X
+    # Calculate the squared differences expanded out in the Euclidean distance formula
+    diff = X[:, np.newaxis, :] - Y[np.newaxis, :, :]
+    distances = np.sum(diff**2, axis=2)
+    return distances
+
+
+# ----------------------------------------------------------------------
+
+
+# NOT DEBUGGED
+def nearest_neighbors(data, k=5):
+    """
+    Find k-nearest neighbors for each point in the dataset using only numpy.
+
+    Parameters:
+    - data (numpy.ndarray): The dataset of shape (N, features).
+    - k (int): The number of nearest neighbors to find.
+
+    Returns:
+    - indices (numpy.ndarray): Indices of the k-nearest neighbors for each point.
+    - distances (numpy.ndarray): Distances to the k-nearest neighbors for each point.
+    """
+    # Compute pairwise Euclidean distances
+    dist_matrix = euclidean_distances(data)
+
+    # We use np.argsort to get indices of sorted distances
+    sorted_indices = np.argsort(dist_matrix, axis=1)
+
+    # Select the first k indices for each point - note we use 1:k+1 to skip the point itself
+    nearest_indices = sorted_indices[:, 1 : k + 1]
+    nearest_distances = np.sort(dist_matrix, axis=1)[:, 1 : k + 1]
+
+    return nearest_indices, nearest_distances
+
+
+# ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 
 
@@ -160,13 +212,8 @@ def k_means(data, k, max_iter=100, tol=1e-4):
 
 # ----------------------------------------------------------------------
 
-import numpy as np
-from sklearn.neighbors import NearestNeighbors
 
-import numpy as np
-from sklearn.neighbors import NearestNeighbors
-
-
+'''
 def create_symmetric_knn_proximity_graph(data, k, sigma=None):
     """
     Create a symmetric k-nearest neighbor proximity graph using a Gaussian kernel from 2D data.
@@ -181,7 +228,7 @@ def create_symmetric_knn_proximity_graph(data, k, sigma=None):
     - A (numpy.ndarray): A symmetric weighted adjacency matrix using Gaussian kernel.
     """
     # Initialize NearestNeighbors with the specified number of neighbors
-    nbrs = NearestNeighbors(n_neighbors=k + 1, algorithm="auto").fit(data)
+    nbrs = nearest_neighbors(n_neighbors=k + 1, algorithm="auto").fit(data)
 
     # Find the k nearest neighbors (including the point itself)
     distances, indices = nbrs.kneighbors(data)
@@ -213,65 +260,4 @@ proximity_matrix = create_symmetric_knn_proximity_graph(data, k)
 
 print("Symmetric Proximity Matrix Using Gaussian Kernel:\n", proximity_matrix)
 # ----------------------------------------------------------------------
-
-import numpy as np
-
-
-def euclidean_distances(X, Y=None):
-    """
-    Compute the squared Euclidean distances between each point in X and Y.
-
-    Parameters:
-    - X (numpy.ndarray): An array of shape (n_samples_X, n_features) containing the dataset.
-    - Y (numpy.ndarray): An optional array of shape (n_samples_Y, n_features) containing another dataset.
-                         If None, Y is assumed to be the same as X.
-
-    Returns:
-    - distances (numpy.ndarray): An array of shape (n_samples_X, n_samples_Y) containing the squared distances.
-    """
-    if Y is None:
-        Y = X
-    # Calculate the squared differences expanded out in the Euclidean distance formula
-    diff = X[:, np.newaxis, :] - Y[np.newaxis, :, :]
-    distances = np.sum(diff**2, axis=2)
-    return distances
-
-
-# ----------------------------------------------------------------------
-
-
-# NOT DEBUGGED
-def nearest_neighbors(data, k=5):
-    """
-    Find k-nearest neighbors for each point in the dataset using only numpy.
-
-    Parameters:
-    - data (numpy.ndarray): The dataset of shape (N, features).
-    - k (int): The number of nearest neighbors to find.
-
-    Returns:
-    - indices (numpy.ndarray): Indices of the k-nearest neighbors for each point.
-    - distances (numpy.ndarray): Distances to the k-nearest neighbors for each point.
-    """
-    # Compute pairwise Euclidean distances
-    dist_matrix = euclidean_distances(data)
-
-    # We use np.argsort to get indices of sorted distances
-    sorted_indices = np.argsort(dist_matrix, axis=1)
-
-    # Select the first k indices for each point - note we use 1:k+1 to skip the point itself
-    nearest_indices = sorted_indices[:, 1 : k + 1]
-    nearest_distances = np.sort(dist_matrix, axis=1)[:, 1 : k + 1]
-
-    return nearest_indices, nearest_distances
-
-
-# Example usage:
-data = np.random.rand(10, 2)  # 10 points in 2D
-k = 3  # Number of nearest neighbors
-indices, distances = nearest_neighbors(data, k)
-
-print("Indices of Nearest Neighbors:\n", indices)
-print("Distances to Nearest Neighbors:\n", distances)
-
-# ----------------------------------------------------------------------
+'''
