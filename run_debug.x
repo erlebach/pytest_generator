@@ -1,19 +1,18 @@
 #!/bin/bash
 
-# either put full paths or path relative to current folder
+# Runs on Gradescope server
+# CODE: student code
+
+# student_code_with_answers is on my local system
 export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./student_code_with_answers:./instructor_code_with_answers:.:./tests
 
-# --import-mode='append' or 'prepend' has to do with the root folder
-# 'append': Adds the root folder of the project to the end of the pythonpath
-# 'prepend' and default adds the root folder of the project to the beginning and end of the pythonpath
+#pytest -s tests/test_structure_preprocessed_hw4_expand.py
+#pytest -s tests/test_answers_preprocessed_hw4_expand.py::test_answers_question1_a_string
 
-pytest -s --import-mode='append' tests/test_structure_preprocessed_spectral_expand.py
+#pytest -s tests/test_answers_preprocessed_hw4_expand.py::test_answers_question7_a_bool
+#pytest -s tests/test_answers_preprocessed_hw4_expand.py
 
-#pytest -s --import-mode='append' tests/test_structure_preprocessed_denclue_expand.py
-#pytest -s --import-mode='append' tests/test_structure_preprocessed_jarvis_patrick_expand.py
+# --import-mode='append' is necessary. Othewise wrong file is included
+pytest -s --import-mode='append'  tests/test_structure_preprocessed_hw4_expand.py::test_structure_question8_c_PX_1_1_plus_float
 
-# OK
-#pytest -s --import-mode='append' tests/test_structure_preprocessed_em_expand.py
-
-# pytest -s --import-mode='append' tests/test_answers_preprocessed_em_expand.py::test_answers_gaussian_mixture_plot_original_cluster_scatterplot2d
-
+##pytest -s tests/test_structure_preprocessed_hw4_expand.py::test_structure_question8_a_PX_1_1_plus_float

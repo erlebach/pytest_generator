@@ -49,29 +49,32 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
     :param directory: Directory from which to load the module
     :return: The result of the module's `compute` function
     """
-    #print("INSIDE load_and_run_module")
+    print("INSIDE load_and_run_module")
+    print(f"{directory=}")
+    print(f"{module_name=}")
+    print(f"{function_name=}")
     original_cwd = os.getcwd()
     os.chdir(directory)
     try:
-        #print("===> module_name: ", module_name)
-        #print("===> import directory: ", directory)
         module = importlib.import_module(directory + "." + module_name)
-        # module = importlib.import_module(module_name) # orig
-        """
-        To execute, `result = module.question1()`
-        invoke  `load_and_run_module(module, directory, 'question1')
-        """
-        #print("==> module: ", module, type(module))
-        #print("==> function_name: ", function_name, type(function_name))
-        #print("module: ", module)
-        #print("==> dir: ", dir(module))
-        func_to_run = getattr(module, function_name)
-        #print("==> func_to_run: ", func_to_run.__name__)
-        #print("args: ", args)
-        #print("kwargs: ", kwargs)
-        result = func_to_run(*args)
-    finally:
-        os.chdir(original_cwd)
+    except:
+        print("Import error in fixture")
+        quit()
+
+    """
+    To execute, `result = module.question1()`
+    invoke  `load_and_run_module(module, directory, 'question1')
+    """
+    try:
+        if hasattr(module, function_name):
+            func_to_run = getattr(module, function_name)
+        else:
+            raise AttributeError(f"{function_name} not found in {module_name}")
+    except Exception as e: 
+        print(f"Error encountered: {e}")
+
+    result = func_to_run(*args)
+    os.chdir(original_cwd)
     return result
 
 # ----------------------------------------------------------------------
@@ -109,8 +112,6 @@ def get_module_results(module_name, function_name, ret='both', *args, **kwargs):
 def run_compute():
     # Include key args: 'student_directory'= and 'instructor_directory'=
     def _module(module_name, function_name, ret, *args, **kwargs):
-        #print("===> _module, kwargs: ", kwargs)
-        #print("==> _module, function_name: ", type(function_name))   # Must be a string
         return get_module_results(module_name, function_name, ret, *args, **kwargs)
     return _module
 

@@ -75,11 +75,18 @@ def get_decoded_str(questions_data, part, answer_key, source_file):
         #print(f"{decode_call_str=}")
         return decode_call_str
 #----------------------------------------------------------------------
-def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_instructor_file, is_student_file, 
+def evaluate_answers(questions_data, question, test_code, is_fixture, is_instructor_file, is_student_file, 
                     decode_i_call_str, decode_s_call_str, fixture, part, function_name):
 
     student_directory = questions_data['student_folder_name']
     instructor_directory = questions_data['instructor_folder_name']
+    part_id = part.get("id", None)
+    if part_id is None:
+        print("part_id is missing. Abort.")
+    # If no type, use default type (often float)
+    part_type = part.get("type")
+    part_question_id = question.get("id", None)
+    question_id = part_id = part["id"]
 
     if not is_fixture and not is_instructor_file:  # yaml file
         test_code += f"    correct_answer = eval('{decode_i_call_str}')\n"
@@ -89,7 +96,7 @@ def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_inst
     elif is_fixture and is_instructor_file:
         fixture_args = fixture['args']
         fixture_name = fixture['name']
-        module_function_name = question_id   # name of function in student/instructor module
+        module_function_name = part_question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
         test_code += f"    kwargs = {{'student_directory': {repr(student_directory)} , 'instructor_directory': {repr(instructor_directory)}}}\n"
         # 2024-03-19
@@ -100,6 +107,12 @@ def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_inst
         explanation = repr(f"Key: {part_id} not found in instructor answer!\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\n"
         test_code += f"        {function_name}.explanation = explanation\n"
+        test_code += f"        answer_type = {repr(part_type)}\n"
+        test_code += f"        question_id = {repr(part_question_id)}\n"
+        test_code += f"        subquestion_id = {part_id}\n"
+        test_code += f"        {function_name}.answer_type = answer_type\n"
+        test_code += f"        {function_name}.question_id = question_id\n"
+        test_code += f"        {function_name}.subquestion_id = subquestion_id\n"
         test_code += f"        assert False\n"
         test_code += f"    else:\n"
         test_code += f"        correct_answer = correct_answer[{part_id}]\n"
@@ -115,13 +128,19 @@ def evaluate_answers(questions_data, question_id, test_code, is_fixture, is_inst
         fixture_args = fixture['args']
         #fixture_name = fixture['name']
         fixture_name = fixture['name']
-        module_function_name = question_id   # name of function in student/instructor module
+        module_function_name = part_question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
         test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's', **kwargs)\n"
         test_code += f"    if {part_id} not in student_answer:\n"
         explanation = repr(f"Key: {part_id} not found in student answer!\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\n"
         test_code += f"        {function_name}.explanation = explanation\n"
+        test_code += f"        answer_type = {repr(part_type)}\n"
+        test_code += f"        question_id = {repr(part_question_id)}\n"
+        test_code += f"        subquestion_id = {part_id}\n"
+        test_code += f"        {function_name}.answer_type = answer_type\n"
+        test_code += f"        {function_name}.question_id = question_id\n"
+        test_code += f"        {function_name}.subquestion_id = subquestion_id\n"
         test_code += f"        assert False\n"
         test_code += f"    else:\n"
         test_code += f"        student_answer = student_answer[{part_id}]\n"
