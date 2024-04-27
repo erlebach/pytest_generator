@@ -97,6 +97,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
         for part in question["parts"]:
             part_type = part.get("type", answer_type)
+            # I will need all fields in lower-level function
+            part["type"] = part_type
+
             if "fixture" in part:
                 fixture = part["fixture"]
                 fixture_name = fixture["name"]
@@ -169,7 +172,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
             test_code = evaluate_answers(
                 questions_data,
-                question["id"],
+                question,
                 test_code,
                 is_fixture,
                 is_instructor_file,
@@ -275,7 +278,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                     test_code += "    function_name.answer_note = answer_note\n"
 
                 test_code += f"    answer_type = {repr(part_type)}\n"
-
                 test_code += f"    question_id = {repr(part_question_id)}\n"
                 test_code += f"    subquestion_id = {repr(part_id)}\n"
 
