@@ -7,10 +7,10 @@ export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./
 # 'append': Adds the root folder of the project to the end of the pythonpath
 # 'prepend' and default adds the root folder of the project to the beginning and end of the pythonpath
 
-pytest -s --import-mode='append' tests/test_structure_preprocessed_spectral_expand.py
-
+# pytest -s --import-mode='append' tests/test_structure_preprocessed_spectral_expand.py
 #pytest -s --import-mode='append' tests/test_structure_preprocessed_denclue_expand.py
-#pytest -s --import-mode='append' tests/test_structure_preprocessed_jarvis_patrick_expand.py
+
+pytest -s --import-mode='append' tests/test_structure_preprocessed_jarvis_patrick_expand.py::test_structure_jarvis_patrick_clustering_jarvis_patrick_function_function
 
 # OK
 #pytest -s --import-mode='append' tests/test_structure_preprocessed_em_expand.py
