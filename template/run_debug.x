@@ -7,7 +7,7 @@
 export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./student_code_with_answers:./instructor_code_with_answers:.:./tests
 
 #pytest -s tests/test_structure_preprocessed_hw4_expand.py
-pytest -s tests/test_answers_preprocessed_hw4_expand.py::test_answers_question8_c_PX_1_1_plus_float
+pytest -s tests/test_answers_preprocessed_hw4_expand.py::test_answers_question1_a_str
 
 # pytest -s --import-mode='append' tests/test_structure_preprocessed_spectral_expand.py
 #pytest -s --import-mode='append' tests/test_structure_preprocessed_denclue_expand.py
