@@ -142,3 +142,30 @@ def disable_plot_show(mocker):
     mock_show = mocker.patch('matplotlib.pyplot.show')
     return mock_show
 #----------------------------------------------------------------------
+
+#### LOCAL FIXTURES FOR THE SPECIFIC ASSIGNMENT
+
+# Assuming 'spectral' is imported from the module where it's defined
+
+"""
+def mock_spectral(original_func, *args, **kwargs):
+    # Modify only the first two arguments: data and labels
+    if len(args) >= 2:
+
+        data, labels = args[0], args[1]
+        sliced_data = data[:300, :]  # Slice data to the first 300 samples
+        sliced_labels = labels[:300]  # Slice labels to the first 300 samples
+        args = (sliced_data, sliced_labels) + args[2:]  # Replace and preserve remaining args
+
+    # Call the original function with modified args and all kwargs
+    return original_func(*args, **kwargs)
+
+@pytest.fixture
+def mock_spectral_fixture(mocker, request):
+    # Dynamically determine the module to mock based on test parameter
+    module_name = request.param
+    module = importlib.import_module(module_name)
+    original_func = getattr(module, 'spectral')
+    # Patch the 'spectral' function in the specified module
+    mocker.patch(f"{module_name}.spectral", side_effect=lambda *args, **kwargs: mock_spectral(original_func, *args, **kwargs))
+"""

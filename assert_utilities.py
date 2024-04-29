@@ -2452,7 +2452,6 @@ def check_answer_lineplot(student_answer, instructor_answer, rel_tol):
     s_grid = check_grid_status(s_dict['ax'])
     i_grid = check_grid_status(s_dict['ax'])
 
-
     title = plot.get_text()
     x_label = plot.gca().get_xlabel()
     y_label = plot.gca().get_ylabel()
@@ -2490,6 +2489,30 @@ def check_structure_lineplot(student_answer):
     """
     status = True
     msg_list = []
+
+    def fig_dict(answ):
+        fig = answ.figure
+        ax = fig.axes[0]
+        coll = ax.collections[0]
+        xy = ax.collections[0].get_offsets()
+        path_collection = answ
+        face_colors = path_collection.get_facecolor() # RGBA
+        s_face_colors_readable = [mcolors.to_hex(c) for c in face_colors]
+        s_dict = {
+            'ax': ax,
+            'title': ax.get_title(),
+            'xlabel': ax.get_xlabel(),
+            'ylabel': ax.get_ylabel(),
+            'x': xy[:, 0],
+            'y': xy[:, 1],
+            'colors': np.unique(s_face_colors_readable)
+        }
+        return s_dict
+
+    s_plt = s_answ = student_answer[0]
+    s_fig = s_plt.figure
+    s_dict = fig_dict(s_answ)
+    s_grid = check_grid_status(s_dict['ax'])
 
     # print("==> check structure lineplot")
     # get axis object

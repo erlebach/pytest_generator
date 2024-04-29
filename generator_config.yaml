@@ -10,7 +10,7 @@ all_tests:
 
   # Folders are relative to the base project folder
   student_folder_name: student_code_with_answers
-  #student_folder_name: sai_teja
+  #student_folder_name: hunter
   instructor_folder_name: instructor_code_with_answers
 
   fixtures: 
