@@ -54,27 +54,47 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
     print(f"{module_name=}")
     print(f"{function_name=}")
     original_cwd = os.getcwd()
-    os.chdir(directory)
+    """
     try:
-        module = importlib.import_module(directory + "." + module_name)
-    except:
-        print("Import error in fixture")
-        quit()
+        os.chdir(directory)
+        try:
+            module = importlib.import_module(directory + "." + module_name)
+        except:
+            print("Import error in fixture")
 
-    """
-    To execute, `result = module.question1()`
-    invoke  `load_and_run_module(module, directory, 'question1')
+        # To execute, `result = module.question1()`
+        # invoke  `load_and_run_module(module, directory, 'question1')
+        try:
+            if hasattr(module, function_name):
+                func_to_run = getattr(module, function_name)
+            else:
+                raise AttributeError(f"{function_name} not found in {module_name}")
+        except Exception as e: 
+            print(f"Error encountered: {e}")
+            result = None
+
+
+        result = func_to_run(*args)
+        os.chdir(original_cwd)
     """
     try:
+        os.chdir(directory)
+        module = importlib.import_module(module_name)
         if hasattr(module, function_name):
+            print("==> module, function name: ", module, function_name)
             func_to_run = getattr(module, function_name)
+            print(f"==> {func_to_run=}")
         else:
             raise AttributeError(f"{function_name} not found in {module_name}")
-    except Exception as e: 
+        print("kwargs= ", kwargs)
+        print("args= ", args)
+        result = func_to_run(*args) #, **kwargs)
+    except Exception as e:
         print(f"Error encountered: {e}")
-
-    result = func_to_run(*args)
-    os.chdir(original_cwd)
+        # Instead of quitting, handle the error to allow cleanup
+        result = None
+    finally:
+        os.chdir(original_cwd)  # Ensure directory is always reset
     return result
 
 # ----------------------------------------------------------------------
