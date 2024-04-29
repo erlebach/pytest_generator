@@ -4,6 +4,24 @@ all_tests:
   # Multiply max_score by partial_score_frac
   partial_score_frac: 1.
 
+  # Where is answer taken from?
+  i_answer_source: instructor_file
+  s_answer_source: student_file
+
+  # Folders are relative to the base project folder
+  student_folder_name: student_code_with_answers
+  student_folder_name: sai_teja
+  instructor_folder_name: instructor_code_with_answers
+
+  fixtures: 
+    # file that contains all the fixtures
+    # Perhaps this should be part of the configuration file
+    # Necessary for fixtures to work
+    fixture:
+      name: run_compute
+      # Fixure arguments in a list
+      args: [expectation_maximization]
+
 test_structure:
   # set all tests to fail
   assert_false: False

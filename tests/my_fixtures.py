@@ -116,3 +116,9 @@ def run_compute():
     return _module
 
 #----------------------------------------------------------------------
+
+@pytest.fixture(scope='function', autouse=True)
+def disable_plot_show(mocker):
+    mock_show = mocker.patch('matplotlib.pyplot.show')
+    return mock_show
+#----------------------------------------------------------------------

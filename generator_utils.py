@@ -60,6 +60,9 @@ def get_decoded_str(questions_data, part, answer_key, source_file):
     else:
         # test that ['answer'] is in part
         #print("part= ", part)
+        print("get_decoded_str")
+        print("  answer_key: ", answer_key)
+        print("part: ", part)
         if answer_key in part and isinstance(part[answer_key], str):
             encoded_answer_str = part[answer_key].replace('"', '"')
             #print(f"{encoded_answer_str=}")

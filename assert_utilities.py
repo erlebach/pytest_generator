@@ -976,6 +976,8 @@ def check_answer_dict_str_float(
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
+    print(f"{instructor_answer=}")
+    print("===> keys: ", keys)
     ps_dict["nb_total"] = len(keys)
 
     # Need an exception in case the student key is not found
@@ -1000,7 +1002,11 @@ def check_answer_dict_str_float(
             ps_dict["nb_mismatches"] += 1
             msg_list.append(msg_)
 
-    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    if ps_dict["nb_total"] == 0:
+        msg_list.append("check_answer_dict_str_float :: Total number of keys is zero. Internal error.")
+        partial_score_frac[0] = 0.0
+    else:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -1027,6 +1033,8 @@ def check_structure_dict_str_float(student_answer, instructor_answer, keys=None)
         instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
         student_keys = set(student_answer.keys())
         missing_keys = list(instructor_keys - student_keys)
+        print("instructor_keys: ", instructor_keys)
+        print("student_keys: ", student_keys)
 
         if len(missing_keys) > 0:
             msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
@@ -2413,7 +2421,37 @@ def check_answer_lineplot(student_answer, instructor_answer, rel_tol):
     status = True
     msg_list = []
 
-    plot = student_answer
+    s_plt = s_answ = student_answer[0]
+    i_plt = i_answ = instructor_answer[0]
+
+    s_fig = s_plt.figure
+    i_fig = i_plt.figure
+
+    def fig_dict(answ):
+        fig = answ.figure
+        ax = fig.axes[0]
+        coll = ax.collections[0]
+        xy = ax.collections[0].get_offsets()
+        path_collection = answ
+        face_colors = path_collection.get_facecolor() # RGBA
+        s_face_colors_readable = [mcolors.to_hex(c) for c in face_colors]
+        s_dict = {
+            'ax': ax,
+            'title': ax.get_title(),
+            'xlabel': ax.get_xlabel(),
+            'ylabel': ax.get_ylabel(),
+            'x': xy[:, 0],
+            'y': xy[:, 1],
+            'colors': np.unique(s_face_colors_readable)
+        }
+        return s_dict
+
+    s_dict = fig_dict(s_answ)
+    i_dict = fig_dict(i_answ)
+
+    s_grid = check_grid_status(s_dict['ax'])
+    i_grid = check_grid_status(s_dict['ax'])
+
 
     title = plot.get_text()
     x_label = plot.gca().get_xlabel()
