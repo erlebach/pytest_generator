@@ -112,12 +112,15 @@ def apply_patches(module_name):
     spectral_module = importlib.import_module(module_name)
     original_spectral = getattr(spectral_module, 'spectral')
     original_scatter = plt.scatter
+    # original_plot = plt.plot
 
     patched_spectral = modify_args_decorator(slice_lg=200)(original_spectral)
     patched_scatter = modify_args_decorator(slice_lg=200)(original_scatter)
+    # patched_plot = modify_args_decorator(slice_lg=200)(original_plot)
 
     spectral_patch = patch.object(spectral_module, 'spectral', new=patched_spectral)
     scatter_patch = patch.object(plt, 'scatter', new=patched_scatter)
+    # plot_patch = patch.object(plt, 'plot', new=patched_plot)
 
     spectral_patch.start()
     scatter_patch.start()

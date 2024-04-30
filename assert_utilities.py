@@ -1020,6 +1020,9 @@ def check_structure_dict_str_float(student_answer, instructor_answer, keys=None)
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
     """
+    print("\n===> ENTER dict_str_float check structure")
+    print(f"{student_answer=}")
+    print(f"{instructor_answer=}")
     status = True
     msg_list = []
 
@@ -2490,21 +2493,29 @@ def check_structure_lineplot(student_answer):
     status = True
     msg_list = []
 
+    def check_grid_status(ax):
+        # Check visibility of grid lines
+        # Get a list of booleans indicating the visibility status of each gridline
+        xgrid_visible = any([line.get_visible() for line in ax.xaxis.get_gridlines()])
+        ygrid_visible = any([line.get_visible() for line in ax.yaxis.get_gridlines()])
+        
+        # If any of the grid lines are visible, we consider the grid "on"
+        return xgrid_visible and ygrid_visible
+
     def fig_dict(answ):
         fig = answ.figure
         ax = fig.axes[0]
-        coll = ax.collections[0]
-        xy = ax.collections[0].get_offsets()
-        path_collection = answ
-        face_colors = path_collection.get_facecolor() # RGBA
+        line = ax.lines[0]
+        xy = np.column_stack((line.get_xdata(), line.get_ydata()))
+        face_colors = [line.get_color()]
         s_face_colors_readable = [mcolors.to_hex(c) for c in face_colors]
         s_dict = {
             'ax': ax,
             'title': ax.get_title(),
             'xlabel': ax.get_xlabel(),
             'ylabel': ax.get_ylabel(),
-            'x': xy[:, 0],
-            'y': xy[:, 1],
+            'x': xy[:, 0] if xy.size else [],
+            'y': xy[:, 1] if xy.size else [],
             'colors': np.unique(s_face_colors_readable)
         }
         return s_dict
@@ -2514,61 +2525,19 @@ def check_structure_lineplot(student_answer):
     s_dict = fig_dict(s_answ)
     s_grid = check_grid_status(s_dict['ax'])
 
-    # print("==> check structure lineplot")
-    # get axis object
-    # print(f"{student_answer=}")
-    """
-    s_ax = student_answer[0].gca()
-    i_ax = student_answer[0].gca()
-    # print(f"{dir(s_ax)=}")
-    # print(f"{type(s_ax).__name__=}")
-    # s_ax = s_ax.gcf().get_axes()
-    # i_ax = instructor_answer[0].gcf().get_axes()
-
-    if len(s_ax) != len(i_ax):
-        msg_list.append(f"There should only be {len(i_ax)} plot(s)!")
+    if s_grid is False:
+        msg_list.append("Missing plot grid")
         status = False
 
-    if type(student_answer).__name__ != "Line2D":
-        msg_list.append("Wrong plot type, not created with plt.plot!")
+    if s_dict['title'] == "":
+        msg_list.append("Missing title")
         status = False
 
-    if not status:
-        return status, "\n".join(msg_list)
-
-    # What happens if the label is not a sring? None if no label
-    s_xlabel = clean_str_answer(s_ax.get_xlabel())  # if s_ax.get_xlabel() else None
-    # i_xlabel = clean_str_answer(i_ax.get_xlabel())  # if s_ax.get_xlabel() else None
-    s_ylabel = clean_str_answer(s_ax.get_ylabel())  # if s_ax.get_ylabel() else None
-    # i_ylabel = clean_str_answer(i_ax.get_ylabel())  # if s_ax.get_ylabel() else None
-    s_title = clean_str_answer(s_ax.get_title())  # if s_ax.get_title() else None
-    # i_title = clean_str_answer(i_ax.get_title())  # if s_ax.get_title() else None
-
-    if not s_xlabel or not s_ylabel:
-        msg_list.append("Either x or y label is missing! Must be there to get a grade.")
+    if s_dict['xlabel'] == "" or s_dict['ylabel'] == "":
+        msg_list.append("Missing x- and/or y-label")
         status = False
 
-    if not s_title:
-        msg_list.append("The title is missing")
-        status = False
-    """
-
-    """ USE LATER
-    s_xgrid_vis = any(line.getvisible() for line in s_ax.xaxis.get_gridlines())
-    i_xgrid_vis = any(line.getvisible() for line in i_ax.xaxis.get_gridlines())
-    s_ygrid_vis = any(line.getvisible() for line in s_ax.yaxis.get_gridlines())
-    i_ygrid_vis = any(line.getvisible() for line in i_ax.yaxis.get_gridlines())
-    """
-
-    """
-    ax:  Axes3D
-    fig:  Figure
-    scat3:  Path3DCollection
-    scat2:  PathCollection
-    plot:  list
-    plot[0]:  Line2D
-    """
-
+    print("\n===> Return from 2D line plot structural check")
     return status, "\n".join(msg_list)
 
 
