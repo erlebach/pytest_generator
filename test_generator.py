@@ -83,6 +83,8 @@ function_header_str = f"""
 from pytest_utils.decorators import max_score, visibility, hide_errors
 import assert_utilities  # <<< SHOULD be specified in config
 from {fixture_import_file} import *   
+# meant to handle fixtures (ideally auto-generated, but not yet)
+from function_dictionaries import *
 #import {fixture_import_file}
 import numpy as np
 import yaml

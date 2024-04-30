@@ -105,7 +105,10 @@ def evaluate_answers(questions_data, question, test_code, is_fixture, is_instruc
         # 2024-03-19
         # I should be able to generalize this so that the first argument is *fixture_args, which would allow fixtures with 
         # either no args or multiple args before module_function_name, 'i', and **kwargs
-        test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i', **kwargs)\n"
+        # Orig
+        # test_code += f"    correct_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 'i', **kwargs)\n"
+        # New patch mechanism
+        test_code += f"    correct_answer = {fixture_name}({fixture_args[0]}, 'i', **kwargs)\n"
         test_code += f"    if {part_id} not in correct_answer:\n"
         explanation = repr(f"Key: {part_id} not found in instructor answer!\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\n"
@@ -133,7 +136,10 @@ def evaluate_answers(questions_data, question, test_code, is_fixture, is_instruc
         fixture_name = fixture['name']
         module_function_name = part_question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
-        test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's', **kwargs)\n"
+        # Original code
+        # test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's', **kwargs)\n"
+        # New patch mechanism
+        test_code += f"    student_answer = {fixture_name}({fixture_args[0]}, 's', **kwargs)\n"
         test_code += f"    if {part_id} not in student_answer:\n"
         explanation = repr(f"Key: {part_id} not found in student answer!\n")  # Change in accordance to structure check
         test_code += f"        explanation = {explanation}\n"
