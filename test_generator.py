@@ -55,18 +55,21 @@ with open("generator_config.yaml", "r") as f:
     )
     config_dict["outer_key_choices"] = []  # default
 
-    config_dict["student_folder_name"] = config.get(
+    config_dict["student_folder_name"] = config.get("all_tests").get(
         "student_folder_name", "student_code_with_answers"
     )
-    config_dict["instructor_folder_name"] = config.get(
+    config_dict["instructor_folder_name"] = config.get("all_tests").get(
         "instructor_folder_name", "instructor_code_with_answers"
     )
-    config_dict["i_answer_source"] = config.get(
-        "instructor_answer", "instructor_code_with_answers"
+    config_dict["i_answer_source"] = config.get("all_tests").get(
+        "instructor_answer", "instructor_file"
     )
-    config_dict["s_answer_source"] = config.get(
-        "student_answer", "student_code_with_answers"
+    config_dict["s_answer_source"] = config.get("all_tests").get(
+        "student_answer", "student_file"
     )
+
+# print("config= ", config)
+print("config_dict= ", config_dict)
 
 # student_folder_name: student_code_with_answers
 # instructor_folder_name: instructor_code_with_answers
