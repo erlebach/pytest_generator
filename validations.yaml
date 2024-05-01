@@ -1,0 +1,37 @@
+# A collection of validations to apply on various components of a student's answers
+#
+# How does the Question Yaml file look? 
+# questions:
+# - id: spectral_clustering
+#   parts:
+#     - id: "spectral_function"
+#       type: function
+# 
+#     - id: "cluster parameters"
+#       type: dict[str,dict[str,float]]
+#       rel_tol: 0.4
+#       validations:
+#         - range_validation: {key_pos: "inner", key: "ARI", min: -1, max: 1}
+
+range_validation:
+  # outer or inner (if dict of dict)
+  key_position: "{key_pos}"
+  key_name: "{key}"
+  range: [{min}, {max}]
+  error_message: "{key} value should be between {min} and {max}."
+
+rel_tol: "{perc}"
+abs_tol: "{perc}"
+
+partial_score_option: True
+min_nb_words: "{nb_words}"
+max_nb_words: "{nb_words}"
+monotone: "{none}"  # "{increasing}" or "{decreasing}"
+single_mode: "{False}"
+exclude_indices: []
+include_indices: []
+str_choices: []
+dict_float_choices: {}
+remove_spaces: False
+
+

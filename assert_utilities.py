@@ -201,7 +201,7 @@ def update_score(ps_dict: dict[str, float | int]) -> None:
 
 
 def check_dict_str_float(
-    keys, i_dict, s_dict, rel_tol, abs_tol, ps_dict: dict[str, float | int]
+        keys: list, i_dict: dict[str,float], s_dict: dict[str,float], rel_tol: float, abs_tol: float, ps_dict: dict[str, float | int]
 ):
     msg_list = []
     status = True
@@ -209,6 +209,7 @@ def check_dict_str_float(
     for k in keys:
         i_el = i_dict.get(k, None)
         s_el = s_dict.get(k, None)
+        print(f".... check_dict_str_float, key {k=}, {i_el=}, {s_el=}")
         if i_el is None or s_el is None:
             continue
         status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=abs_tol)
@@ -472,28 +473,35 @@ def check_structure_dict_str_dict_str_list(student_answer, instructor_answer):
 
 # ======================================================================
 def check_answer_dict_str_dict_str_float(
-    student_answer, instructor_answer, rel_tol, dict_float_choices, partial_score_frac: list[float]
+    student_answer, instructor_answer, rel_tol, dict_float_choices, validations, partial_score_frac: list[float]
 ):
     """
     The type is a dict[str, dict[str, list]]
     """
+    print("==> enter check_answer_dict_str_dicdt_str_float")
     status = True
     msg_list = []
     ps_dict = init_partial_score_dict()
 
     # Should go in structure check
     if not isinstance(student_answer, dict):
-        return False
+        return False, "Student answer must be a 'dict'"
 
     for k, v in instructor_answer.items():
-        # if not (isinstance(k, str) and isinstance(v, dict)):
-        # return False
+        # v is a dict[str,dict]
+
+        #### IGNORE FOR NOW
+        if not isinstance(k, int):
+            status = False
+            msg_list.append("All out keys must be of type 'int'")
+            break
 
         # I should have a keys argument
         keys = instructor_answer.keys()
-    
         s_answ = student_answer[k]
+
         if len(dict_float_choices) > 0 and k in dict_float_choices:
+            ### I MUST HANDLE ps_dict properly
             for val in dict_float_choices[k]:
                 status_, msg_list_ = check_dict_str_float(
                     keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
@@ -502,15 +510,21 @@ def check_answer_dict_str_dict_str_float(
                     msg_list_.append(f"Student answer {student_answer[k]} is within rel error of {rel_tol*100}%% of one of the accepted answers ({val})")
                     break
         else:
+            ps_dict['nb_total'] += len(v.keys())
+            print("===> keys: ", keys,   ",  k= ", k)  # keys: [0,1,..., 10], k=0, 1, 2
+            print("===> v.keys: ", list(v.keys()))
             status_, msg_list_ = check_dict_str_float(
-                keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
-        )
+                list(v.keys()), v, student_answer[k], rel_tol, 1.0e-5, ps_dict
+                #keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
+            )
 
         if status_ is False:
             status = status_
             msg_list.extend(msg_list_)
 
+    print(f".... {ps_dict=}")
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    print("==> exit check_answer_dict_str_dict_str_float")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -532,11 +546,12 @@ def check_structure_dict_str_dict_str_float(student_answer, instructor_answer):
     if len(missing_keys) > 0:
         return False, f"- Missing keys: {[repr(k) for k in missing_keys]}."
 
-    # print("answer keys: ", list(student_answer.keys()))
-    # for k, v in instructor_answer.items():
-    # print(f"key: {k}, value: {v}")
 
     for k, v in instructor_answer.items():
+        ### POSSIBLY IGNORE FOR NOW (for homework 6)
+        #if not isinstance(k, str):
+            #msg_list.append(f"Key {k} must be of type 'str'")
+            #status = False
         if not isinstance(v, dict):
             msg_list.append(f"- answer[{repr(k)}] must be of type 'dict'")
             status *= False
@@ -1080,8 +1095,9 @@ def check_answer_dict_str_ndarray(
     msg_list.append("Check array norms")
 
     keys = list(instructor_answer.keys()) if keys is None else keys
+
     ps_dict = init_partial_score_dict()
-    ps_dict["nb_total"] = len(keys)
+    ps_dict['nb_total'] += len(keys)
 
     # Need an exception in case the student key is not found
     i_norms = {k: np.linalg.norm(instructor_answer[k]) for k in keys}

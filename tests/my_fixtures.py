@@ -187,7 +187,7 @@ def apply_patches(*patches):
             patch_obj.stop()
 
 
-def patch_functions(module_name, function_dict, slice_lg=200):
+def patch_functions(module_name, function_dict, slice_lg=500):
     # print("\n\n: ENTER patch_functions")
     # print(f"===> {module_name=}")
     module = importlib.import_module(module_name)

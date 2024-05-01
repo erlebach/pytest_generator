@@ -278,6 +278,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 dict_float_choices = part.get(
                     "dict_float_choices", config_dict["dict_float_choices"]
                 )
+                validations = part.get("validations", None)
                 monotone_increasing = part.get(
                     "monotone_increasing", config_dict["monotone_increasing"]
                 )
@@ -312,12 +313,16 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 if monotone_increasing is not None:
                     test_code += f"    monotone_increasing = {monotone_increasing}\n"
                     test_code += f"    local_namespace['monotone_increasing'] = monotone_increasing\n"
+    
+                if validations is not None:
+                    test_code += f"    validations = {validations}\n"
+                    test_code += f"    local_namespace['validations'] = validations\n"
 
                 if str_choices is not None:
                     test_code += f"    str_choices = {str_choices}\n"
                     test_code += f"    local_namespace['str_choices'] = str_choices\n"
 
-                if part_type in ["dict[str,float]"]:
+                if part_type in ["dict[str,float]", "dict[str,dict[str,float]]"]:
                     test_code += f"    dict_float_choices = {dict_float_choices}\n"
                     test_code += f"    local_namespace['dict_float_choices'] = dict_float_choices\n"
 
