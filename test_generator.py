@@ -17,9 +17,20 @@ def load_yaml_file(file_path):
         questions_data = yaml.safe_load(file)
     return questions_data
 
+def load_validations_options_file(file_path):
+    with open(file_path, "r") as file:
+        validations_options = yaml.safe_load(file)
+    return validations_options
 
-with open("generator_config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+def load_configuration_file(file_path):
+    with open(file_path, "r") as file:
+        config = yaml.safe_load(file)
+    return config
+
+def create_config_dict():
+    with open("generator_config.yaml", "r") as f:
+        config = yaml.safe_load(f)
+
     option_defaults = config.get("option_defaults", {})
     types = config.get("types", {})
     config_dict = {}
@@ -67,6 +78,9 @@ with open("generator_config.yaml", "r") as f:
     config_dict["s_answer_source"] = config.get("all_tests").get(
         "student_answer", "student_file"
     )
+    return config_dict
+
+config_dict = create_config_dict()
 
 # print("config= ", config)
 print("config_dict= ", config_dict)
