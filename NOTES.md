@@ -196,4 +196,8 @@ to compare std.
 ----------------------------------------------------------------------
 2024-05-02
 - New branch "validations": work on validation of ARI in assert_utililities
+- I should add a fixture to substitute the first N elements of a known datasets and not the student's dataset
 
+2024-05-02_18:53
+- In yaml, numbers 1.e4 and 1.0e4 are interpreted as strings rather than floats. To solve: 
+  rel_tol: !!float 1.e4, 

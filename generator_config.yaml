@@ -8,7 +8,8 @@ all_tests:
   i_answer_source: instructor_file
   s_answer_source: student_file
 
-  # Folders are relative to the base project folder
+  # Folders are relative to the base project folder. 
+  # Do not include slashes!
   student_folder_name: student_code_with_answers
   # student_folder_name: deevesh
   # student_folder_name: anand

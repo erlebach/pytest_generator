@@ -5,16 +5,51 @@ import os
 import inspect
 import pytest
 import functools
+from functools import wraps
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 import importlib
 
 ### WHAT IS THIS?
 from contextlib import contextmanager
+import os
+import sys
 
 # Don't I have to import this in the patching software?
 # import spectral_clustering
+
+
+# @pytest.fixture
+def load_data_labels(nb_slices: int):
+    # Load your data here, using numpy or any suitable library
+    base_path = Path(__file__).parent
+
+    # Define the paths to your data and labels files
+    data_file_path = (
+        base_path / "question1_cluster_data.npy"
+    )  # Adjust the file name as needed
+    labels_file_path = (
+        base_path / "question1_cluster_labels.npy"
+    )  # Adjust the file name as needed
+
+    data = np.load(data_file_path)[:nb_slices]
+    labels = np.load(labels_file_path)[:nb_slices]
+    return data, labels
+
+
+# ----------------------------------------------------------------------
+
+
+def data_decorator(f):
+    # @wraps(f)
+    def wrapper(*args, **kwargs):
+        print("==> data_decorator:  is happening before the function is called.")
+        return f(*args, **kwargs)
+
+    return wrapper
+
 
 # ----------------------------------------------------------------------
 
@@ -51,11 +86,18 @@ def with_custom_sys_path(path, func, *args, **kwargs):
     original_sys_path = list(sys.path)
     try:
         sys.path.insert(0, path)
-        # print(f"==> with_custom_sys_path args, {path=}")
-        # print(f"==> with_custom_sys_path args , {func=}")
+        print(f"==> with_custom_sys_path args, {path=}")
+        print(f"==> with_custom_sys_path args , {func=}")
         # print(f"==> with_custom_sys_path args , {args=}")
         # print(f"==> with_custom_sys_path args , {kwargs=}")
         # print("==> args= ", args)
+        # print(f"==> {sys.path=}")
+
+        # Folder information
+        # module_path = inspect.getfile(func.__module__)
+        module_path = inspect.getfile(sys.modules[func.__module__])
+        folder = os.path.dirname(module_path)
+        print(f"==> {folder=}, {module_path=}")
         return func(*args, **kwargs)
     finally:
         sys.path = original_sys_path
@@ -90,13 +132,22 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
 
     with temporary_directory_change(directory):
         # print(f"==> new CWD: {os.getcwd()=}")
-        module = importlib.import_module(module_name)
+        # print(f"==> load_and_run_module: {module_name=}, {function_name=}")
+
+        module_path = inspect.getfile(sys.modules[module_name])
+        folder = os.path.dirname(module_path)
+        # print(f"==> load_and_run_module: {folder=}")
+        # print(f"==> {directory=}")
+        # print(f"==> {sys.path=}")
+
+        # folder_path = ".." + directory + "." + module_name
+        ## Make sure that directory does not have any "/" or "./". 
+        ## Make sure that both tests/ and tests/.. have an __init__.py
+        ## Any folder with a __init__.py is a package
+        folder_path = directory + "." + module_name
+        module = importlib.import_module(folder_path)  
         if hasattr(module, function_name):
             func_to_run = getattr(module, function_name)
-            #print(
-                #f"==> {func_to_run=}"
-            #)  # modify_args_decorator.<locals>.decorator.<locals>.wrapper
-            # print(f"==> {args=}")  # No args.
             return func_to_run(
                 *args
             )  # Removed **kwargs for simplification in this example
@@ -109,34 +160,28 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
 # ----------------------------------------------------------------------
 
 
+def substitute_args_decorator(arg1, arg2):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Replace the first two arguments
+            print(f"==> substitute_args_decorator: {arg1.shape=}, {arg2.shape=}")
+            args = (arg1, arg2) + args[2:]
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
 def modify_args_decorator(slice_lg=300):
     def decorator(func):
-        # print(f"==> enter decorator: {func=}, {func.__module__=}")
-
+        @wraps(func)
         def wrapper(*args, **kwargs):
-
-            # get the current call stack
             current_stack = inspect.stack()
-            # The first element of the stack is this wrapper function,
-            # so the second element is where this function was called from.
             caller = current_stack[1]  # Get caller information from the stack
-            # print(f"****** Function {func.__name__} called from {caller.filename} at line {caller.lineno}")
-            # print(f"****** Function args: {args}, kwargs: {kwargs}")
 
-            # Get the current module where the function is being called
-            # current_module = inspect.getmodule(inspect.currentframe())
-            # caller_module = inspect.getmodule(inspect.currentframe().f_back)
-            # print(f"Function {func.__name__} called from module: {current_module.__name__}")
-            # print(f"Called by module: {caller_module.__name__}")
-            # END DEBUGING
-
-            # print(f"decorator::wrapper: {func=}, {args=}, {kwargs=}")
-
-            # if len(args) >= 2 and len(args[0]) > slice_lg and len(args[1]) > slice_lg:
             if True:
-                # print(f"==> {func.__name__=}")
-                # print(f"==> {len(args)=}")
-                # print(f"==> {len(kwargs)=}")
                 args = [arg[:slice_lg] if len(arg) > slice_lg else arg for arg in args]
                 kwargs = {
                     k: (
@@ -147,20 +192,7 @@ def modify_args_decorator(slice_lg=300):
                     for k, v in kwargs.items()
                 }
                 modified_args = args
-                # modified_kwargs = kwargs
-                # 1st array is sometimes 1D, sometimes 2D
-                # modified_args = (args[0][:slice_lg], args[1][:slice_lg]) + args[2:]
-
-                # Check if 'c' is in keyword arguments and modify it if it's a list or a numpy array
-                # if "c" in kwargs:
-                #     c_arg = kwargs["c"]
-                #     if (
-                #         isinstance(c_arg, (list, np.ndarray)) and len(c_arg) > slice_lg
-                #     ):  # Ensure 'c' is list or numpy array
-                #         kwargs["c"] = c_arg[:slice_lg]
                 return func(*modified_args, **kwargs)
-
-            # print(f"modify_args_decorator: {func=}, {args=}, {kwargs=}")
             return func(*args, **kwargs)
 
         return wrapper
@@ -187,26 +219,27 @@ def apply_patches(*patches):
             patch_obj.stop()
 
 
-def patch_functions(module_name, function_dict, slice_lg=500):
-    # print("\n\n: ENTER patch_functions")
-    # print(f"===> {module_name=}")
+def patch_functions(module_name, function_dict, arg1=None, arg2=None, slice_lg=None):
+    if slice_lg is None:
+        slice_lg = 200
+
+    # print(f"===> patch_functions, module_name= ", module_name)
     module = importlib.import_module(module_name)
     patches = []
     for func_name, func in function_dict.items():
-        # print(f"===> patch_functions: {func_name=}, {func=}")
         if func is None:
             # If no function object is supplied, get the function from the module
-            # print("==> func is None, module: ", module)
             func = getattr(module, func_name)
-            # print(f"==> {func=}, {func.__module__=}")
         else:
-            # print("==> func is not None")
             # Use the provided function directly
             func = func
 
-        # print(f"==> modify_decorator: {func=}")
-        # print(f"+++==> modify_decorator: {func.__dict__=}")
-        patched_func = modify_args_decorator(slice_lg=slice_lg)(func)
+        # Check if we need to replace the first two arguments
+        if func_name == "spectral" and (arg1 is not None and arg2 is not None):
+            patched_func = substitute_args_decorator(arg1, arg2)(func)
+            print("data is substituted")
+        else:
+            patched_func = modify_args_decorator(slice_lg=slice_lg)(func)
 
         # Check where the function comes from to apply the correct patch
         if func in [plt.scatter, plt.plot]:
@@ -215,7 +248,6 @@ def patch_functions(module_name, function_dict, slice_lg=500):
             patcher = patch("matplotlib.pyplot." + func_name, new=patched_func)
         else:
             # Patch the function assumed to be from the provided module
-            # print(f"===> patcher: {func_name=}, {patched_func=}")
             patcher = patch.object(module, func_name, new=patched_func)
 
         patches.append(patcher)
@@ -224,25 +256,29 @@ def patch_functions(module_name, function_dict, slice_lg=500):
 
 @pytest.fixture(scope="module")
 def run_compute():
-    # def _module(module_name, function_dict, ret, *args, **kwargs):
     def _module(patch_dict, ret, *args, **kwargs):
         # print("\n==> patch_dict: ", patch_dict)
+        # print(f"===> run_compute, {ret=}")
         module_name = patch_dict["module"]
         function_name = patch_dict["function_name"]
         function_dict = patch_dict["patched_functions"]
 
-        # print(
-            # f"Executing in module: {repr(module_name)} function: {repr(function_name)}"
-        # )
+        # Replace first two arguments of spectral by my own data
+        nb_samples = 200
+        data, labels = load_data_labels(nb_slices=nb_samples)
+        # Replace first two args of spectral by my own data. This avoids some randomness
+        patches = patch_functions(
+            module_name, function_dict, arg1=data, arg2=labels, slice_lg=nb_samples
+        )
+        # patches = patch_functions(module_name, function_dict, arg1=None, arg2=None, slice_lg=nb_samples)
 
-        patches = patch_functions(module_name, function_dict)
         with apply_patches(*patches):
             # results = get_module_results(module_name, function_dict.keys()[0], ret, *args, **kwargs)
             # print(f"{list(function_dict.keys())=}")
             # print(f"{list(function_dict.keys())[0]=}")
             #  print(
             #     f"Executing get_module_results with patches active for function: {function_name}"
-            #)
+            # )
             results = get_module_results(
                 module_name, function_name, ret, *args, **kwargs
             )
@@ -257,6 +293,7 @@ def run_compute():
 # Using custom sys path to get module results
 def get_module_results(module_name, function_name, ret="both", *args, **kwargs):
     directories = kwargs.get("student_directory"), kwargs.get("instructor_directory")
+    # print("==> get_module_results:: directories= ", directories)
     results = []
     for directory in directories:
         # print(f"==> get_module_results: {directory=}, {module_name=}, {function_name=}")

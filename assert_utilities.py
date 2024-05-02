@@ -30,6 +30,16 @@ def check_missing_keys(missing_keys, msg_list):
 
 
 # ----------------------------------------------------------------------
+def check_float_range(s_el, frange):
+    mn, mx = frange
+    status = True
+    msg_= ""
+    if s_el <= mn or s_el >= mx:
+        status = False
+        msg_ = f"Value is {s_el} outside the range {frange}."
+    return status, msg_
+
+# ----------------------------------------------------------------------
 def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
@@ -196,9 +206,32 @@ def update_score(ps_dict: dict[str, float | int]) -> None:
     """ """
     ps_dict["partial_frac_score"] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
-
 # ----------------------------------------------------------------------
 
+def check_dict_str_float_range(keys, s_dict, range_val, ps_dict):
+    status = True
+    msg_list = []
+    key = range_val['key']
+    # print(f"==> check_dict_str_float_range, {key=}")
+
+    for k in keys:
+        if k != key:
+            continue
+        s_el = s_dict.get(k, None)
+        if s_el is None:
+            continue
+        status_, msg_ = check_float_range(s_el, (range_val['min'], range_val['max']))
+        # print(f"return from check_float_range, {status_=}")
+        if status_ is False:
+            msg_list.append(msg_)
+            status = False
+            ps_dict["nb_mismatches"] += 1
+
+    # print(f"==> exit check_dict_str_float_range, {msg_list=}")
+    msg = "\n".join(msg_list)
+    # print(f"==> exit check_dict_str_float_range, '\n'.join(msg_list): {msg=}")
+    return status, "\n".join(msg_list)
+# ----------------------------------------------------------------------
 
 def check_dict_str_float(
         keys: list, i_dict: dict[str,float], s_dict: dict[str,float], rel_tol: float, abs_tol: float, ps_dict: dict[str, float | int]
@@ -206,10 +239,12 @@ def check_dict_str_float(
     msg_list = []
     status = True
 
+    print(f"check_dict_float: {rel_tol=}, {abs_tol=}")
+    print(f"check_dict_float: {type(rel_tol)=}, {type(abs_tol)=}")
+
     for k in keys:
         i_el = i_dict.get(k, None)
         s_el = s_dict.get(k, None)
-        print(f".... check_dict_str_float, key {k=}, {i_el=}, {s_el=}")
         if i_el is None or s_el is None:
             continue
         status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=abs_tol)
@@ -333,14 +368,32 @@ def are_sets_equal(set1, set2, rtol=1e-5, atol=1e-6):
 
 
 # ======================================================================
-def check_answer_float(student_answer, instructor_answer, rel_tol, abs_tol):
+def check_answer_float(student_answer, instructor_answer, options): # rel_tol, abs_tol):
     """
     Check answer correctness. Assume the structure is correct.
     """
-    status, msg = check_float(
-        instructor_answer, student_answer, rel_tol=rel_tol, abs_tol=abs_tol
+    # print(f"==> check_answer_float, {options=}")
+    # print(f"==> {student_answer=}, {instructor_answer=}")
+    status = True
+    msg_list = []
+    s_answ = student_answer
+    i_answ = instructor_answer
+    rel_tol = options.get('rel_tol', 1.e-2)
+    abs_tol = options.get('abs_tol', 1.e-6)
+    range_val = options.get('range_validation', None) # read from spectral_yaml
+    status_, msg_ = check_float(
+        i_answ, s_answ, rel_tol=rel_tol, abs_tol=abs_tol
     )
-    return return_value(status, [msg], student_answer, instructor_answer)
+    if status_ is False:
+        msg_list.append(msg_)
+        status = status_
+    elif range_val is not None:
+        status_, msg_ = check_float_range(s_answ, (range_val['min'], range_val['max']))
+        if status_ is False:
+            msg_list.append(msg_)
+            status = status_
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -353,7 +406,7 @@ def check_structure_float(student_answer):
     else:
         status = False
         msg_list = [
-            f"Answer should be of type float. It is of type {repr(type(student_answer).__name__)}"
+            f"Answer should be of type float. It is of type {repr(type(student_answer).__name__)}."
         ]
     return status, "\n".join(msg_list)
 
@@ -472,30 +525,26 @@ def check_structure_dict_str_dict_str_list(student_answer, instructor_answer):
 
 
 # ======================================================================
-def check_dict_str_float_range(range_val, keys, s_answ, ps_dict):
-    status = True
-    msg_list = []
-    return status, "\n".join(msg_list)
-# ======================================================================
 def check_answer_dict_str_dict_str_float(
     student_answer, instructor_answer, rel_tol, dict_float_choices, options, partial_score_frac: list[float]
 ):
     """
     The type is a dict[str, dict[str, list]]
     """
-    print("===> check_answer, options= ", options)
+    #print("===> check_answer_dict_str_dict_str_float, options= ", options)
     range_val = options.get('range_validation', None) # read from spectral_yaml
-    dict_float_choices = options.get('dict_float_choices', None)
-    rel_tol = options.get(rel_tol, rel_tol)  # this will change in the future
-    print(f"==> {rel_tol=}")  # 1.e-10
-    print(f"==> {range_val=}")
+    dict_float_choices = options.get('dict_float_choices', {})
+    rel_tol = options.get('rel_tol', 1.e-2)  # this will change in the future
+    abs_tol = options.get('abs_tol', 1.e-5)
+    #print(f"==> {rel_tol=}") 
+    #print(f"==> {abs_tol=}")  
 
     # Create get_rules, which returns a list of rules. 
     # Ideally, it should return a list of rule functions, 
     #    which take a rule dictionary as an argument. . 
     # rules = get_rules()
 
-    print("==> enter check_answer_dict_str_dict_str_float")
+    # print("==> enter check_answer_dict_str_dict_str_float")
     status = True
     msg_list = []
     ps_dict = init_partial_score_dict()
@@ -530,17 +579,27 @@ def check_answer_dict_str_dict_str_float(
                     break
         else:
             ps_dict['nb_total'] += len(v.keys())
-            status_, msg_list_ = check_dict_str_float_range(
-                range_val, list(v.keys()), v, student_answer[k], ps_dict)
-            )
+            #status_, msg_list_ = check_dict_str_float_range(
+                #range_val, list(v.keys()), v, student_answer[k], ps_dict)
+            #)
             status_, msg_list_ = check_dict_str_float(
-                list(v.keys()), v, student_answer[k], rel_tol, 1.0e-5, ps_dict
+                list(v.keys()), v, student_answer[k], rel_tol, abs_tol, ps_dict
                 #keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
             )
+            if status_ is False:
+                status = status_
+                msg_list.extend(msg_list_)
+            elif range_val is not None:
+                status_, msg_ = check_dict_str_float_range(list(v.keys()), student_answer[k], range_val, ps_dict)
+                # print(f"exit from check list range, {msg_=}")
+                msg_list.append(msg_)
+                if status_ is False:
+                    status = status_
+                    msg_list.extend(msg_list_)
 
-        if status_ is False:
-            status = status_
-            msg_list.extend(msg_list_)
+        #if status_ is False:
+            #status = status_
+            #msg_list.extend(msg_list_)
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
@@ -1009,8 +1068,8 @@ def check_answer_dict_str_float(
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
-    print(f"{instructor_answer=}")
-    print("===> keys: ", keys)
+    # print(f"{instructor_answer=}")
+    # print("===> keys: ", keys)
     ps_dict["nb_total"] = len(keys)
 
     # Need an exception in case the student key is not found
@@ -1053,9 +1112,9 @@ def check_structure_dict_str_float(student_answer, instructor_answer, keys=None)
     rel_tol: tolerance on the matrix norm
     keys: None if all keys should be considered
     """
-    print("\n===> ENTER dict_str_float check structure")
-    print(f"{student_answer=}")
-    print(f"{instructor_answer=}")
+    # print("\n===> ENTER dict_str_float check structure")
+    # print(f"{student_answer=}")
+    # print(f"{instructor_answer=}")
     status = True
     msg_list = []
 
@@ -1069,8 +1128,8 @@ def check_structure_dict_str_float(student_answer, instructor_answer, keys=None)
         instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
         student_keys = set(student_answer.keys())
         missing_keys = list(instructor_keys - student_keys)
-        print("instructor_keys: ", instructor_keys)
-        print("student_keys: ", student_keys)
+        # print("instructor_keys: ", instructor_keys)
+        # print("student_keys: ", student_keys)
 
         if len(missing_keys) > 0:
             msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
@@ -1710,7 +1769,7 @@ def check_answer_list_float(
     if not status:
         msg_list.append("Some elements are incorrect")
 
-    print(f"==> {monotone_increasing=}")
+    # print(f"==> {monotone_increasing=}")
     if monotone_increasing: 
         partial_score_frac[0] = 1.0   #### <<<< ERROR
     else:
@@ -1779,7 +1838,7 @@ def check_answer_list_ndarray(
 
     if answ_eq_len:
         for i, (s_arr, i_arr) in enumerate(zip(student_answer, instructor_answer)):
-            print(f"===> outside if, {i=}, {exclude_indices=}")
+            # print(f"===> outside if, {i=}, {exclude_indices=}")
             if i in exclude_indices:
                 ps_dict["nb_total"] -= 1
                 continue
@@ -1800,7 +1859,7 @@ def check_answer_list_ndarray(
         msg_list.append("Replace the arrays by their norms")
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-    print("return_value, msg_list= ", msg_list)
+    # print("return_value, msg_list= ", msg_list)
     return return_value(status, msg_list, s_norm_list, i_norm_list)
 
 
@@ -1972,10 +2031,10 @@ def check_answer_list_list_float(
     status = True
     msg_list = []
     ps_dict = init_partial_score_dict()
-    print("==> exclude_indices: ", exclude_indices)
+    # print("==> exclude_indices: ", exclude_indices)
 
     for i, (s_lst, i_lst) in enumerate(zip(student_answer, instructor_answer)):
-        print("i= ", i)
+        #print("i= ", i)
         # if exclude_indices != [] and i in exclude_indices:
         if i in exclude_indices:
             continue
@@ -2016,7 +2075,7 @@ def check_structure_list_list_float(student_answer, instructor_answer):
             continue
 
         for j, el in enumerate(s_list):
-            print("j, el= ", j, el)
+            #print("j, el= ", j, el)
             if not isinstance(float(el), float):
                 msg_list.append(
                     f"- answer[{i}][{j}] cannot be cast to a float. All elements must be castable to float."
@@ -2458,8 +2517,24 @@ def check_answer_lineplot(student_answer, instructor_answer, rel_tol):
     status = True
     msg_list = []
 
-    s_plt = s_answ = student_answer[0]
-    i_plt = i_answ = instructor_answer[0]
+    def check_grid_status(ax):
+        # Check visibility of grid lines
+        # Get a list of booleans indicating the visibility status of each gridline
+        xgrid_visible = any([line.get_visible() for line in ax.xaxis.get_gridlines()])
+        ygrid_visible = any([line.get_visible() for line in ax.yaxis.get_gridlines()])
+        
+        # If any of the grid lines are visible, we consider the grid "on"
+        return xgrid_visible and ygrid_visible
+
+    if isinstance(student_answer, list):
+        s_plt = s_answ = student_answer[0]
+    else:
+        s_plt = s_answ = student_answer
+
+    if isinstance(instructor_answer, list):
+        i_plt = i_answ = instructor_answer[0]
+    else:
+        i_plt = i_answ = instructor_answer[0]
 
     s_fig = s_plt.figure
     i_fig = i_plt.figure
@@ -2467,19 +2542,20 @@ def check_answer_lineplot(student_answer, instructor_answer, rel_tol):
     def fig_dict(answ):
         fig = answ.figure
         ax = fig.axes[0]
-        coll = ax.collections[0]
-        xy = ax.collections[0].get_offsets()
+        xy = answ.get_data()
         path_collection = answ
-        face_colors = path_collection.get_facecolor() # RGBA
-        s_face_colors_readable = [mcolors.to_hex(c) for c in face_colors]
+        line_color = answ.get_color()
+        sym_color = answ.get_markerfacecolor()
+        # print(f"==> {line_color=}, {sym_color=}")
         s_dict = {
             'ax': ax,
             'title': ax.get_title(),
             'xlabel': ax.get_xlabel(),
             'ylabel': ax.get_ylabel(),
-            'x': xy[:, 0],
-            'y': xy[:, 1],
-            'colors': np.unique(s_face_colors_readable)
+            'x': xy[0],
+            'y': xy[1],
+            'line_color': line_color,
+            'sym_color': sym_color
         }
         return s_dict
 
@@ -2489,21 +2565,15 @@ def check_answer_lineplot(student_answer, instructor_answer, rel_tol):
     s_grid = check_grid_status(s_dict['ax'])
     i_grid = check_grid_status(s_dict['ax'])
 
-    title = plot.get_text()
-    x_label = plot.gca().get_xlabel()
-    y_label = plot.gca().get_ylabel()
-    print("====> title: ", title)
-    print("x_label: ", x_label)
-    print("y_label: ", y_label)
+    title = s_dict['title']
+    x_label = s_dict['xlabel']
+    y_label = s_dict['ylabel']
 
-    for i, line in enumerate(lines):
-        xdata = line.get_xdata()
-        ydata = line.get_ydata()
-        print(f"Line {i+1}:")
-        print("X-data:", xdata)
-        print("Y-data:", ydata)
-
-
+    # print(f"==> {i_dict['xlabel']=}, {s_dict['xlabel']=}")
+    # print(f"==> {i_dict['ylabel']=}, {s_dict['ylabel']=}")
+    # print(f"==> {i_dict['title']=}, {s_dict['title']=}")
+    # print(f"==> {i_grid=}, {s_grid=}")
+    # print(f"==> {len(i_dict['x'])=}, {len(s_dict['x'])=}")
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -2571,7 +2641,7 @@ def check_structure_lineplot(student_answer):
         msg_list.append("Missing x- and/or y-label")
         status = False
 
-    print("\n===> Return from 2D line plot structural check")
+    # print("\n===> Return from 2D line plot structural check")
     return status, "\n".join(msg_list)
 
 
@@ -2628,7 +2698,7 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol):
     s_grid = check_grid_status(s_dict['ax'])
     i_grid = check_grid_status(s_dict['ax'])
 
-    print(f"{s_grid=}, {i_grid=}")
+    # print(f"{s_grid=}, {i_grid=}")
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -2692,7 +2762,7 @@ def check_answer_scatterplot3d(student_answer, instructor_answer, rel_tol):
     status, msg = check_float(sum_i, sum_s, rel_tol=rel_tol, abs_tol=1.e-5)
     msg_list.append(msg)
 
-    return return_value(status, msg_list, student_answer, instructor_answer)
+    return return_value(status, msg_list, s_answ, i_answ)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
