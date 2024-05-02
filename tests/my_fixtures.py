@@ -131,14 +131,8 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
     """
 
     with temporary_directory_change(directory):
-        # print(f"==> new CWD: {os.getcwd()=}")
-        # print(f"==> load_and_run_module: {module_name=}, {function_name=}")
-
         module_path = inspect.getfile(sys.modules[module_name])
         folder = os.path.dirname(module_path)
-        # print(f"==> load_and_run_module: {folder=}")
-        # print(f"==> {directory=}")
-        # print(f"==> {sys.path=}")
 
         # folder_path = ".." + directory + "." + module_name
         ## Make sure that directory does not have any "/" or "./". 
@@ -153,8 +147,6 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
             )  # Removed **kwargs for simplification in this example
         else:
             raise AttributeError(f"{function_name} not found in {module_name}")
-    # print(f"==> after with temporary, CWD: {os.getcwd()=}")
-    # return result
 
 
 # ----------------------------------------------------------------------
@@ -210,12 +202,12 @@ def apply_patches(*patches):
     patched_objects = []
     try:
         for patch_obj in patches:
-            # print(f"... starting patch: {patch_obj}")
+            print(f"... starting patch: {patch_obj}")
             patched_objects.append(patch_obj.start())
         yield patched_objects
     finally:
         for patch_obj in patches:
-            # print(f"... stopping patch: {patch_obj}")
+            print(f"... stopping patch: {patch_obj}")
             patch_obj.stop()
 
 
@@ -236,8 +228,9 @@ def patch_functions(module_name, function_dict, arg1=None, arg2=None, slice_lg=N
 
         # Check if we need to replace the first two arguments
         if func_name == "spectral" and (arg1 is not None and arg2 is not None):
+            print(f"===> {arg1.shape=}, {arg2.shape=}")
             patched_func = substitute_args_decorator(arg1, arg2)(func)
-            print("data is substituted")
+            print("data is substituted")  # why isn't patch applied?
         else:
             patched_func = modify_args_decorator(slice_lg=slice_lg)(func)
 
@@ -257,28 +250,24 @@ def patch_functions(module_name, function_dict, arg1=None, arg2=None, slice_lg=N
 @pytest.fixture(scope="module")
 def run_compute():
     def _module(patch_dict, ret, *args, **kwargs):
-        # print("\n==> patch_dict: ", patch_dict)
-        # print(f"===> run_compute, {ret=}")
         module_name = patch_dict["module"]
         function_name = patch_dict["function_name"]
         function_dict = patch_dict["patched_functions"]
 
         # Replace first two arguments of spectral by my own data
         nb_samples = 200
+
+        ### My patches are not applied. WHY? 
+
         data, labels = load_data_labels(nb_slices=nb_samples)
-        # Replace first two args of spectral by my own data. This avoids some randomness
+        # Replace first two args of spectral by my own data. This avoids some randomness.
+
         patches = patch_functions(
             module_name, function_dict, arg1=data, arg2=labels, slice_lg=nb_samples
         )
-        # patches = patch_functions(module_name, function_dict, arg1=None, arg2=None, slice_lg=nb_samples)
+        # patches = patch_functions(module_name, function_dict, arg1=None, arg2=None, slice_lg=nb_samples.)
 
         with apply_patches(*patches):
-            # results = get_module_results(module_name, function_dict.keys()[0], ret, *args, **kwargs)
-            # print(f"{list(function_dict.keys())=}")
-            # print(f"{list(function_dict.keys())[0]=}")
-            #  print(
-            #     f"Executing get_module_results with patches active for function: {function_name}"
-            # )
             results = get_module_results(
                 module_name, function_name, ret, *args, **kwargs
             )
@@ -293,10 +282,8 @@ def run_compute():
 # Using custom sys path to get module results
 def get_module_results(module_name, function_name, ret="both", *args, **kwargs):
     directories = kwargs.get("student_directory"), kwargs.get("instructor_directory")
-    # print("==> get_module_results:: directories= ", directories)
     results = []
     for directory in directories:
-        # print(f"==> get_module_results: {directory=}, {module_name=}, {function_name=}")
         result = with_custom_sys_path(
             directory,
             load_and_run_module,
