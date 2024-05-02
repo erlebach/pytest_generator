@@ -193,3 +193,7 @@ to compare std.
 ----------------------------------------------------------------------
 2024-04-20_16:20
 - ERROR: in spectral: there is no xi variable. Only sigma. 
+----------------------------------------------------------------------
+2024-05-02
+- New branch "validations": work on validation of ARI in assert_utililities
+

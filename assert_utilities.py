@@ -472,13 +472,30 @@ def check_structure_dict_str_dict_str_list(student_answer, instructor_answer):
 
 
 # ======================================================================
+def check_dict_str_float_range(range_val, keys, s_answ, ps_dict):
+    status = True
+    msg_list = []
+    return status, "\n".join(msg_list)
+# ======================================================================
 def check_answer_dict_str_dict_str_float(
-    student_answer, instructor_answer, rel_tol, dict_float_choices, validations, partial_score_frac: list[float]
+    student_answer, instructor_answer, rel_tol, dict_float_choices, options, partial_score_frac: list[float]
 ):
     """
     The type is a dict[str, dict[str, list]]
     """
-    print("==> enter check_answer_dict_str_dicdt_str_float")
+    print("===> check_answer, options= ", options)
+    range_val = options.get('range_validation', None) # read from spectral_yaml
+    dict_float_choices = options.get('dict_float_choices', None)
+    rel_tol = options.get(rel_tol, rel_tol)  # this will change in the future
+    print(f"==> {rel_tol=}")  # 1.e-10
+    print(f"==> {range_val=}")
+
+    # Create get_rules, which returns a list of rules. 
+    # Ideally, it should return a list of rule functions, 
+    #    which take a rule dictionary as an argument. . 
+    # rules = get_rules()
+
+    print("==> enter check_answer_dict_str_dict_str_float")
     status = True
     msg_list = []
     ps_dict = init_partial_score_dict()
@@ -507,12 +524,15 @@ def check_answer_dict_str_dict_str_float(
                     keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
                 )
                 if status_ is True:
-                    msg_list_.append(f"Student answer {student_answer[k]} is within rel error of {rel_tol*100}%% of one of the accepted answers ({val})")
+                    msg_list_.append(f"Student answer {student_answer[k]} is ")
+                    msg_list_.append("within rel error of {rel_tol*100}%% of ")
+                    msg_list_.append("one of the accepted answers ({val})")
                     break
         else:
             ps_dict['nb_total'] += len(v.keys())
-            print("===> keys: ", keys,   ",  k= ", k)  # keys: [0,1,..., 10], k=0, 1, 2
-            print("===> v.keys: ", list(v.keys()))
+            status_, msg_list_ = check_dict_str_float_range(
+                range_val, list(v.keys()), v, student_answer[k], ps_dict)
+            )
             status_, msg_list_ = check_dict_str_float(
                 list(v.keys()), v, student_answer[k], rel_tol, 1.0e-5, ps_dict
                 #keys, v, student_answer[k], rel_tol, 1.0e-5, ps_dict
@@ -522,9 +542,7 @@ def check_answer_dict_str_dict_str_float(
             status = status_
             msg_list.extend(msg_list_)
 
-    print(f".... {ps_dict=}")
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-    print("==> exit check_answer_dict_str_dict_str_float")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 

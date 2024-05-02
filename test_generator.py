@@ -4,13 +4,23 @@ import yaml
 import pytest
 import argparse
 from types_list import types_list
-from generator_utils import sanitize_function_name
-from generator_utils import get_decoded_str
-from generator_utils import evaluate_answers
+from generator_utils import sanitize_function_name, get_decoded_str, evaluate_answers
+
+def add_attribute(name, attr):
+    if attr is not None:
+        test_code = f"    {name} = {attr}\n"
+        test_code += f"    local_namespace['{name}'] = {name}\n"
+    else:
+        test_code = ""
+    return test_code
+
+def apply_options(defaults: dict, overrides: dict) -> dict:
+    result = defaults.copy()  # Start with the defaults
+    result.update(overrides)  # Apply overrides
+    return result
 
 with open("type_handlers.yaml") as f:
     type_handlers = yaml.safe_load(f)
-
 
 def load_yaml_file(file_path):
     with open(file_path, "r") as file:
@@ -34,7 +44,7 @@ def create_config_dict():
     option_defaults = config.get("option_defaults", {})
     types = config.get("types", {})
     config_dict = {}
-    answer_type = config.get("all_tests").get("type", "float")
+    config_dict['answer_type'] = config.get("all_tests").get("type", "float")
     config_dict["rel_tol"] = (
         config.get("types", {}).get("float", {}).get("rel_tol", 0.01)
     )
@@ -78,12 +88,9 @@ def create_config_dict():
     config_dict["s_answer_source"] = config.get("all_tests").get(
         "student_answer", "student_file"
     )
-    return config_dict
+    return config, config_dict
 
-config_dict = create_config_dict()
-
-# print("config= ", config)
-print("config_dict= ", config_dict)
+config, config_dict = create_config_dict()
 
 # student_folder_name: student_code_with_answers
 # instructor_folder_name: instructor_code_with_answers
@@ -112,6 +119,7 @@ with open('type_handlers.yaml', 'r') as f:
     type_handlers = yaml.safe_load(f)
 """
 
+# ----------------------------------------------------------------------
 
 def generate_test_answers_code(questions_data, sim_type, output_file="test_answers.py"):
     global rel_tol, abs_tol, exclude_indices, include_indices
@@ -193,6 +201,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             fixture_args = fixture["args"]  # list of strings
 
         for part in question["parts"]:
+            options = part.get('options', {})
+            answer_type = config_dict['answer_type']
             part_type = part.get("type", answer_type)
             # I will need all fields in lower-level function
             part["type"] = part_type
@@ -292,7 +302,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 dict_float_choices = part.get(
                     "dict_float_choices", config_dict["dict_float_choices"]
                 )
-                validations = part.get("validations", None)
                 monotone_increasing = part.get(
                     "monotone_increasing", config_dict["monotone_increasing"]
                 )
@@ -324,17 +333,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += f"    rel_tol = {rel_tol}\n"
                 test_code += f"    abs_tol = {abs_tol}\n"
 
-                if monotone_increasing is not None:
-                    test_code += f"    monotone_increasing = {monotone_increasing}\n"
-                    test_code += f"    local_namespace['monotone_increasing'] = monotone_increasing\n"
-    
-                if validations is not None:
-                    test_code += f"    validations = {validations}\n"
-                    test_code += f"    local_namespace['validations'] = validations\n"
-
-                if str_choices is not None:
-                    test_code += f"    str_choices = {str_choices}\n"
-                    test_code += f"    local_namespace['str_choices'] = str_choices\n"
+                test_code += add_attribute("options", options)
+                test_code += add_attribute("str_choices", str_choices)
+                test_code += add_attribute("monotone_increasing", monotone_increasing)
 
                 if part_type in ["dict[str,float]", "dict[str,dict[str,float]]"]:
                     test_code += f"    dict_float_choices = {dict_float_choices}\n"
@@ -371,21 +372,13 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'keys':keys})\n"
 
                 local_vars_dict = part.get("locals", None)
-                if local_vars_dict:
-                    # if 'locals' in part:
-                    test_code += f"    local_vars_dict = {local_vars_dict}\n"
-                    test_code += (
-                        "    local_namespace['local_vars_dict'] = local_vars_dict\n"
-                    )
+                test_code += add_attribute("local_vars_dict", local_vars_dict)
 
                 # One of a finite number of choices for string type
                 choices = part.get("choices", [])
                 if choices == [] and (type == "string" or type == "str"):
                     choices = []
-
-                if choices is not None:
-                    test_code += f"    choices = {choices}\n"
-                    test_code += "    local_namespace['choices'] = choices\n"
+                test_code += add_attribute("choices", choices)
 
                 note = part.get("note", None)
                 if sim_type == "answers" and note is not None:
@@ -447,12 +440,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
         file.write(test_code)
 
 
-# Usage example:
-# questions_data = load_yaml_file('path_to_questions_answers.yaml')
-# generate_test_answers_code(questions_data)
-
-
-# NEW
+# ----------------------------------------------------------------------
 def main(yaml_name, sim_type):
     """
     sim_type = ['answers', 'structure']
