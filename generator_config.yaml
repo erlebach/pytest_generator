@@ -234,5 +234,6 @@ option_defaults:
   - str_choices: []
   - dict_float_choices: {}
   - remove_spaces: False
+  - is_probability: False
 
 

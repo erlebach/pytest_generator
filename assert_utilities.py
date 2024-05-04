@@ -39,6 +39,7 @@ def check_float_range(s_el, frange):
         msg_ = f"Value is {s_el} outside the range {frange}."
     return status, msg_
 
+
 # ----------------------------------------------------------------------
 def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
     status = True
@@ -69,6 +70,46 @@ def check_int(i_el, s_el):
 
 # ----------------------------------------------------------------------
 
+def check_list_float_monotone_increasing(s_arr):
+    """ Check that the list is monotonically increasing """
+    status = True
+    msg = ""
+    if isinstance(s_arr, list):
+        s_arr = np.array(s_arr)
+    el = s_arr[0]
+    for a in s_arr[1:]:
+        if a < el:
+            status = False
+            msg = "The list of floats must be non-decreasing."
+            break
+        el = a
+    return status, msg
+
+def check_list_float_monotone_decreasing(s_arr):
+    """ Check that the list is monotonically increasing """
+    status = True
+    msg = ""
+    if isinstance(s_arr, list):
+        s_arr = np.array(s_arr)
+    el = s_arr[0]
+    for a in s_arr[1:]:
+        if a > el:
+            status = False
+            msg = "The list of floats must be non-increasing."
+            break
+        el = a
+    return status, msg
+
+def check_list_float_is_probability(s_arr, rel_tol, abs_tol):
+    """ Check that the list is a probability"""
+    if isinstance(s_arr, list):
+        s_arr = np.array(s_arr)
+    ssum = np.sum(s_arr)
+    status, msg, check_float(1., ssum, rel_tol=rel_tol, abs_tol=abs_tol)
+    if status is False:
+        msg += "\nThe list of float is not a probability (does not sum to 1 to "
+        msg += "within a relative error of {100*rel_tol}%.)."
+    return status, msg
 
 def check_list_float(i_arr, s_arr, rel_tol, abs_tol, ps_dict: dict[str, float | int], exclude_indices: list[int]=[]):
     """
@@ -168,6 +209,9 @@ def check_str(i_str, s_str, str_choices: list[str] | None =None, remove_spaces: 
 
 # ----------------------------------------------------------------------
 def check_list_str(i_list, s_list, ps_dict: dict[str, float | int]):
+    """ 
+    Check for string equality 
+    """
     msg_list = []
     status = True
     ps_dict["nb_total"] += len(i_list)

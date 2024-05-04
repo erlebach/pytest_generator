@@ -22,6 +22,9 @@ templates:
     code_snippet: {}
     error_message: "{key} value should be between {min} and {max}."
 
+  monotone_increasing: False
+  monotone_decreasing: False
+
   rel_tol: "{perc}"
   abs_tol: "{perc}"
 

@@ -135,11 +135,11 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
         folder = os.path.dirname(module_path)
 
         # folder_path = ".." + directory + "." + module_name
-        ## Make sure that directory does not have any "/" or "./". 
+        ## Make sure that directory does not have any "/" or "./".
         ## Make sure that both tests/ and tests/.. have an __init__.py
         ## Any folder with a __init__.py is a package
         folder_path = directory + "." + module_name
-        module = importlib.import_module(folder_path)  
+        module = importlib.import_module(folder_path)
         if hasattr(module, function_name):
             func_to_run = getattr(module, function_name)
             return func_to_run(
@@ -257,7 +257,7 @@ def run_compute():
         # Replace first two arguments of spectral by my own data
         nb_samples = 200
 
-        ### My patches are not applied. WHY? 
+        ### My patches are not applied. WHY?
 
         data, labels = load_data_labels(nb_slices=nb_samples)
         # Replace first two args of spectral by my own data. This avoids some randomness.
