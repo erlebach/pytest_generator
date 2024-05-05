@@ -3,23 +3,30 @@
 import sys
 import os
 import inspect
+from pathlib import Path
+from contextlib import contextmanager
+
 import pytest
-import functools
-from functools import wraps
 import numpy as np
 import matplotlib.pyplot as plt
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+from functools import wraps
+from unittest.mock import patch
 import importlib
-from importlib import reload
-
-### WHAT IS THIS?
-from contextlib import contextmanager
-import os
-import sys
 
 # Don't I have to import this in the patching software?
 # import spectral_clustering
+
+
+### NEW
+def load_data_labels(data_filename, labels_filename, nb_slices):
+    base_path = Path(__file__).parent
+    data_file_path = base_path / data_filename
+    labels_file_path = base_path / labels_filename
+
+    data = np.load(data_file_path)[:nb_slices]
+    labels = np.load(labels_file_path)[:nb_slices]
+    return data, labels
+
 
 
 # @pytest.fixture
@@ -39,17 +46,6 @@ def load_data_labels(nb_slices: int):
     data = np.load(data_file_path)[:nb_slices]
     labels = np.load(labels_file_path)[:nb_slices]
     return data, labels
-
-
-# ----------------------------------------------------------------------
-
-
-def data_decorator(f):
-    # @wraps(f)
-    def wrapper(*args, **kwargs):
-        return f(*args, **kwargs)
-
-    return wrapper
 
 
 # ----------------------------------------------------------------------
@@ -85,7 +81,6 @@ def with_custom_sys_path(path, func, *args, **kwargs):
     :param kwargs: Keyword arguments to pass to the function
     """
     original_sys_path = list(sys.path)
-    print(f"==> enter with_custom_sys_path, {len(args)=}")  # 3
     try:
         sys.path.insert(0, path)
 
@@ -93,7 +88,6 @@ def with_custom_sys_path(path, func, *args, **kwargs):
         # module_path = inspect.getfile(func.__module__)
         module_path = inspect.getfile(sys.modules[func.__module__])
         folder = os.path.dirname(module_path)
-        print("=== func= ", func)
         return func(*args, **kwargs)
     finally:
         sys.path = original_sys_path
@@ -125,19 +119,10 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
     :param directory: Directory from which to load the module
     :return: The result of the module's `compute` function
     """
-    print("\n\n==> load_and_run_module, directory: ", directory)
-
-    print("==> enter load_and_run_module, len(args): ", len(args))
 
     with temporary_directory_change(directory):
-        # module = sys.modules["student_MWE." + module_name]
-        #module = importlib.import_module("student_MWE." + module_name)
-        print(f"===> load_and_module, import: {directory + '.' + module_name=}")
-        print(f"===> load_and_module, {function_name=}")
         module = importlib.import_module(directory + "." + module_name)
-        print(f"===> load_and_module after import, {module=}")
         module_path = inspect.getfile(module)
-        # module_path = inspect.getfile(sys.modules["student_code_with_answers." + module_name])
         folder = os.path.dirname(module_path)
 
         # folder_path = ".." + directory + "." + module_name
@@ -149,7 +134,6 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
         module = importlib.import_module(folder_path)
         if hasattr(module, function_name):
             func_to_run = getattr(module, function_name)
-            print("-==> load_and_run_module, nb_args: ", len(args))
             return func_to_run(
                 *args
             )  # Removed **kwargs for simplification in this example
@@ -162,7 +146,7 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
 
 def substitute_args_decorator(arg1, arg2):
     def decorator(func):
-        # @wraps(func)
+        @wraps(func)
         def wrapper(*args, **kwargs):
             # Replace the first two arguments
             args = (arg1, arg2) + args[2:]
@@ -172,12 +156,10 @@ def substitute_args_decorator(arg1, arg2):
 
     return decorator
 
-def modify_args_using_shape(args, kwargs, slice_lg=300):
+def modify_args_using_slice(args, kwargs, slice_lg=300):
     modified_args = []
     for arg in args:
         if isinstance(arg, np.ndarray) and arg.shape[0] > slice_lg:
-            #new_shape = (slice_lg,) + arg.shape[1:]  # Create a new shape that keeps other dimensions intact
-            #arg.resize(new_shape, refcheck=False)  # Resize in place, modifying the original array
             modified_args.append(arg[0:slice_lg])
         else:
             modified_args.append(arg)
@@ -185,8 +167,6 @@ def modify_args_using_shape(args, kwargs, slice_lg=300):
     modified_kwargs = {}
     for k, v in kwargs.items():
         if isinstance(v, np.ndarray) and v.shape[0] > slice_lg:
-            #new_shape = (slice_lg,) + v.shape[1:]  # Same as above for kwargs
-            #v.resize(new_shape, refcheck=False)
             modified_kwargs[k] = v[0:slice_lg]
         else:
             modified_kwargs[k] = v
@@ -196,42 +176,15 @@ def modify_args_using_shape(args, kwargs, slice_lg=300):
 
 def modify_args_decorator(slice_lg=300):
     def decorator(func):
-        # @wraps(func)
+        @wraps(func)
         def wrapper(*args, **kwargs):
             """
             Once the decorated function is called, the arguments revert to their original size
             """
-            # current_stack = inspect.stack()
-            # caller = current_stack[1]  # Get caller information from the stack
-
-            modified_args, modified_kwargs = modify_args_using_shape(args, kwargs, slice_lg=slice_lg)
+            modified_args, modified_kwargs = modify_args_using_slice(args, kwargs, slice_lg=slice_lg)
 
             return func(*modified_args, **modified_kwargs)
 
-            """
-            if False:
-                args = [
-                    (
-                        arg[:slice_lg]
-                        if isinstance(arg, np.ndarray) and len(arg) > slice_lg
-                        else arg
-                    )
-                    for arg in args
-                ]
-                kwargs = {
-                    k: (
-                        v[:slice_lg]
-                        if isinstance(v, np.ndarray) and len(v) > slice_lg
-                        else v
-                    )
-                    for k, v in kwargs.items()
-                }
-                return func(*args, **kwargs)
-
-            return func(*args, **kwargs)
-            """
-
-        print("before return wrapper")
         return wrapper
 
     return decorator
@@ -248,12 +201,10 @@ def apply_patches(*patches):
     try:
         for patch_obj in patches:
             patched_objects.append(patch_obj.start())
-            print("... start")
         yield patched_objects
     finally:
         for patch_obj in patches:
             patch_obj.stop()
-            print("... stop")
 
 
 def patch_functions(directory, module_name, function_dict, arg1=None, arg2=None, slice_lg=None):
@@ -261,24 +212,14 @@ def patch_functions(directory, module_name, function_dict, arg1=None, arg2=None,
         slice_lg = 200
 
     # module = importlib.import_module("student_code_with_answers." + module_name)  # NEW
-    print(f"\n===> patch_functions: {module_name=}")
-    print(f"\n===> patch_functions: {function_dict=}")
-    print(f"\n===> patch_functions: {directory=}")
-    #module = sys.modules[module_name]
-    #print("==> patch_functions: module= ", module)
-    # module = importlib.import_module("student_MWE." + module_name)  # NEED THE FOLDER
     module = importlib.import_module(directory + "." + module_name)  # NEED THE FOLDER
-    print(f"\n===> patch_function: {module=}")
     patches = []
 
     for func_name, provided_func in function_dict.items():
         # Use the provided function directly or fetch from module if None
-        print("patch_functions: func_name= ", func_name)
-        print("patch_functions: provided_func= ", provided_func)
         func = (
             provided_func if provided_func is not None else getattr(module, func_name)
         )
-        print("patch_functions: func= ", func)
 
         # Decide which decorator to apply based on whether specific arguments are provided
         # if func_name == 'spectral':
@@ -288,7 +229,6 @@ def patch_functions(directory, module_name, function_dict, arg1=None, arg2=None,
                 patched_func = substitute_args_decorator(arg1, arg2)(func)
             else:
                 # Apply modify_args_decorator for other cases or when slice_lg is specified
-                print(f"modify_args_decorator: {func=}")
                 patched_func = modify_args_decorator(slice_lg=slice_lg)(func)
 
         # Determine the patching strategy based on function origin (matplotlib or custom module)
@@ -311,7 +251,6 @@ def run_compute():
         function_dict = patch_dict["patched_functions"]
 
         directories = kwargs.get("student_directory"), kwargs.get("instructor_directory")
-        print(f"run_compute: {directories=}")
 
         if ret == 's':
             directory = directories[0]
@@ -319,7 +258,8 @@ def run_compute():
             directory = directories[1]
         else:
             print("Only ret='i' or 's' implemented")
-            raise "Not implemented error"
+            raise NotImplementedError("Only 'i' or 's' implemented")
+
 
         # Replace first two arguments of spectral by my own data
         nb_samples = 200
@@ -336,7 +276,6 @@ def run_compute():
         # patches = patch_functions(module_name, function_dict, arg1=data, arg2=labels, slice_lg=nb_samples)
 
         with apply_patches(*patches):
-            # reload("student_code_with_answers.spectral_clustering") # <<< NEW, 2024-05-04
             results = get_module_results(
                 # High level function (typically the question in a student assignment)
                 module_name,
@@ -356,7 +295,6 @@ def run_compute():
 # Using custom sys path to get module results
 def get_module_results(module_name, function_name, ret="both", *args, **kwargs):
     directories = kwargs.get("student_directory"), kwargs.get("instructor_directory")
-    print(f"get_module_results: {directories=}")
     results = []
     if ret == 's':
         results = with_custom_sys_path(
@@ -381,24 +319,9 @@ def get_module_results(module_name, function_name, ret="both", *args, **kwargs):
 
     else:
         print("return not handled: 'both'")
-        raise "FAIL"
+        raise NotImplementedError("Only 'i' or 's' implemented")
     
     return results
-
-    """
-    for directory in directories:
-        result = with_custom_sys_path(
-            directory,
-            load_and_run_module,
-            module_name,
-            directory,
-            function_name,
-            *args,
-            **kwargs,
-        )
-        results.append(result)
-    return results if ret == "both" else results[0] if ret == "s" else results[1]
-    """
 
 
 # ----------------------------------------------------------------------
