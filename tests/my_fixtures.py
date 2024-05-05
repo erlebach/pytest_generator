@@ -3,6 +3,7 @@
 import sys
 import os
 import inspect
+import functools
 from pathlib import Path
 from contextlib import contextmanager
 
