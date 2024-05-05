@@ -1784,7 +1784,7 @@ def check_structure_list_int(student_answer, instructor_answer):
 
 # ======================================================================
 def check_answer_list_float(
-        student_answer, instructor_answer, rel_tol, exclude_indices: list[int], monotone_increasing=None, partial_score_frac: list[float]=0.
+        student_answer, instructor_answer, options, rel_tol, exclude_indices: list[int], monotone_increasing=None, partial_score_frac: list[float]=0.
 ):
     """
     Check that all elements in the list have matching norms

@@ -28,6 +28,12 @@ types:
     assert_structure: "assert_utilities.check_structure_set_set_int(student_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
+  list[float]:
+    import: "" 
+    # monotone 
+    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, options, rel_tol, exclude_indices, monotone_increasing, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_list_float(student_answer, instructor_answer)"
+
   list[list[float]]:
     import: ""
     # Fix for structure
@@ -38,12 +44,6 @@ types:
     import: ""
     assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, exclude_indices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_ndarray(student_answer, instructor_answer)"
-
-  list[float]:
-    import: "" 
-    # monotone 
-    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, rel_tol, exclude_indices, monotone_increasing, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_list_float(student_answer, instructor_answer)"
 
   list[int]:
     import: "" 

@@ -24,6 +24,7 @@ templates:
 
   monotone_increasing: False
   monotone_decreasing: False
+  is_probability: False
 
   rel_tol: "{perc}"
   abs_tol: "{perc}"

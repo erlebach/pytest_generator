@@ -11,6 +11,7 @@ all_tests:
   # Folders are relative to the base project folder. 
   # Do not include slashes!
   student_folder_name: student_code_with_answers
+  # student_folder_name: student_MWE
   # student_folder_name: deevesh
   # student_folder_name: anand
   instructor_folder_name: instructor_code_with_answers
