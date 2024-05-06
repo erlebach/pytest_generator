@@ -13,7 +13,7 @@ all_tests:
   student_folder_name: student_code_with_answers
   # student_folder_name: student_MWE
   # student_folder_name: deevesh
-  student_folder_name: anand
+  # student_folder_name: anand
   instructor_folder_name: instructor_code_with_answers
 
   fixtures: 
