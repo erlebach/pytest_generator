@@ -37,6 +37,7 @@ templates:
   exclude_indices: []
   include_indices: []
   str_choices: []
+  outer_key_choices: []
   dict_float_choices: {}
   remove_spaces: False
 

@@ -45,36 +45,36 @@ def create_config_dict():
     types = config.get("types", {})
     config_dict = {}
     config_dict['answer_type'] = config.get("all_tests").get("type", "float")
-    config_dict["rel_tol"] = (
-        config.get("types", {}).get("float", {}).get("rel_tol", 0.01)
-    )
-    config_dict["abs_tol"] = (
-        config.get("types", {}).get("float", {}).get("abs_tol", 0.01)
-    )
-    str_choices = config.get("test_answers", {}).get("str_choices", [])
-    config_dict["str_choices"] = config.get("types", {}).get("str_choices", [])
-    config_dict["dict_float_choices"] = config.get("types", {}).get(
-        "dict_float_choices", {}
-    )
+    # config_dict["rel_tol"] = (
+        # config.get("types", {}).get("float", {}).get("rel_tol", 0.01)
+    # )
+    # config_dict["abs_tol"] = (
+        # config.get("types", {}).get("float", {}).get("abs_tol", 0.01)
+    # )
+    # str_choices = config.get("test_answers", {}).get("str_choices", [])
+    # config_dict["str_choices"] = config.get("types", {}).get("str_choices", [])
+    #config_dict["dict_float_choices"] = config.get("types", {}).get(
+        #"dict_float_choices", {}
+    #)
     config_dict["partial_score_frac"] = config.get("all_tests", {}).get(
         "partial_score_frac", {}
     )
-    print(f"{config_dict['partial_score_frac']=}")
+    # print(f"{config_dict['partial_score_frac']=}")
 
-    config_dict["remove_spaces"] = config_dict.get("option_defaults", {}).get(
-        "remove_spaces", False
-    )
-    config_dict["monotone_increasing"] = config_dict.get("monotone_increasing", {}).get(
-        "monotone_increasing", False
-    )
+    # config_dict["remove_spaces"] = config_dict.get("option_defaults", {}).get(
+        # "remove_spaces", False
+    # )
+    # config_dict["monotone_increasing"] = config_dict.get("monotone_increasing", {}).get(
+        # "monotone_increasing", False
+    # )
 
-    config_dict["exclude_indices"] = (
-        config.get("types", {}).get("list[string]", {}).get("exclude_indices", [])
-    )
-    config_dict["include_indices"] = (
-        config.get("types", {}).get("list[string]", {}).get("include_indices", [])
-    )
-    config_dict["outer_key_choices"] = []  # default
+    # config_dict["exclude_indices"] = (
+        # config.get("types", {}).get("list[string]", {}).get("exclude_indices", [])
+    # )
+    # config_dict["include_indices"] = (
+        # config.get("types", {}).get("list[string]", {}).get("include_indices", [])
+    # )
+    # config_dict["outer_key_choices"] = []  # default
 
     config_dict["student_folder_name"] = config.get("all_tests").get(
         "student_folder_name", "student_code_with_answers"
@@ -111,6 +111,7 @@ from {fixture_import_file} import *
 from function_dictionaries import *
 #import {fixture_import_file}
 import numpy as np
+from pytest_utilities import get_current_function
 import yaml
 # pytest might change the python path. Make sure to import it last. 
 # import pytest
@@ -122,8 +123,8 @@ with open('type_handlers.yaml', 'r') as f:
 # ----------------------------------------------------------------------
 
 def generate_test_answers_code(questions_data, sim_type, output_file="test_answers.py"):
-    global rel_tol, abs_tol, exclude_indices, include_indices
-    global str_choices, dict_float_choices
+    # global rel_tol, abs_tol, exclude_indices, include_indices
+    # global str_choices, dict_float_choices
 
     # Fill in data from configuration file from the 'all_tests' section
     """
@@ -296,59 +297,59 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += "    local_namespace = {}\n"
 
                 import_file = f"type_handlers['types']['{part_type}']['import']"
-                rel_tol = part.get("rel_tol", config_dict["rel_tol"])
-                abs_tol = part.get("abs_tol", config_dict["abs_tol"])
-                str_choices = part.get("str_choices", config_dict["str_choices"])
-                dict_float_choices = part.get(
-                    "dict_float_choices", config_dict["dict_float_choices"]
-                )
-                monotone_increasing = part.get(
-                    "monotone_increasing", config_dict["monotone_increasing"]
-                )
-                remove_spaces = part.get(
-                    "remove_spaces",
-                    question.get("remove_spaces", config_dict["remove_spaces"]),
-                )
+                # rel_tol = part.get("rel_tol", config_dict["rel_tol"])
+                # abs_tol = part.get("abs_tol", config_dict["abs_tol"])
+                # str_choices = part.get("str_choices", config_dict["str_choices"])
+                # dict_float_choices = part.get(
+                    # "dict_float_choices", config_dict["dict_float_choices"]
+                # )
+                # monotone_increasing = part.get(
+                    # "monotone_increasing", config_dict["monotone_increasing"]
+                # )
+                # remove_spaces = part.get(
+                    # "remove_spaces",
+                    # question.get("remove_spaces", config_dict["remove_spaces"]),
+                # )
 
                 # indices to exclude from grading for list[float]
                 # Ignore index if in exclude list
-                exclude_indices = part.get(
-                    "exclude_indices", config_dict["exclude_indices"]
-                )
-                test_code += f"    exclude_indices = {exclude_indices}\n"
-                test_code += (
-                    f"    local_namespace['exclude_indices'] = exclude_indices\n"
-                )
+                # exclude_indices = part.get(
+                    # "exclude_indices", config_dict["exclude_indices"]
+                # )
+                # test_code += f"    exclude_indices = {exclude_indices}\n"
+                # test_code += (
+                    # f"    local_namespace['exclude_indices'] = exclude_indices\n"
+                # )
 
                 # indices to include from grading for list[float]
                 # Ignore index if not in include list
-                include_indices = part.get(
-                    "include_indices", config_dict["include_indices"]
-                )
-                test_code += f"    include_indices = {include_indices}\n"
-                test_code += (
-                    f"    local_namespace['include_indices'] = include_indices\n"
-                )
+                # include_indices = part.get(
+                    # "include_indices", config_dict["include_indices"]
+                # )
+                # test_code += f"    include_indices = {include_indices}\n"
+                # test_code += (
+                    # f"    local_namespace['include_indices'] = include_indices\n"
+                # )
 
-                test_code += f"    rel_tol = {rel_tol}\n"
-                test_code += f"    abs_tol = {abs_tol}\n"
+                # test_code += f"    rel_tol = {rel_tol}\n"
+                # test_code += f"    abs_tol = {abs_tol}\n"
 
                 test_code += add_attribute("options", options)
-                test_code += add_attribute("str_choices", str_choices)
-                test_code += add_attribute("monotone_increasing", monotone_increasing)
+                # test_code += add_attribute("str_choices", str_choices)
+                # test_code += add_attribute("monotone_increasing", monotone_increasing)
 
-                if part_type in ["dict[str,float]", "dict[str,dict[str,float]]"]:
-                    test_code += f"    dict_float_choices = {dict_float_choices}\n"
-                    test_code += f"    local_namespace['dict_float_choices'] = dict_float_choices\n"
+                # if part_type in ["dict[str,float]", "dict[str,dict[str,float]]"]:
+                    # test_code += f"    dict_float_choices = {dict_float_choices}\n"
+                    # test_code += f"    local_namespace['dict_float_choices'] = dict_float_choices\n"
 
-                if part_type in ["str", "dict[str,float]", "list[str]"]:
-                    test_code += f"    remove_spaces = {remove_spaces}\n"
-                    test_code += (
-                        f"    local_namespace['remove_spaces'] = remove_spaces\n"
-                    )
+                # if part_type in ["str", "dict[str,float]", "list[str]"]:
+                    # test_code += f"    remove_spaces = {remove_spaces}\n"
+                    # test_code += (
+                        # f"    local_namespace['remove_spaces'] = remove_spaces\n"
+                    # )
 
-                test_code += f"    local_namespace['rel_tol'] = rel_tol\n"
-                test_code += f"    local_namespace['abs_tol'] = abs_tol\n"
+                # test_code += f"    local_namespace['rel_tol'] = rel_tol\n"
+                # test_code += f"    local_namespace['abs_tol'] = abs_tol\n"
 
                 assertion_answer = eval(
                     f"type_handlers['types']['{part_type}']['assert_answer']"
@@ -356,10 +357,10 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 assertion_structure = eval(
                     f"type_handlers['types']['{part_type}']['assert_structure']"
                 )  # Only difference
-                keys = part.get(
-                    "keys", None
-                )  ### <<<< different: optional keys to consider (temporary)
-                test_code += f"    keys = {keys}\n"
+                #keys = part.get(
+                    #"keys", None
+                #)  ### <<<< different: optional keys to consider (temporary)
+                # test_code += f"    keys = {keys}\n"
 
                 if eval(import_file):
                     test_code += f"    import {eval(import_file)}\n"
@@ -369,16 +370,17 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 # Check answers
                 test_code += f'    msg_answer = "{assertion_answer}"\n'
 
-                test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'keys':keys})\n"
+                test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer})\n"
+                # test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'keys':keys})\n"
 
                 local_vars_dict = part.get("locals", None)
                 test_code += add_attribute("local_vars_dict", local_vars_dict)
 
                 # One of a finite number of choices for string type
-                choices = part.get("choices", [])
-                if choices == [] and (type == "string" or type == "str"):
-                    choices = []
-                test_code += add_attribute("choices", choices)
+                # choices = part.get("choices", [])
+                # if choices == [] and (type == "string" or type == "str"):
+                    # choices = []
+                # test_code += add_attribute("choices", choices)
 
                 note = part.get("note", None)
                 if sim_type == "answers" and note is not None:
