@@ -5,7 +5,8 @@ import os
 import inspect
 import functools
 from pathlib import Path
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
+
 
 import pytest
 import numpy as np
@@ -54,8 +55,16 @@ def load_data_labels(nb_slices: int):
 
 @pytest.fixture(scope="function", autouse=True)
 def disable_plot_show(mocker):
-    mock_show = mocker.patch("matplotlib.pyplot.show")
-    return mock_show
+    # mock_show = mocker.patch("matplotlib.pyplot.show")
+
+    with ExitStack() as stack:
+        # Mock plt.show() with no specific side effect
+        mock_show = stack.enter_context(patch('matplotlib.pyplot.show'))
+
+        # Replace plt.clf() with plt.close()
+        stack.enter_context(patch('matplotlib.pyplot.clf', new=lambda: plt.close()))
+
+        yield mock_show
 
 
 # ----------------------------------------------------------------------

@@ -41,9 +41,9 @@ def check_float_range(s_el, frange):
     msg_= ""
     if s_el <= mn or s_el >= mx:
         status = False
-        msg_ = f"Value is {s_el} outside the range {frange}."
+        msg_ = f"Value is {s_el} outside the range [{mn},{mx}]."
     else:
-        msg_ = f"Value is {s_el}, within the range {frange}."
+        msg_ = f"Value is {s_el}, within the range [{mn},{mx}]."
     return status, msg_
 
 
@@ -52,6 +52,10 @@ def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
 
+    if rel_tol < 0:
+        return status, msg
+
+    print("==== check_float, rel_tol= ", rel_tol)
     if math.fabs(i_el) <= abs_tol:
         abs_err = math.fabs(i_el - s_el)
         status = True if abs_err < 1.0e-5 else False
@@ -2709,6 +2713,8 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol):
     s_plt = s_answ
     i_plt = i_answ
 
+    print("s_answ= ", s_answ)
+    print(f"{type(s_answ)=}")
     s_fig = s_plt.figure
     i_fig = i_plt.figure
     # Assume only a single axis
@@ -2725,6 +2731,9 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol):
 
     def fig_dict(answ):
         fig = answ.figure
+        print("==> answ= ", answ)
+        print("==> fig= ", fig)
+        print("==> ", dir(fig))
         ax = fig.axes[0]
         coll = ax.collections[0]
         xy = ax.collections[0].get_offsets()
