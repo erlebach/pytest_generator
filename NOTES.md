@@ -201,3 +201,12 @@ to compare std.
 2024-05-02_18:53
 - In yaml, numbers 1.e4 and 1.0e4 are interpreted as strings rather than floats. To solve: 
   rel_tol: !!float 1.e4, 
+
+2024-05-05_23:08
+assert_utilities::Check_answer_float : Range information is not returning. Why? 
+
+I could run the student code with my own set of parameters. How to do that? 
+By rewriting the dictionary, keeping the same keys as the students. 
+How to break out of a look in a pytest, and continue student code after loop.? 
+
+----------------------------------------------------------------------

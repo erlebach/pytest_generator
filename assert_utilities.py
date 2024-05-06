@@ -10,6 +10,11 @@ import yaml
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
+def check_msg_status(status, msg_list, status_, msg_):
+    msg_list.append("\n" + msg_)
+    if status_ is False:
+        status = status_
+    return status, msg_list
 
 
 def init_partial_score_dict() -> dict[str, float | int]:
@@ -37,6 +42,8 @@ def check_float_range(s_el, frange):
     if s_el <= mn or s_el >= mx:
         status = False
         msg_ = f"Value is {s_el} outside the range {frange}."
+    else:
+        msg_ = f"Value is {s_el}, within the range {frange}."
     return status, msg_
 
 
@@ -425,17 +432,16 @@ def check_answer_float(student_answer, instructor_answer, options): # rel_tol, a
     rel_tol = options.get('rel_tol', 1.e-2)
     abs_tol = options.get('abs_tol', 1.e-6)
     range_val = options.get('range_validation', None) # read from spectral_yaml
-    status_, msg_ = check_float(
-        i_answ, s_answ, rel_tol=rel_tol, abs_tol=abs_tol
-    )
-    if status_ is False:
-        msg_list.append(msg_)
-        status = status_
-    elif range_val is not None:
+
+    if range_val is not None:
         status_, msg_ = check_float_range(s_answ, (range_val['min'], range_val['max']))
-        if status_ is False:
-            msg_list.append(msg_)
-            status = status_
+        status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
+
+    if status is True:
+        status_, msg_ = check_float(
+            i_answ, s_answ, rel_tol=rel_tol, abs_tol=abs_tol
+        )
+        status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 spectral_patch_dict = {
     'module': 'spectral_clustering',
     'function_name': 'spectral_clustering',
+    'nb_samples': 200,
     'patched_functions': {
         'spectral': None,  # Patch the 'spectral' function found in the spectral_clustering module
         'scatter': plt.scatter,  # Patch plt.scatter from matplotlib.pyplot
@@ -26,6 +27,8 @@ em_patch_dict = {
     'module': 'expectation_maximization',
     'function_name': 'gaussian_mixture',
     # Error if key not present
+    # I wnat to be to handle 1 or 2 arguments to patch up
+    'nb_samples': 200,
     'patched_functions': {
         # 'em_algorithm': None,  
         #'scatter': plt.scatter,  

@@ -213,7 +213,7 @@ def patch_functions(directory, module_name, function_dict, arg1=None, arg2=None,
         slice_lg = 200
 
     # module = importlib.import_module("student_code_with_answers." + module_name)  # NEW
-    module = importlib.import_module(directory + "." + module_name)  # NEED THE FOLDER
+    module = importlib.import_module(directory + "." + module_name)  
     patches = []
 
     for func_name, provided_func in function_dict.items():
