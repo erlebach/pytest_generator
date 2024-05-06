@@ -179,12 +179,12 @@ types:
 
   lineplot:
     import: ""
-    assert_answer: "assert_utilities.check_answer_lineplot(student_answer, instructor_answer, rel_tol)"
+    assert_answer: "assert_utilities.check_answer_lineplot(student_answer, instructor_answer, options)"
     assert_structure: "assert_utilities.check_structure_lineplot(student_answer)"
 
   scatterplot2d:
     import: ""
-    assert_answer: "assert_utilities.check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol)"
+    assert_answer: "assert_utilities.check_answer_scatterplot2d(student_answer, instructor_answer, options)"
     assert_structure: "assert_utilities.check_structure_scatterplot2d(student_answer)"
 
   scatterplot3d:
