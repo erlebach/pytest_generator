@@ -580,18 +580,19 @@ def check_structure_dict_str_dict_str_list(student_answer, instructor_answer):
 
 # ======================================================================
 def check_answer_dict_str_dict_str_float(
-    student_answer, instructor_answer, rel_tol, dict_float_choices, options, partial_score_frac: list[float]
+        student_answer: dict, instructor_answer: dict, options: dict, partial_score_frac: list[float]
 ):
     """
     The type is a dict[str, dict[str, list]]
     """
-    #print("===> check_answer_dict_str_dict_str_float, options= ", options)
+    print("===> check_answer_dict_str_dict_str_float, options= ", options)
     range_val = options.get('range_validation', None) # read from spectral_yaml
+    at_least_val = options.get("at_least_validation", None)
+    print("===> at_least_val= ", at_least_val)
     dict_float_choices = options.get('dict_float_choices', {})
     rel_tol = options.get('rel_tol', 1.e-2)  # this will change in the future
     abs_tol = options.get('abs_tol', 1.e-5)
-    #print(f"==> {rel_tol=}") 
-    #print(f"==> {abs_tol=}")  
+
 
     # Create get_rules, which returns a list of rules. 
     # Ideally, it should return a list of rule functions, 
@@ -602,6 +603,17 @@ def check_answer_dict_str_dict_str_float(
     status = True
     msg_list = []
     ps_dict = init_partial_score_dict()
+
+    #---
+    if at_least_val and at_least_val["key_pos"] == "outer":
+        if len(student_answer) < at_least_val["count"]:
+            status = False
+            msg_list.append(f"Number of outer dict keys ({len(student_answer)}) is less than the required minimum of {at_least_val['count']}")
+        else: 
+            msg_list.append(f"Number of outer dict keys ({len(student_answer)}) is at least {at_least_val['count']} as required.")
+        partial_score_frac[0] = 0.0  
+        return return_value(status, msg_list, student_answer, instructor_answer)
+    #---
 
     # Should go in structure check
     if not isinstance(student_answer, dict):
@@ -650,10 +662,6 @@ def check_answer_dict_str_dict_str_float(
                 if status_ is False:
                     status = status_
                     msg_list.extend(msg_list_)
-
-        #if status_ is False:
-            #status = status_
-            #msg_list.extend(msg_list_)
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
@@ -2011,16 +2019,28 @@ def check_answer_ndarray(student_answer, instructor_answer, rel_tol):
     """
     msg_list = []
     status = True
-    s_norm = np.linalg.norm(student_answer)
-    i_norm = np.linalg.norm(instructor_answer)
 
-    # Can i_norm be zero?
-    status, msg_ = check_float(i_norm, s_norm, rel_tol, 1.0e-5)
+    if isinstance(student_answer, float) and np.isnan(student_answer):
+        status = False
+        msg_list("Answer is a Nan!")
+        print("===> check_answer_ndarray, {student_answer=}")
 
-    if not status:
-        msg_list.append(msg_)
-        msg_list.append("For comparison, the array was replaced by its norm")
-        msg_list.append(f"The norms have relative error > {rel_tol}")
+    elif isinstance(student_answer, type(np.zeros([1]))) and np.isnan(student_answer).any():
+        status = False
+        msg_list("Array has NaN elements!")
+
+    else:
+        s_norm = np.linalg.norm(student_answer)
+        i_norm = np.linalg.norm(instructor_answer)
+
+        # Can i_norm be zero?
+        if status is True:
+            status, msg_ = check_float(i_norm, s_norm, rel_tol, 1.0e-5)
+
+            if not status:
+                msg_list.append(msg_)
+                msg_list.append("For comparison, the array was replaced by its norm")
+                msg_list.append(f"The norms have relative error > {rel_tol}")
 
     return return_value(status, msg_list, s_norm, i_norm)
 

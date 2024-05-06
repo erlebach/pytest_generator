@@ -98,7 +98,7 @@ types:
 
   dict[str,dict[str,float]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, rel_tol, dict_float_choices, options, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, options, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_dict_str_float(student_answer, instructor_answer)"
 
   explain_str:
