@@ -2,7 +2,7 @@ types:
   ndarray: 
     import: "" 
     #assert: "isinstance({answer_var}, type(np.zeros(1)))"
-    assert_answer: "assert_utilities.check_answer_ndarray(student_answer, instructor_answer, rel_tol)"
+    assert_answer: "assert_utilities.check_answer_ndarray(student_answer, instructor_answer, options)"
     assert_structure: "assert_utilities.check_structure_ndarray(student_answer)"
       #answer_msg: "Correct answer: \n Matrix shapes, type, and norms"
 
@@ -31,18 +31,18 @@ types:
   list[float]:
     import: "" 
     # monotone 
-    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, options, rel_tol, exclude_indices, monotone_increasing, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, options, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_float(student_answer, instructor_answer)"
 
   list[list[float]]:
     import: ""
     # Fix for structure
-    assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, rel_tol, exclude_indices, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, options, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_list_float(student_answer, instructor_answer)"
  
   list[ndarray]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, exclude_indices, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, options, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_ndarray(student_answer, instructor_answer)"
 
   list[int]:
@@ -53,7 +53,7 @@ types:
   list[str]:
     import: ""
     #  partial_score_frac_l: a one-element list with partial score fractiion, i.e. [0.75]
-    assert_answer: "assert_utilities.check_answer_list_str(student_answer, instructor_answer, include_indices, exclude_indices, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_list_str(student_answer, instructor_answer, options, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_str(student_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
@@ -65,7 +65,7 @@ types:
 
   set[str]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_set_str(student_answer, instructor_answer, partial_score_frac_l, choices)"
+    assert_answer: "assert_utilities.check_answer_set_str(student_answer, instructor_answer, options, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_set_str(student_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
@@ -93,7 +93,7 @@ types:
 
   dict[int,list[float]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_int_list_float(student_answer, instructor_answer, keys, rel_tol, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_dict_int_list_float(student_answer, instructor_answer, options, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_int_list_float(student_answer, instructor_answer, keys)"
 
   dict[str,dict[str,float]]:
@@ -109,8 +109,8 @@ types:
 
   dict[str,set[int]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_set_int(student_answer, instructor_answer, keys)"
-    assert_structure: "assert_utilities.check_structure_dict_str_set_int(student_answer, instructor_answer, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_str_set_int(student_answer, instructor_answer, options)"
+    assert_structure: "assert_utilities.check_structure_dict_str_set_int(student_answer, instructor_answer, options)"
 
   dict[str,set]:
     import: ""
@@ -121,7 +121,7 @@ types:
   dict[str,float]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer,
-                      rel_tol, keys, dict_float_choices, partial_score_frac_l)"
+                      choices, partial_score_frac_l)"
                       #rel_tol, keys, dict_float_choices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, instructor_answer, keys)"
 
@@ -136,7 +136,7 @@ types:
 
   dict[int,ndarray]:
     import: "" 
-    assert_answer: "assert_utilities.check_answer_dict_int_ndarray(student_answer, instructor_answer, rel_tol, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_int_ndarray(student_answer, instructor_answer, options)"
     assert_structure: "assert_utilities.check_structure_dict_int_ndarray(student_answer, instructor_answer, keys)"
 
   dict[tuple[int],ndarray]:
@@ -148,7 +148,7 @@ types:
     import: "" 
     # assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"  
     # The instructor answer is useful to check key values
-    assert_answer: "assert_utilities.check_answer_dict_str_tuple_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_dict_str_tuple_ndarray(student_answer, instructor_answer, options, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_tuple_ndarray(student_answer, instructor_answer)"
 
   dict_str_dict_str_float:
@@ -158,13 +158,13 @@ types:
 
   str:
     import: ""
-    assert_answer: "assert_utilities.check_answer_str(student_answer, instructor_answer, str_choices, remove_spaces)"
-    assert_structure: "assert_utilities.check_structure_str(student_answer, choices)"
+    assert_answer: "assert_utilities.check_answer_str(student_answer, instructor_answer, options):"
+    assert_structure: "assert_utilities.check_structure_str(student_answer, options)"
 
   # Evaluate to a float
   eval_float:
     import: ""
-    assert_answer: "assert_utilities.check_answer_eval_float(student_answer, instructor_answer, local_vars_dict, rel_tol)"
+    assert_answer: "assert_utilities.check_answer_eval_float(student_answer, instructor_answer, options)"
     assert_structure: "assert_utilities.check_structure_eval_float(student_answer)"
     help: >
       A string to be evaluated using eval(). It will be important
@@ -189,15 +189,12 @@ types:
 
   scatterplot3d:
     import: ""
-    assert_answer: "assert_utilities.check_answer_scatterplot3d(student_answer, instructor_answer, rel_tol)"
+    assert_answer: "assert_utilities.check_answer_scatterplot3d(student_answer, instructor_answer, options)"
     assert_structure: "assert_utilities.check_structure_scatterplot3d(student_answer)"
 
   dendrogram: 
     import: ""
-    # Return from Dendrogram function
-    #assert: "isinstance({answer_var}, dict"
-    assert_answer: "assert_utilities.check_answer_dendrogram(student_answer, instructor_answer, rel_tol)"
-    #answer_msg: "Correct answer: {instructor_answer}"
+    assert_answer: "assert_utilities.check_answer_dendrogram(student_answer, instructor_answer, options)"
     assert_structure: "assert_utilities.check_structure_dendrogram(student_answer)"
 
   list:
@@ -223,8 +220,8 @@ types:
 
   dict[int,list]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer, keys)"
-    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_int_list(student_answer, instructor_answer, options)"
+    assert_structure: "assert_utilities.check_structure_dict_int_list(student_answer, instructor_answer)"
 
   dict[str,dict[str,list]]:
     import: ""

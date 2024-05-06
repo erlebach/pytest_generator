@@ -423,7 +423,7 @@ def are_sets_equal(set1, set2, rtol=1e-5, atol=1e-6):
 
 
 # ======================================================================
-def check_answer_float(student_answer, instructor_answer, options): # rel_tol, abs_tol):
+def check_answer_float(student_answer, instructor_answer, options):
     """
     Check answer correctness. Assume the structure is correct.
     """
@@ -467,12 +467,14 @@ def check_structure_float(student_answer):
 
 # ======================================================================
 def check_answer_eval_float(
-    student_answer, instructor_answer, local_vars_dict, rel_tol
+    student_answer, instructor_answer, options
 ):
     msg_list = []
     status = True
     s_answ = student_answer
     i_answ = instructor_answer
+    rel_tol = options.get("rel_tol", 1.e-2)
+    local_vars_dict = options.get("local_vars_dict", {})
     # s_answ = s_answ.replace('^', '**')
     # s_answ = s_answ.replace('x', '*')
     # s_answ = s_answ.replace('X', '*')
@@ -832,12 +834,13 @@ def check_structure_dict(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_str(student_answer, instructor_answer, str_choices: list[str], remove_spaces):
+def check_answer_str(student_answer, instructor_answer, options):
     """
     Arguments:
     - str_choices: check that the answer is one of str_choices if str_choices is not None
     """
-    #print(f"check_answer_str, {remove_spaces=}")
+    str_choices = options.get(str_choices, [])
+    remove_spaces = options.get("remove_spaces", False)
     status, msg = check_str(instructor_answer, student_answer, str_choices, remove_spaces=remove_spaces)
     return return_value(status, [msg], student_answer, instructor_answer)
 
@@ -852,6 +855,7 @@ def check_structure_str(student_answer, choices):
     """
     status = True
     msg_list = []
+    choices = options.get("choices", [])
     choices = [clean_str_answer(c) for c in choices]
 
     # Ideally, should be done when yaml file is preprocessed
@@ -924,7 +928,7 @@ def check_structure_explain_str(student_answer):
 
 
 def check_answer_set_str(
-    student_answer, instructor_answer, partial_score_frac: list[float], choices=None
+    student_answer, instructor_answer, options, partial_score_frac: list[float]
 ):
     """
     s_answ: student answer: set of strings
@@ -934,8 +938,7 @@ def check_answer_set_str(
     msg_list = []
     status = True
     ps_dict = init_partial_score_dict()
-    if choices is None:
-        choices = []
+    choices = options.get("choices", [])
 
     s_answ = {i.lower().strip() for i in student_answer}
     i_answ = {i.lower().strip() for i in instructor_answer}
@@ -1070,11 +1073,12 @@ def check_structure_dict_str_set(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_dict_str_set_int(student_answer, instructor_answer, keys=None):
+def check_answer_dict_str_set_int(student_answer, instructor_answer, options):
     """ """
     msg_list = []
     status = True
     ps_dict = init_partial_score_dict()
+    keys = options.get('keys', None)
     status, msg_list = check_set_int(
         set(student_answer), set(instructor_answer), ps_dict
     )
@@ -1084,7 +1088,7 @@ def check_answer_dict_str_set_int(student_answer, instructor_answer, keys=None):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_str_set_int(student_answer, instructor_answer, keys=None):
+def check_structure_dict_str_set_int(student_answer, instructor_answer, options):
     """
     TODO: provide a list of keys to check as an argument keys (default None)
     Check that the outer dict keys are correct
@@ -1092,6 +1096,7 @@ def check_structure_dict_str_set_int(student_answer, instructor_answer, keys=Non
     """
     status = True
     msg_list = []
+    keys = options.get('keys', None)
 
     if not isinstance(student_answer, dict):
         msg_list.append("Answer should be of type 'dict'.")
@@ -1117,7 +1122,7 @@ def check_structure_dict_str_set_int(student_answer, instructor_answer, keys=Non
 
 
 def check_answer_dict_str_float(
-    student_answer, instructor_answer, rel_tol, keys, dict_float_choices, partial_score_frac: list[float]
+    student_answer, instructor_answer, options, partial_score_frac: list[float]
 ):
     """
     student answer: dictionary with keys:str, values: an ndarray
@@ -1128,7 +1133,10 @@ def check_answer_dict_str_float(
     # print("==> check_answer_dict_str_float")
     msg_list = []
     status = True
+    keys = options.get("keys", None)
     keys = list(instructor_answer.keys()) if keys is None else keys
+    rel_tol = options.get("rel_tol", 1.e-2)
+    dict_float_choices = options.get("dict_float_choices", [])
     ps_dict = init_partial_score_dict()
     # print(f"{instructor_answer=}")
     # print("===> keys: ", keys)
@@ -1419,7 +1427,7 @@ def check_structure_dict_tuple_int_ndarray(student_answer, instructor_answer, ke
 # ----------------------------------------------------------------------
 
 
-def check_answer_dict_int_ndarray(student_answer, instructor_answer, rel_tol, keys):
+def check_answer_dict_int_ndarray(student_answer, instructor_answer, options):
     """
     Similar to check_answer_dict_str_ndarray
     student answer: dictionary with keys:str, values: an ndarray
@@ -1431,6 +1439,9 @@ def check_answer_dict_int_ndarray(student_answer, instructor_answer, rel_tol, ke
     status = True
     i_dict_norm = {}
     s_dict_norm = {}
+
+    rel_tol = options.get("rel_tol", 1.e-2)
+    keys = options.get("keys", None)
     keys = list(instructor_answer.keys()) if keys is None else keys
 
     # print("Assert_utilities, type dict_int_ndarray NOT HANDLED")
@@ -1529,7 +1540,7 @@ def check_structure_dict_int_ndarray(student_answer, instructor_answer, keys=Non
 
 
 # ======================================================================
-def check_answer_dict_int_list(student_answer, instructor_answer, keys):
+def check_answer_dict_int_list(student_answer, instructor_answer, options):
     """
     Similar to check_answer_dict_str_ndarray
     list of floats (if not specified)
@@ -1541,6 +1552,7 @@ def check_answer_dict_int_list(student_answer, instructor_answer, keys):
     """
     msg_list = []
     status = True
+    keys = options.get("keys", None)
     keys = list(instructor_answer.keys()) if keys is None else keys
 
     # print("Assert_utilities, type dict_int_list NOT HANDLED")
@@ -1577,7 +1589,7 @@ def check_answer_dict_int_list(student_answer, instructor_answer, keys):
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-def check_structure_dict_int_list(student_answer, instructor_answer, keys=None):
+def check_structure_dict_int_list(student_answer, instructor_answer):
     """
     student answer: dictionary with keys:str, values: an ndarray
     list of floats (if not specified)
@@ -1634,8 +1646,7 @@ def check_structure_dict_int_list(student_answer, instructor_answer, keys=None):
 
 # ======================================================================
 def check_answer_dict_int_list_float(
-    student_answer, instructor_answer, keys, rel_tol, partial_score_frac: list[float]
-):
+        student_answer, instructor_answer, options):
     """
     Similar to check_answer_dict_str_ndarray
     list of floats (if not specified)
@@ -1647,9 +1658,13 @@ def check_answer_dict_int_list_float(
     """
     msg_list = []
     status = True
-    keys = list(instructor_answer.keys()) if keys is None else keys
+
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(keys)
+
+    rel_tol = options.get("rel_tol", 1.e-2)
+    keys = options.get("keys", None)
+    keys = list(instructor_answer.keys()) if keys is None else keys
 
     # Need an exception in case the student key is not found
     for k in keys:
@@ -1802,7 +1817,7 @@ def check_structure_list_int(student_answer, instructor_answer):
 
 # ======================================================================
 def check_answer_list_float(
-        student_answer, instructor_answer, options, rel_tol, exclude_indices: list[int], monotone_increasing=None, partial_score_frac: list[float]=0.
+        student_answer, instructor_answer, options, partial_score_frac: list[float]=0.
 ):
     """
     Check that all elements in the list have matching norms
@@ -1814,6 +1829,10 @@ def check_answer_list_float(
     answ_eq_len = len(student_answer) == len(instructor_answer) # checked in structure
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(instructor_answer)
+
+    rel_tol = options.get("rel_tol", 1.e-2)
+    exclude_indices = options.get("exclude_indices", [])
+    monotone_increasing = options.get("monotone_increasing", False)
 
     if answ_eq_len and (monotone_increasing is None or monotone_increasing is False):
         status, msg_list_ = check_list_float(student_answer, instructor_answer, rel_tol=rel_tol, abs_tol=1.e-6, ps_dict=ps_dict, exclude_indices=exclude_indices)
@@ -1884,7 +1903,7 @@ def check_structure_list_float(student_answer, instructor_answer):
 
 
 def check_answer_list_ndarray(
-    student_answer, instructor_answer, rel_tol, exclude_indices, partial_score_frac: list[float]
+    student_answer, instructor_answer, options, partial_score_frac: list[float]
 ):
     """
     rel_tol: max relative error on the L2 norm
@@ -1895,12 +1914,15 @@ def check_answer_list_ndarray(
     answ_eq_len = len(student_answer) == len(instructor_answer)
     i_norm_list = []
     s_norm_list = []
+
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(instructor_answer)
 
+    rel_tol = options.get("rel_tol", 1.e-2)
+    exclude_indices = options.get("exclude_indices", [])
+
     if answ_eq_len:
         for i, (s_arr, i_arr) in enumerate(zip(student_answer, instructor_answer)):
-            # print(f"===> outside if, {i=}, {exclude_indices=}")
             if i in exclude_indices:
                 ps_dict["nb_total"] -= 1
                 continue
@@ -2005,20 +2027,18 @@ def check_structure_list_ndarray(student_answer, instructor_answer):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-# def check_structure_set_ndarray(student_answer):
-#     return Tr
-
 
 # ======================================================================
 
 
-def check_answer_ndarray(student_answer, instructor_answer, rel_tol):
+def check_answer_ndarray(student_answer, instructor_answer, options):
     """
     rel_tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
     """
     msg_list = []
     status = True
+    rel_tol = options.get("rel_tol", 1.e-2)
 
     if isinstance(student_answer, float) and np.isnan(student_answer):
         status = False
@@ -2095,8 +2115,8 @@ def check_structure_function(student_answer):
 
 
 def check_answer_list_list_float(
-    student_answer, instructor_answer, rel_tol,
-    exclude_indices: list[int],
+    student_answer, instructor_answer,
+    options: dict,
     partial_score_frac: list[float]
 ):
     """
@@ -2106,6 +2126,10 @@ def check_answer_list_list_float(
     msg_list = []
     ps_dict = init_partial_score_dict()
     # print("==> exclude_indices: ", exclude_indices)
+
+    rel_tol = options.get("rel_tol", 1.e-2)
+    # list[int]
+    exclude_indices = options.get("exclude_indices", [])
 
     for i, (s_lst, i_lst) in enumerate(zip(student_answer, instructor_answer)):
         #print("i= ", i)
@@ -2273,7 +2297,7 @@ def check_structure_set_set_int(student_answer):
 
 
 def check_answer_dict_str_tuple_ndarray(
-    student_answer, instructor_answer, rel_tol, partial_score_frac: list[float]
+    student_answer, instructor_answer, options, partial_score_frac: list[float]
 ):
     """
     GE original function restructed by GPT-4 (2024-03-06)
@@ -2284,6 +2308,9 @@ def check_answer_dict_str_tuple_ndarray(
     msg_list = []
     status = True  # Assuming correct until proven otherwise
     ps_dict = init_partial_score_dict()
+
+    rel_tol = options.get('rel_tol', 1.e-2)
+    abs_tol = options.get('abs_tol', 1.e-5)
 
     # Dictionaries to hold norms for student and instructor answers
     s_norms = {}
@@ -2352,7 +2379,7 @@ def check_structure_dict_str_tuple_ndarray(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_dendrogram(student_dendro, instructor_dendro, rel_tol):
+def check_answer_dendrogram(student_dendro, instructor_dendro, options):
     """
     With help from GPT-4
     Compares two dendrogram dictionaries.
@@ -2368,6 +2395,9 @@ def check_answer_dendrogram(student_dendro, instructor_dendro, rel_tol):
     """
     status = True
     msg_list = []
+
+    rel_tol = options.get('rel_tol', 1.e-2)  # this will change in the future
+    abs_tol = options.get('abs_tol', 1.e-5)
 
     dend1 = student_dendro
     dend2 = instructor_dendro
@@ -2510,8 +2540,7 @@ def check_structure_bool(student_answer):
 def check_answer_list_str(
     student_answer,
     instructor_answer,
-    include_indices: list[int],
-    exclude_indices: list[int],
+    options,
     partial_score_frac: list[float],
 ):
     """
@@ -2525,6 +2554,8 @@ def check_answer_list_str(
     status = True
     mismatched_strings = []
     ps_dict = init_partial_score_dict()
+    include_indices = options.get("include_indices", [])
+    exclude_indices = options.get("exclude_indices", [])
 
     normalized_s_answ = [clean_str_answer(s) for s in student_answer]
     normalized_i_answ = [clean_str_answer(s) for s in instructor_answer]
@@ -2855,12 +2886,14 @@ def check_structure_scatterplot2d(student_answer):
 # ======================================================================
 
 
-def check_answer_scatterplot3d(student_answer, instructor_answer, rel_tol):
+def check_answer_scatterplot3d(student_answer, instructor_answer, options):
     status = True
     msg_list = []
 
     s_answ = student_answer
     i_answ = instructor_answer
+
+    rel_tol = options.get("rel_tol", 1.e-2)
 
     # Check for equality
     x, y, z = s_answ._offsets3d

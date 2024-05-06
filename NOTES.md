@@ -212,3 +212,7 @@ How to break out of a look in a pytest, and continue student code after loop.?
 ----------------------------------------------------------------------
 2024-05-06_12:56
 - I could've asked the students to return their ARI and SSE functions. I could have tested the results. MY ERROR.
+----------------------------------------------------------------------
+2024-05-06
+- merged validations branch back into the main branch. 
+----------------------------------------------------------------------
