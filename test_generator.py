@@ -194,7 +194,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             else:
                 test_code += f"def {function_name}():\n"
 
-            test_code += f"    function_name = {function_name}\n"
             test_code += f"    function_name = get_current_function()\n"
 
             is_fixture = (
@@ -259,9 +258,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 # Check answers
                 test_code += f'    msg_answer = "{assertion_answer}"\n'
 
-                test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer})\n"
-                # test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'keys':keys})\n"
-
                 local_vars_dict = part.get("locals", None)
                 test_code += add_attribute("local_vars_dict", local_vars_dict)
 
@@ -280,7 +276,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += f"    subquestion_id = {repr(part_id)}\n"
 
                 test_code += f"    partial_score_frac_l = [0.]\n"
-                test_code += "    local_namespace['partial_score_frac_l'] = partial_score_frac_l\n"
+
+                test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'options': options, 'partial_score_frac_l': partial_score_frac_l})\n"
 
                 test_code += "    function_name.answer_type = answer_type\n"
                 test_code += "    function_name.question_id = question_id\n"
@@ -303,14 +300,13 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                     test_code += "        explanation_answer += f'Instructor answer: {repr(correct_answer)}\\n'\n"
                     test_code += "        explanation_answer += f'Student answer: {repr(student_answer)}'\n"
                     test_code += "        function_name.partial_score_frac = partial_score_frac_l[0]\n"
-                    # test_code += "        print(f'FAILURE, partial score: {function_name.partial_score_frac}')\n"
 
                 if sim_type == "answers":
                     test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure, '==Answer tests==:', explanation_answer])\n"
                 else:
                     test_code += "    explanation = '\\n'.join(['==Structure tests==:', explanation_structure])\n"
 
-                test_code += f"    {function_name}.explanation = explanation\n"
+                test_code += f"    function_name.explanation = explanation\n"
                 test_code += f"    assert is_success\n"
 
             else:
