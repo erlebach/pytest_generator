@@ -36,7 +36,6 @@ def apply_validations(s_answ, i_answ, validations, options):
     return all(res[0] for res in results), " \n".join(res[1] for res in results)
 
 
-
 def check_msg_status(status, msg_list, status_, msg_):
     msg_list.append("\n" + msg_)
     if status_ is False:
@@ -79,9 +78,7 @@ def check_float_range(s_el, i_el, mn, mx):
 
 
 # ----------------------------------------------------------------------
-def check_float(i_el, s_el, rel_tol=1.e-2, abs_tol=1.0e-5):
-    #def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
-# def check_float(i_el, s_el, ferror): #rel_tol=1.0e-2, abs_tol=1.0e-5):
+def check_float(s_el, i_el, rel_tol=1.e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
 
@@ -103,6 +100,8 @@ def check_float(i_el, s_el, rel_tol=1.e-2, abs_tol=1.0e-5):
         msg = f"Student element {s_el} has rel error > {100*rel_tol}% relative to instructor element {i_el}"
     return status, msg
 
+# ----------------------------------------------------------------------
+# def check_at_least(i_list
 
 # ----------------------------------------------------------------------
 
@@ -163,7 +162,7 @@ def check_list_float_is_probability(s_arr, rel_tol, abs_tol):
     if isinstance(s_arr, list):
         s_arr = np.array(s_arr)
     ssum = np.sum(s_arr)
-    status, msg, check_float(1., ssum, rel_tol=rel_tol, abs_tol=abs_tol)
+    status, msg, check_float(ssum, 1., rel_tol=rel_tol, abs_tol=abs_tol)
     if status is False:
         msg += "\nThe list of float is not a probability (does not sum to 1 to "
         msg += "within a relative error of {100*rel_tol}%.)."
@@ -181,7 +180,7 @@ def check_list_float(i_arr, s_arr, rel_tol, abs_tol, ps_dict: dict[str, float | 
         if i in exclude_indices:
             ps_dict["nb_total"] -= 1
             continue
-        status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=abs_tol)
+        status_, msg_ = check_float(s_el, i_el, rel_tol=rel_tol, abs_tol=abs_tol)
         if status_ is False:
             status = False
             msg_list.append(msg_)
@@ -346,7 +345,7 @@ def check_dict_str_float(
         s_el = s_dict.get(k, None)
         if i_el is None or s_el is None:
             continue
-        status_, msg_ = check_float(i_el, s_el, rel_tol=rel_tol, abs_tol=abs_tol)
+        status_, msg_ = check_float(s_el, i_el, rel_tol=rel_tol, abs_tol=abs_tol)
         if status_ is False:
             msg_list.append(msg_)
             status = False
@@ -497,7 +496,7 @@ def check_answer_float_exp(student_answer, instructor_answer, options, validatio
 
     if status is True:
         status_, msg_ = check_float(
-            i_answ, s_answ, rel_tol=rel_tol, abs_tol=abs_tol
+            s_answ, i_answ, rel_tol=rel_tol, abs_tol=abs_tol
         )
         status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
 
@@ -531,7 +530,7 @@ def check_answer_float(student_answer, instructor_answer, options, validation_fu
     if status is True:
         status_, msg_ = check_float(
             # i_answ, s_answ, rel_tol=rel_tol, abs_tol=abs_tol
-            i_answ, s_answ, rel_tol, abs_tol
+            s_answ, i_answ, rel_tol, abs_tol
         )
         status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
     """
@@ -578,7 +577,7 @@ def check_answer_eval_float(
             local_dct[var] = random_values[var]
         s_float = eval(s_answ, config_dict["local_namespaces"], local_dct)
         i_float = eval(i_answ, config_dict["local_namespaces"], local_dct)
-        status, msg = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.0e-5)
+        status, msg = check_float(s_float, i_float, rel_tol=rel_tol, abs_tol=1.0e-5)
         msg_list.append(msg)
         return return_value(status, msg_list, s_answ, i_answ)
 
@@ -1257,7 +1256,7 @@ def check_answer_dict_str_float(
                 if status_ is True:
                     break
         else:
-            status_, msg_ = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.e-6)
+            status_, msg_ = check_float(s_float, i_float, rel_tol=rel_tol, abs_tol=1.e-6)
 
         if status_ is False:
             status = False
@@ -1449,7 +1448,7 @@ def check_answer_dict_tuple_int_ndarray(
             )
         i_dict_norm[k] = s_norm = np.linalg.norm(s_arr)
         s_dict_norm[k] = i_norm = np.linalg.norm(i_arr)
-        status_, msg = check_float(i_norm, s_norm, rel_tol, abs_tol=1.0e-5)
+        status_, msg = check_float(s_norm, i_norm, rel_tol, abs_tol=1.0e-5)
         if status_ is False:
             status = False
             msg_list.append(msg)
@@ -2033,7 +2032,7 @@ def check_answer_list_ndarray(
             #print(
             #   "IMPROVE: could first create a list of norms, and call check_list_float"
             #)
-            status_, msg = check_float(i_norm, s_norm, rel_tol, abs_tol=1.0e-5)
+            status_, msg = check_float(s_norm, i_norm, rel_tol, abs_tol=1.0e-5)
             if status_ is False:
                 status = False
                 msg_list.append(msg)
@@ -2155,7 +2154,7 @@ def check_answer_ndarray(student_answer, instructor_answer, options, validation_
 
         # Can i_norm be zero?
         if status is True:
-            status, msg_ = check_float(i_norm, s_norm, rel_tol, 1.0e-5)
+            status, msg_ = check_float(s_norm, i_norm, rel_tol, 1.0e-5)
 
             if not status:
                 msg_list.append(msg_)
@@ -3008,7 +3007,7 @@ def check_answer_scatterplot3d(student_answer, instructor_answer, options, valid
     sum_i = np.sum(i_x) + np.sum(i_y) + np.sum(i_z)
     sum_s = np.sum(s_x) + np.sum(s_y) + np.sum(s_z)
 
-    status, msg = check_float(sum_i, sum_s, rel_tol=rel_tol, abs_tol=1.e-5)
+    status, msg = check_float(sum_s, sum_i, rel_tol=rel_tol, abs_tol=1.e-5)
     msg_list.append(msg)
 
     return return_value(status, msg_list, s_answ, i_answ)
