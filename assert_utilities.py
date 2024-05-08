@@ -11,44 +11,28 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 def apply_validations(s_answ, i_answ, validations, options):
-    #print("ENTER apply_validations")
-    #print(f"ENTER apply_validations: {validations=}")
-    #print(f"ENTER apply_validations: {options=}")
     results = []
     for validation in validations:
-        #print(f"{validation=}")
         # Directly use the function name to get the function object
         # No need to use the following line since I am in assert_utilities
-        #func = getattr(assert_utilities, validation['function'])
         func = globals()[validation['function']]  # using globals() to access the function by name
         args = [s_answ, i_answ]
 
         # Append additional arguments from options based on what each validation requires
-        # validation['args'] contains only specific additional args
-        #print(f"{validation['args']=}")
-        #print(f"{options=}")
         for arg_spec in validation['args']:  
-            # print(f"arg_sec in validation['args']: {arg_spec=}")
             if isinstance(arg_spec, tuple):
                 tuple_args = tuple(options.get(arg_name, None) for arg_name in arg_spec)
                 args.extend([arg_spec])  # Extend args with the contents of the tuple
             else:
                 # Handle single arguments by appending them from options or using a default
                 args.append(arg_spec)
-                #if arg_spec in options:
-                    #args.append(options[arg_spec])
-                #else:
-                    ## Provide a default or raise an error if a required option is missing
-                    #raise ValueError(f"Missing parameter {arg_spec}")
 
-### FIX ERROR: I keep the arguments in test_generator.py, so the substitution must occur here. 
-### HOW TO DO THIS? 
-
-
-        #print(f"{args=}")
+        print(f"==> xxx {args=}")
+        # result[0] : status
+        # result[1] : message
         result = func(*args)
         results.append(result)
-    #print("==> return from apply_validations, {results=}")
+
     return all(res[0] for res in results), " \n".join(res[1] for res in results)
 
 
@@ -83,6 +67,7 @@ def check_float_range(s_el, i_el, mn, mx):
 #def check_float_range(s_el, i_el, frange):
     # print("===> inside check_float_range")
     #mn, mx = frange
+    print("==> inside check_float_range")
     status = True
     msg_= ""
     if s_el <= mn or s_el >= mx:
@@ -94,22 +79,23 @@ def check_float_range(s_el, i_el, mn, mx):
 
 
 # ----------------------------------------------------------------------
-def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
+def check_float(i_el, s_el, rel_tol=1.e-2, abs_tol=1.0e-5):
+    #def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
 # def check_float(i_el, s_el, ferror): #rel_tol=1.0e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
-    # rel_tol, abs_tol = ferror
 
-    # print(f"==> check_flaot {i_el=}, {type(i_el)=}")
-    # print(f"{rel_tol=}, {type(abs_tol)=}")
+    print(f"==> inside check_float {s_el=}, {type(i_el)=}")
+    print(f"{rel_tol=}, {type(abs_tol)=}")
 
     if rel_tol < 0:
+        print(f"==>    rel_tol < 0, {status=}, {msg=}")
         return status, msg
 
     # print("==== check_float, rel_tol= ", rel_tol)
     if math.fabs(i_el) <= abs_tol:
         abs_err = math.fabs(i_el - s_el)
-        status = True if abs_err < 1.0e-5 else False
+        status = True if abs_err < abs_tol else False
     elif math.fabs((i_el - s_el) / i_el) < rel_tol:
         status = True
     else:
@@ -328,7 +314,6 @@ def check_dict_str_float_range(keys, s_dict, range_val, ps_dict):
     status = True
     msg_list = []
     key = range_val['key']
-    # print(f"==> check_dict_str_float_range, {key=}")
 
     for k in keys:
         if k != key:
@@ -336,16 +321,14 @@ def check_dict_str_float_range(keys, s_dict, range_val, ps_dict):
         s_el = s_dict.get(k, None)
         if s_el is None:
             continue
-        status_, msg_ = check_float_range(s_el, (range_val['min'], range_val['max']))
-        # print(f"return from check_float_range, {status_=}")
+        #  2nd argument not used
+        status_, msg_ = check_float_range(s_el, 1.0, range_val['min'], range_val['max'])
         if status_ is False:
             msg_list.append(msg_)
             status = False
             ps_dict["nb_mismatches"] += 1
 
-    # print(f"==> exit check_dict_str_float_range, {msg_list=}")
     msg = "\n".join(msg_list)
-    # print(f"==> exit check_dict_str_float_range, '\n'.join(msg_list): {msg=}")
     return status, "\n".join(msg_list)
 # ----------------------------------------------------------------------
 
@@ -508,7 +491,8 @@ def check_answer_float_exp(student_answer, instructor_answer, options, validatio
 
 
     if range_val is not None:
-        status_, msg_ = check_float_range(s_answ, (range_val['min'], range_val['max']))
+        # 2nd arg not used
+        status_, msg_ = check_float_range(s_answ, 1., range_val['min'], range_val['max'])
         status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
 
     if status is True:
@@ -528,18 +512,12 @@ def check_answer_float(student_answer, instructor_answer, options, validation_fu
     """
     Check answer correctness. Assume the structure is correct.
     """
-    # print(f"==> check_answer_float, {options=}")
-    # print(f"==> {student_answer=}, {instructor_answer=}")
     status = True
     msg_list = []
 
-    # print(f"{validation_functions=}")
-    # print(f"{options=}")
-    # print("==> before apply_validations")
-    apply_validations(student_answer, instructor_answer, validation_functions, options)
-    # print("==> after apply_validations")
-    # print("==== AFTER apply_validations ===")  # Last 5 lines for testing
+    status, msg = apply_validations(student_answer, instructor_answer, validation_functions, options)
 
+    """
     s_answ = student_answer
     i_answ = instructor_answer
     rel_tol = options.get('rel_tol', 1.e-2)
@@ -547,7 +525,7 @@ def check_answer_float(student_answer, instructor_answer, options, validation_fu
     range_val = options.get('range_validation', None) # read from spectral_yaml
 
     if range_val is not None:
-        status_, msg_ = check_float_range(s_answ, (range_val['min'], range_val['max']))
+        status_, msg_ = check_float_range(s_answ, i_answ, range_val['min'], range_val['max'])
         status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
 
     if status is True:
@@ -556,8 +534,9 @@ def check_answer_float(student_answer, instructor_answer, options, validation_fu
             i_answ, s_answ, rel_tol, abs_tol
         )
         status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
+    """
 
-    return return_value(status, msg_list, student_answer, instructor_answer)
+    return return_value(status, [msg], student_answer, instructor_answer)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
