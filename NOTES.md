@@ -216,3 +216,6 @@ How to break out of a look in a pytest, and continue student code after loop.?
 2024-05-06
 - merged validations branch back into the main branch. 
 ----------------------------------------------------------------------
+2024-05-07_23:42
+- Look at output of `generate_all_homeworks.py`. Analyze errors. 
+Look at output. 

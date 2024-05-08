@@ -32,17 +32,15 @@ def preprocess_yaml(input_file, output_file):
     
     for question in data.get('questions', []):
         parts = question.get('parts', [])
+        print(f"==> {parts=}")
         for i, part in enumerate(parts):
-            # print("part: ", part)
+            print("part: ", part)
             # Encode all answers
-            #part['answer'] = encode_answer(part['answer'])
             if 's_answers' in part and isinstance(part['s_answers'], list):
-                #print(f"{part['s_answers']=}")
                 answers = part['s_answers']
                 for j, answ in enumerate(answers):
                     part['s_answers'][j] = encode_data(answ)
             if 'i_answers' in part and isinstance(part['i_answers'], list):
-                #print(f"{part['i_answers']=}")
                 answers = part['i_answers']
                 for j, answ in enumerate(answers):
                     part['i_answers'][j] = encode_data(answ)
@@ -50,9 +48,7 @@ def preprocess_yaml(input_file, output_file):
                 part['s_answer'] = encode_data(part['s_answer'])
             if 'i_answer' in part:
                 part['i_answer'] = encode_data(part['i_answer'])
-            #print(f"{len(parts)=}, {i=}")
             parts[i] = part
-            #print("part= ", part)
         question['parts'] = parts
     
     with open(output_file, 'w') as file:

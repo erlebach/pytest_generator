@@ -10,6 +10,49 @@ import yaml
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
+def apply_validations(s_answ, i_answ, validations, options):
+    #print("ENTER apply_validations")
+    #print(f"ENTER apply_validations: {validations=}")
+    #print(f"ENTER apply_validations: {options=}")
+    results = []
+    for validation in validations:
+        #print(f"{validation=}")
+        # Directly use the function name to get the function object
+        # No need to use the following line since I am in assert_utilities
+        #func = getattr(assert_utilities, validation['function'])
+        func = globals()[validation['function']]  # using globals() to access the function by name
+        args = [s_answ, i_answ]
+
+        # Append additional arguments from options based on what each validation requires
+        # validation['args'] contains only specific additional args
+        #print(f"{validation['args']=}")
+        #print(f"{options=}")
+        for arg_spec in validation['args']:  
+            # print(f"arg_sec in validation['args']: {arg_spec=}")
+            if isinstance(arg_spec, tuple):
+                tuple_args = tuple(options.get(arg_name, None) for arg_name in arg_spec)
+                args.extend([arg_spec])  # Extend args with the contents of the tuple
+            else:
+                # Handle single arguments by appending them from options or using a default
+                args.append(arg_spec)
+                #if arg_spec in options:
+                    #args.append(options[arg_spec])
+                #else:
+                    ## Provide a default or raise an error if a required option is missing
+                    #raise ValueError(f"Missing parameter {arg_spec}")
+
+### FIX ERROR: I keep the arguments in test_generator.py, so the substitution must occur here. 
+### HOW TO DO THIS? 
+
+
+        #print(f"{args=}")
+        result = func(*args)
+        results.append(result)
+    #print("==> return from apply_validations, {results=}")
+    return all(res[0] for res in results), " \n".join(res[1] for res in results)
+
+
+
 def check_msg_status(status, msg_list, status_, msg_):
     msg_list.append("\n" + msg_)
     if status_ is False:
@@ -35,8 +78,11 @@ def check_missing_keys(missing_keys, msg_list):
 
 
 # ----------------------------------------------------------------------
-def check_float_range(s_el, frange):
-    mn, mx = frange
+# All low-level check functions take s_el, i_el as first two parameters
+def check_float_range(s_el, i_el, mn, mx):
+#def check_float_range(s_el, i_el, frange):
+    # print("===> inside check_float_range")
+    #mn, mx = frange
     status = True
     msg_= ""
     if s_el <= mn or s_el >= mx:
@@ -49,13 +95,18 @@ def check_float_range(s_el, frange):
 
 # ----------------------------------------------------------------------
 def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
+# def check_float(i_el, s_el, ferror): #rel_tol=1.0e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
+    # rel_tol, abs_tol = ferror
+
+    # print(f"==> check_flaot {i_el=}, {type(i_el)=}")
+    # print(f"{rel_tol=}, {type(abs_tol)=}")
 
     if rel_tol < 0:
         return status, msg
 
-    print("==== check_float, rel_tol= ", rel_tol)
+    # print("==== check_float, rel_tol= ", rel_tol)
     if math.fabs(i_el) <= abs_tol:
         abs_err = math.fabs(i_el - s_el)
         status = True if abs_err < 1.0e-5 else False
@@ -80,6 +131,16 @@ def check_int(i_el, s_el):
 
 
 # ----------------------------------------------------------------------
+def check_list_at_least(s_arr, nb_el):
+    """ Check that the list is has at least nb_el elements"""
+    len_arr = len(s_arr)
+    if len_arr < nb_el:
+        status = False
+        msg = f"The number of elements in the list ({len_arr}) is less than required ({nb_el})"
+    else:
+        status = True
+        msg = f"The number of elements in the list ({len_arr}) is greater or equal than required ({nb_el})"
+    return status, msg
 
 def check_list_float_monotone_increasing(s_arr):
     """ Check that the list is monotonically increasing """
@@ -294,8 +355,8 @@ def check_dict_str_float(
     msg_list = []
     status = True
 
-    print(f"check_dict_float: {rel_tol=}, {abs_tol=}")
-    print(f"check_dict_float: {type(rel_tol)=}, {type(abs_tol)=}")
+    # print(f"check_dict_float: {rel_tol=}, {abs_tol=}")
+    # print(f"check_dict_float: {type(rel_tol)=}, {type(abs_tol)=}")
 
     for k in keys:
         i_el = i_dict.get(k, None)
@@ -423,7 +484,47 @@ def are_sets_equal(set1, set2, rtol=1e-5, atol=1e-6):
 
 
 # ======================================================================
-def check_answer_float(student_answer, instructor_answer, options):
+def check_answer_float_exp(student_answer, instructor_answer, options, validation_functions):
+    """
+    Check answer correctness. Assume the structure is correct.
+    """
+    # print(f"==> check_answer_float_exp, {options=}")
+    status = True
+    msg_list = []
+    s_answ = student_answer
+    i_answ = instructor_answer
+
+
+    rel_tol = options.get('rel_tol', 1.e-2)
+    abs_tol = options.get('abs_tol', 1.e-6)
+    range_val = options.get('range_validation', None) # read from spectral_yaml
+
+    functions = {
+            'check_float_range': [check_float, [frange]],
+            'check_float': [check_float, [s_answ, i_answ, options]], 
+    }
+    for func_name, (func, args) in functions.items():
+        status_, msg_ = func(*args)
+
+
+    if range_val is not None:
+        status_, msg_ = check_float_range(s_answ, (range_val['min'], range_val['max']))
+        status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
+
+    if status is True:
+        status_, msg_ = check_float(
+            i_answ, s_answ, rel_tol=rel_tol, abs_tol=abs_tol
+        )
+        status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
+# ======================================================================
+def check_answer_float(student_answer, instructor_answer, options, validation_functions):
     """
     Check answer correctness. Assume the structure is correct.
     """
@@ -431,6 +532,14 @@ def check_answer_float(student_answer, instructor_answer, options):
     # print(f"==> {student_answer=}, {instructor_answer=}")
     status = True
     msg_list = []
+
+    # print(f"{validation_functions=}")
+    # print(f"{options=}")
+    # print("==> before apply_validations")
+    apply_validations(student_answer, instructor_answer, validation_functions, options)
+    # print("==> after apply_validations")
+    # print("==== AFTER apply_validations ===")  # Last 5 lines for testing
+
     s_answ = student_answer
     i_answ = instructor_answer
     rel_tol = options.get('rel_tol', 1.e-2)
@@ -443,7 +552,8 @@ def check_answer_float(student_answer, instructor_answer, options):
 
     if status is True:
         status_, msg_ = check_float(
-            i_answ, s_answ, rel_tol=rel_tol, abs_tol=abs_tol
+            # i_answ, s_answ, rel_tol=rel_tol, abs_tol=abs_tol
+            i_answ, s_answ, rel_tol, abs_tol
         )
         status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
 
@@ -581,16 +691,27 @@ def check_structure_dict_str_dict_str_list(student_answer, instructor_answer):
 
 
 # ======================================================================
+# xxx
 def check_answer_dict_str_dict_str_float(
-        student_answer: dict, instructor_answer: dict, options: dict, partial_score_frac: list[float]
+        student_answer: dict, instructor_answer: dict, options: dict, validation_functions, partial_score_frac: list[float]
 ):
     """
     The type is a dict[str, dict[str, list]]
     """
-    print("===> check_answer_dict_str_dict_str_float, options= ", options)
+    # print("\n===> ENTER check_answer_dict_str_dict_str_float, options= ", options)
+    # print("\n==> options keys: ", list(options.keys()))
     range_val = options.get('range_validation', None) # read from spectral_yaml
     at_least_val = options.get("at_least_validation", None)
-    print("===> at_least_val= ", at_least_val)
+
+    # print("options= ", options)
+    # print(f"{validation_functions=}")
+
+    # print("==> before apply_validations")
+    # print(f"{options['student_answer']=}")
+    apply_validations(validation_functions, options)
+    # print("==> after apply_validations")
+    # print("==== AFTER apply_validations ===")
+
     dict_float_choices = options.get('dict_float_choices', {})
     rel_tol = options.get('rel_tol', 1.e-2)  # this will change in the future
     abs_tol = options.get('abs_tol', 1.e-5)
@@ -834,7 +955,7 @@ def check_structure_dict(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_str(student_answer, instructor_answer, options):
+def check_answer_str(student_answer, instructor_answer, options, validation_functions):
     """
     Arguments:
     - str_choices: check that the answer is one of str_choices if str_choices is not None
@@ -928,7 +1049,7 @@ def check_structure_explain_str(student_answer):
 
 
 def check_answer_set_str(
-    student_answer, instructor_answer, options, partial_score_frac: list[float]
+    student_answer, instructor_answer, options, validation_functions, partial_score_frac: list[float]
 ):
     """
     s_answ: student answer: set of strings
@@ -1073,7 +1194,7 @@ def check_structure_dict_str_set(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_dict_str_set_int(student_answer, instructor_answer, options):
+def check_answer_dict_str_set_int(student_answer, instructor_answer, options, validation_functions):
     """ """
     msg_list = []
     status = True
@@ -1088,7 +1209,7 @@ def check_answer_dict_str_set_int(student_answer, instructor_answer, options):
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_dict_str_set_int(student_answer, instructor_answer, options):
+def check_structure_dict_str_set_int(student_answer, instructor_answer, options, validation_functions):
     """
     TODO: provide a list of keys to check as an argument keys (default None)
     Check that the outer dict keys are correct
@@ -1122,7 +1243,7 @@ def check_structure_dict_str_set_int(student_answer, instructor_answer, options)
 
 
 def check_answer_dict_str_float(
-    student_answer, instructor_answer, options, partial_score_frac: list[float]
+    student_answer, instructor_answer, options, validation_functions, partial_score_frac: list[float]
 ):
     """
     student answer: dictionary with keys:str, values: an ndarray
@@ -1427,7 +1548,7 @@ def check_structure_dict_tuple_int_ndarray(student_answer, instructor_answer, ke
 # ----------------------------------------------------------------------
 
 
-def check_answer_dict_int_ndarray(student_answer, instructor_answer, options):
+def check_answer_dict_int_ndarray(student_answer, instructor_answer, options, validation_functions):
     """
     Similar to check_answer_dict_str_ndarray
     student answer: dictionary with keys:str, values: an ndarray
@@ -1540,7 +1661,7 @@ def check_structure_dict_int_ndarray(student_answer, instructor_answer, keys=Non
 
 
 # ======================================================================
-def check_answer_dict_int_list(student_answer, instructor_answer, options):
+def check_answer_dict_int_list(student_answer, instructor_answer, options, validation_functions):
     """
     Similar to check_answer_dict_str_ndarray
     list of floats (if not specified)
@@ -1817,7 +1938,7 @@ def check_structure_list_int(student_answer, instructor_answer):
 
 # ======================================================================
 def check_answer_list_float(
-        student_answer, instructor_answer, options, partial_score_frac: list[float]=0.
+        student_answer, instructor_answer, options, validation_functions, partial_score_frac: list[float]=0.
 ):
     """
     Check that all elements in the list have matching norms
@@ -1903,7 +2024,7 @@ def check_structure_list_float(student_answer, instructor_answer):
 
 
 def check_answer_list_ndarray(
-    student_answer, instructor_answer, options, partial_score_frac: list[float]
+    student_answer, instructor_answer, options, validation_functions, partial_score_frac: list[float]
 ):
     """
     rel_tol: max relative error on the L2 norm
@@ -2031,7 +2152,7 @@ def check_structure_list_ndarray(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_ndarray(student_answer, instructor_answer, options):
+def check_answer_ndarray(student_answer, instructor_answer, options, validation_functions):
     """
     rel_tol: max relative error on the L2 norm
     Check that all elements in the list have matching norms
@@ -2043,7 +2164,7 @@ def check_answer_ndarray(student_answer, instructor_answer, options):
     if isinstance(student_answer, float) and np.isnan(student_answer):
         status = False
         msg_list("Answer is a Nan!")
-        print("===> check_answer_ndarray, {student_answer=}")
+        # print("===> check_answer_ndarray, {student_answer=}")
 
     elif isinstance(student_answer, type(np.zeros([1]))) and np.isnan(student_answer).any():
         status = False
@@ -2297,7 +2418,7 @@ def check_structure_set_set_int(student_answer):
 
 
 def check_answer_dict_str_tuple_ndarray(
-    student_answer, instructor_answer, options, partial_score_frac: list[float]
+    student_answer, instructor_answer, options, validation_functions, partial_score_frac: list[float]
 ):
     """
     GE original function restructed by GPT-4 (2024-03-06)
@@ -2379,7 +2500,7 @@ def check_structure_dict_str_tuple_ndarray(student_answer, instructor_answer):
 # ======================================================================
 
 
-def check_answer_dendrogram(student_dendro, instructor_dendro, options):
+def check_answer_dendrogram(student_dendro, instructor_dendro, options, validation_functions):
     """
     With help from GPT-4
     Compares two dendrogram dictionaries.
@@ -2611,7 +2732,7 @@ def check_structure_list_str(student_answer):
 # ======================================================================
 
 
-def check_answer_lineplot(student_answer, instructor_answer, options):
+def check_answer_lineplot(student_answer, instructor_answer, options, validation_functions):
     """
     Lineplots generated by matlab. Check one or multiple lines.
     Check the following:
@@ -2770,7 +2891,7 @@ def check_structure_lineplot(student_answer):
 
 
 # FIX to handle 2D
-def check_answer_scatterplot2d(student_answer, instructor_answer, options):
+def check_answer_scatterplot2d(student_answer, instructor_answer, options, validation_functions):
     status = True
     msg_list = []
 
@@ -2782,8 +2903,8 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, options):
 
     at_least_val = options.get('at_least_validation', None)
 
-    print("s_answ= ", s_answ)
-    print(f"{type(s_answ)=}")
+    # print("s_answ= ", s_answ)
+    # print(f"{type(s_answ)=}")
     s_fig = s_plt.figure
     i_fig = i_plt.figure
     # Assume only a single axis
@@ -2800,9 +2921,9 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, options):
 
     def fig_dict(answ):
         fig = answ.figure
-        print("==> answ= ", answ)
-        print("==> fig= ", fig)
-        print("==> ", dir(fig))
+        # print("==> answ= ", answ)
+        # print("==> fig= ", fig)
+        # print("==> ", dir(fig))
         ax = fig.axes[0]
         coll = ax.collections[0]
         xy = ax.collections[0].get_offsets()
@@ -2886,7 +3007,7 @@ def check_structure_scatterplot2d(student_answer):
 # ======================================================================
 
 
-def check_answer_scatterplot3d(student_answer, instructor_answer, options):
+def check_answer_scatterplot3d(student_answer, instructor_answer, options, validation_functions):
     status = True
     msg_list = []
 

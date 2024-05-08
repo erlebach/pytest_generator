@@ -5,7 +5,94 @@ import pytest
 import argparse
 from types_list import types_list
 from generator_utils import sanitize_function_name, get_decoded_str, evaluate_answers
+from function_call_lists import validation_function_templates as validation_functions
 
+# In spectral.yaml
+#     options:
+#         float_error: {'rel_tol': 3.e-2, 'abs_tol': 1.e-5}
+#         float_range: {'min': -3., 'max': 4.}
+#
+# in function_call_lists
+#    'float_error': {
+#        'function': 'check_float',
+#        'parameters': [('rel_tol', 'abs_tol')]
+#    },
+
+def generate_validations(part):
+    """
+    Options: list of validation names with parameters
+    options:
+      float_error: {'rel_tol': 3.e-2, 'abs_tol': 1.e-5}
+      float_range: {'min': -3., 'max': 4.}
+
+    - the keys of options are also the keys in validation_function_templates
+
+    validation_function_templates = {
+        'range_validation': {
+            'function': 'check_float_range',
+            'parameters': ['min', 'max']
+            #'parameters': [('min', 'max')]
+        },
+        'float_error': {
+            'function': 'check_float',
+            'parameters': ['rel_tol', 'abs_tol']
+            #'parameters': [('rel_tol', 'abs_tol')]
+        },
+
+    - Return value: 
+          validation_functions=[
+                 {'function': 'check_float', 'args': ['rel_tol', 'abs_tol']}, 
+                 {'function': 'check_float_range', 'args': ['min', 'max']}
+          ]
+
+    Desired output: for each function, a list of arguments, followed by application of the function.
+    I am returning to the philosphy of creating the function at the test_generator level, with the 
+    parameters defined in the input yaml file. 
+    """
+    validations = []
+    options = part.get('options', {})
+    print(f"==> {part=}")
+
+    for key, config in options.items():
+        if key in validation_functions:
+            func_info = validation_functions[key]
+            func_name = func_info['function']
+            expected_params = func_info['parameters']
+            args = []
+
+            # Collect parameters based on expected_params and the configuration provided
+            print(f"==> {expected_params=}")
+            for param in expected_params:
+                print(f"==> {param=}")
+                if isinstance(param, tuple):
+                    print("parameter is a tuple, param= ", param)
+                    # Extract each parameter from the config
+                    tuple_args = tuple(config.get(p, None) for p in param)
+                    args.append(tuple_args)
+                else:
+                    ## Handle standard parameters which might not need to be specified every time
+
+                    if param in ['student_answer', 'instructor_answer']:
+                        # Use these placeholders, or resolve actual values contextually if necessary
+                        args.append(param)  # This assumes param itself is a placeholder
+                    elif param in config:  # directory use value from config if mentioned
+                        # Directly use the value from config if it is explicitly mentioned
+                        args.append(config[param])
+                    else:
+                        # Handle missing parameters with an error or skip
+                        args.append(param)
+                        pass
+                        # raise ValueError(f"Required parameter '{param}' not provided for '{key}' validation.")
+
+            validations.append({
+                'function': func_name,
+                'args': args
+            })
+
+    return validations
+
+
+# ----------------------------------------------------------------------
 def add_attribute(name, attr):
     if attr is not None:
         test_code = f"    {name} = {attr}\n"
@@ -114,8 +201,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             if k not in questions_data:
                 questions_data[k] = v
 
-    print(f"==> {questions_data=}")
-
     module_ = questions_data["module"]
     test_code = function_header_str
     max_score = questions_data.get("max_score", 0.0)
@@ -146,6 +231,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
         for part in question["parts"]:
             options = part.get('options', {})
+            print("=========================================")
+            print(f"\n===> {part=}")
+
             answer_type = config_dict['answer_type']
             part_type = part.get("type", answer_type)
             # I will need all fields in lower-level function
@@ -241,7 +329,14 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
                 import_file = f"type_handlers['types']['{part_type}']['import']"
 
-                test_code += add_attribute("options", options)
+                validation_functions = generate_validations(part)
+                print(f"==> {validation_functions=}")
+                print("==> validation_functions")
+                for fct in validation_functions:
+                    print(f"\n===> {fct=}")
+
+                test_code += f"    validation_functions = {validation_functions}\n"
+                test_code += f"    options = {options}\n"
 
                 assertion_answer = eval(
                     f"type_handlers['types']['{part_type}']['assert_answer']"
@@ -257,9 +352,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += f'    msg_structure = "{assertion_structure}"\n'
                 # Check answers
                 test_code += f'    msg_answer = "{assertion_answer}"\n'
-
-                local_vars_dict = part.get("locals", None)
-                test_code += add_attribute("local_vars_dict", local_vars_dict)
 
                 note = part.get("note", None)
                 if sim_type == "answers" and note is not None:
@@ -277,7 +369,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
                 test_code += f"    partial_score_frac_l = [0.]\n"
 
-                test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'options': options, 'partial_score_frac_l': partial_score_frac_l})\n"
+                test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'options': options, 'validation_functions': validation_functions, 'partial_score_frac_l': partial_score_frac_l})\n"
 
                 test_code += "    function_name.answer_type = answer_type\n"
                 test_code += "    function_name.question_id = question_id\n"
@@ -326,6 +418,8 @@ def main(yaml_name, sim_type):
     """
     sim_type = ['answers', 'structure']
     """
+
+    print("\n******* main ******")
     questions_data = load_yaml_file(yaml_name)
     generate_test_answers_code(
         questions_data, sim_type, f"test_{sim_type}_{yaml_name[:-5]}.py"
@@ -342,4 +436,8 @@ if __name__ == "__main__":
         "-t", "--simtype", help="'answers' or 'structure'", required=True
     )
     args = parser.parse_args()
+
+    print("++++++++++++++++++++++++++++++++++++++++++++++")
+    print("++++++++++++++++++++++++++++++++++++++++++++++")
+    print("+++++ START MAIN ++++")
     main(args.yaml, args.simtype)
