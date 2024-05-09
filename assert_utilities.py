@@ -27,7 +27,6 @@ def apply_validations(s_answ, i_answ, validations, options):
                 # Handle single arguments by appending them from options or using a default
                 args.append(arg_spec)
 
-        print(f"==> xxx {args=}")
         # result[0] : status
         # result[1] : message
         result = func(*args)
@@ -600,6 +599,7 @@ def check_structure_eval_float(student_answer):
 # ======================================================================
 
 
+# I should implement this
 # def check_answer_dict_str_dict_str_list(student_answer, instructor_answer):
 #     """
 #     The type is a dict[str, dict[str, list]]
@@ -669,7 +669,6 @@ def check_structure_dict_str_dict_str_list(student_answer, instructor_answer):
 
 
 # ======================================================================
-# xxx
 def check_answer_dict_str_dict_str_float(
         student_answer: dict, instructor_answer: dict, options: dict, validation_functions, partial_score_frac: list[float]
 ):
@@ -686,7 +685,7 @@ def check_answer_dict_str_dict_str_float(
 
     # print("==> before apply_validations")
     # print(f"{options['student_answer']=}")
-    apply_validations(validation_functions, options)
+    # apply_validations(student_answer, instructor_answer, validation_functions, options)
     # print("==> after apply_validations")
     # print("==== AFTER apply_validations ===")
 

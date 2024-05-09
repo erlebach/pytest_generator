@@ -2,7 +2,7 @@ types_list = [
     "bool",
     "dendrogram", 
     "dict[str,dict[str,float]]",
-    "dict[str,dict[str,list]]",
+    "dict[str,dict[str,list]]",  # No function
     "dict[str,float]", 
     "dict[str,ndarray]", 
     "dict[str,set[int]]", 
