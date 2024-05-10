@@ -12,5 +12,5 @@ python yaml_expand.py --yaml "$out.yaml" -o "$pre.yaml"
 
 echo "===> answers"
 python test_generator.py  --yaml "$pre.yaml" --simtype 'answers'
-echo "===> structure"
-python test_generator.py  --yaml "$pre.yaml" --simtype 'structure'
+## echo "===> structure"
+## python test_generator.py  --yaml "$pre.yaml" --simtype 'structure'

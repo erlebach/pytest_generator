@@ -1,0 +1,99 @@
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 20
+module: all_questions
+
+# choices: instructor_file, student_file, yaml_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+fixtures: 
+  fixture:
+    name: run_compute
+    # Fixure arguments in a list
+    # args: [spectral_clustering]
+    args: [spectral_patch_dict]
+
+  # Default throughout this file. 
+  # Can be overriden in each question
+  options:
+      partial_score: True
+      rel_tol: 1.0e-2  
+      abs_tol: 1.0e-6
+
+links: 
+    - "https://www.analyticsvidhya.com/blog/2019/08/11-important-model-evaluation-error-metrics/"
+#----------------------------------------------------------------------------------------------------
+questions:
+- id: spectral_clustering
+  parts:
+    #- id: "spectral_function"
+    #type: function
+
+    - id: "cluster parameters"
+      type: dict[str,dict[str,float]]
+      options:
+        # key in function_call_lists
+        float_error: {'rel_tol': .01, 'abs_tol': 1.e-5}  # test validator in test_generator
+        # key in function_call_lists
+        float_range: {'min': -1., 'max': 2}  # 
+
+        # distinguish simple versus complex function is the presence of 'validation_list'
+        # key in function_call_lists
+        apply_validations_to_key: 
+          - key: ARI 
+            key_pos: inner
+            validation_list: [float_range, float_error]
+            options_list: 
+              - { min: -1, max: 1 }  # Options for 'float_range'
+              - { rel_tol: 0.03, abs_tol: 1e-5 }  # Options for 'float_error'
+
+          - key: SSE
+            key_pos: outer
+            validation_list: ['at_least_count']
+            options_list: [ { count: 10} ] # Options for 'check_at_least'
+
+    # Explanation of parameters: 
+    # `key` is the dictionary key to check, 
+    # `validation_list` contains names of validation functions,
+    # `options_list` includes specific parameters for each validation in corresponding order.
+
+##    # I'd like to check that ARI < 1
+##    # answ[i]['ARI'] <= 1. and >= -1.
+##
+##    - id: "cluster scatterplot with largest ARI"
+##      type: scatterplot2d
+##
+##    - id: "cluster scatterplot with smallest SSE"
+##      type: scatterplot2d
+##
+##    - id: "eigenvalue plot"
+##      type: lineplot
+##      options: 
+##        at_least_count: {count: 95}
+##   
+##    - id: "mean_ARIs"
+##      type: float
+##      options:
+##        float_range: {min: -1, max: 1}
+##        float_error: {'rel_tol': -1., 'abs_tol': 1.e-5}
+##
+##    - id: "std_ARIs"
+##      type: float
+##      max_score: 0
+##      options:
+##        float_error: {'rel_tol': .01, 'abs_tol': 1.e-5}
+##
+##    - id: "mean_SSEs"
+##      type: float
+##      options:
+##        float_error: {'rel_tol': -1, 'abs_tol': 1.e-5}
+##
+##    - id: "std_SSEs"
+##      type: float
+##      max_score: 0
+##      options:
+##        float_error: {'rel_tol': -1., 'abs_tol': 1.e-5}
+###----------------------------------------------------------------------------------------------------

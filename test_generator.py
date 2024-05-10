@@ -18,76 +18,103 @@ from function_call_lists import validation_function_templates as validation_func
 #        'parameters': [('rel_tol', 'abs_tol')]
 #    },
 
+# GPT-4 version
+def validate_complex_function(key, value):
+    """
+    (Every 'function' key is a key in `validation_functions`)
+    Parameters: 
+    ----------
+    value: {
+        'key': 'ARI', 'key_pos': 'inner', 
+        'options_list': [{'max': 1, 'min': -1}, {'abs_tol': '1e-5', 'rel_tol': 0.03}], 
+        'validation_list': ['float_range', 'float_error']
+           }
+    Return: dict
+    ------
+       {
+          'outer_function': 'apply_validations_to_key', 'args': ['inner', 'ARI'], 
+          'inner_functions': [
+              {'function': 'fct1', 'args': [.01, .3]},  
+              {'function': 'fct2', 'args': [-1., 3.]}
+          ]
+       }
+    """
+    loc_key = value.get('key', "")
+    key_pos = value.get('key_pos', "inner")
+    validation_list = value['validation_list']
+    options_list = value['options_list']
+
+    if loc_key == "":
+        print("Missing key")
+        validation_details = {}
+
+    inner_functions = []
+
+    # Generate a list of functions to apply
+    for function_key, params in zip(validation_list, options_list):
+        function_template = validation_functions[function_key]
+        function_name = function_template['function']
+        parameters = function_template['parameters']
+        args = [params[param] for param in parameters]
+
+        # Append the details of each validation function
+        inner_functions.append({
+            'function': function_name,
+            'args': args
+        })
+
+    # Assemble the complex function details including both the outer and inner function calls
+    validation_details = {
+        'outer_function': 'apply_validations_to_key',
+        'args': [key_pos, loc_key],
+        'inner_functions': inner_functions
+    }
+
+    return validation_details
+
+
+
+def validate_simple_function(key, value):
+    """
+    Return: dict
+    -------
+        {'function': 'check_float', 'args': [0.01, 1e-05]}
+    """
+    args = []
+    for k,v in value.items():
+        args.append(k)
+
+    # Handle simple validation configurations
+    function_template = validation_functions[key]
+    function_name = function_template['function']
+    function_args = [value[param] for param in function_template['parameters']]
+
+    validation_details = {
+        'function': function_name,
+        'args': function_args
+    }
+    return validation_details
+
+
 def generate_validations(part):
     """
-    Options: list of validation names with parameters
-    options:
-      float_error: {'rel_tol': 3.e-2, 'abs_tol': 1.e-5}
-      float_range: {'min': -3., 'max': 4.}
-
-    - the keys of options are also the keys in validation_function_templates
-
-    validation_function_templates = {
-        'range_validation': {
-            'function': 'check_float_range',
-            'parameters': ['min', 'max']
-            #'parameters': [('min', 'max')]
-        },
-        'float_error': {
-            'function': 'check_float',
-            'parameters': ['rel_tol', 'abs_tol']
-            #'parameters': [('rel_tol', 'abs_tol')]
-        },
-
-    - Return value: 
-          validation_functions=[
-                 {'function': 'check_float', 'args': ['rel_tol', 'abs_tol']}, 
-                 {'function': 'check_float_range', 'args': ['min', 'max']}
-          ]
-
-    Desired output: for each function, a list of arguments, followed by application of the function.
-    I am returning to the philosphy of creating the function at the test_generator level, with the 
-    parameters defined in the input yaml file. 
+    Return: 
+    ------
+    validation_functions=[{'function': 'check_float', 'args': [0.01, 1e-05]}, {'function': 'check_float_range', 'args': [-1.0, 2]}]
     """
-    validations = []
     options = part.get('options', {})
-    print(f"==> {part=}")
+    validations = []
 
-    for key, config in options.items():
-        if key in validation_functions:
-            func_info = validation_functions[key]
-            func_name = func_info['function']
-            expected_params = func_info['parameters']
-            args = []
-
-            # Collect parameters based on expected_params and the configuration provided
-            print(f"==> {expected_params=}")
-            for param in expected_params:
-                print(f"==> {param=}")
-                if isinstance(param, tuple):
-                    print("parameter is a tuple, param= ", param)
-                    # Extract each parameter from the config
-                    tuple_args = tuple(config.get(p, None) for p in param)
-                    args.append(tuple_args)
-                else:
-                    ## Handle standard parameters which might not need to be specified every time
-
-                    if param in ['student_answer', 'instructor_answer']:
-                        # Use these placeholders, or resolve actual values contextually if necessary
-                        args.append(param)  # This assumes param itself is a placeholder
-                    elif param in config:  # directory use value from config if mentioned
-                        # Directly use the value from config if it is explicitly mentioned
-                        args.append(config[param])
-                    else:
-                        # Handle missing parameters with an error or skip
-                        args.append(param)
-                        pass
-                        # raise ValueError(f"Required parameter '{param}' not provided for '{key}' validation.")
-
-            validations.append({
-                'function': func_name,
-                'args': args
-            })
+    # Iterate over all entries in the options dictionary
+    for key, value in options.items():
+        if isinstance(value, list):
+            for value_el in value:
+                if 'validation_list' in value_el and 'options_list' in value_el:
+                    details = validate_complex_function(key, value_el)
+                    validations.append(details)
+        else:
+            details = validate_simple_function(key, value)
+            validations.append(details)
 
     return validations
 
@@ -330,10 +357,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 import_file = f"type_handlers['types']['{part_type}']['import']"
 
                 validation_functions = generate_validations(part)
-                print(f"==> {validation_functions=}")
-                print("==> validation_functions")
-                for fct in validation_functions:
-                    print(f"\n===> {fct=}")
+                print(f"\nRETURN, {validation_functions=}")
 
                 test_code += f"    validation_functions = {validation_functions}\n"
                 test_code += f"    options = {options}\n"
@@ -437,7 +461,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    print("++++++++++++++++++++++++++++++++++++++++++++++")
-    print("++++++++++++++++++++++++++++++++++++++++++++++")
-    print("+++++ START MAIN ++++")
+    # print("++++++++++++++++++++++++++++++++++++++++++++++")
+    # print("++++++++++++++++++++++++++++++++++++++++++++++")
+    # print("+++++ START MAIN ++++")
     main(args.yaml, args.simtype)

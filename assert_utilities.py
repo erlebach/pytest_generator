@@ -10,6 +10,8 @@ import yaml
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
+"""
+# Original version
 def apply_validations(s_answ, i_answ, validations, options):
     results = []
     for validation in validations:
@@ -33,6 +35,40 @@ def apply_validations(s_answ, i_answ, validations, options):
         results.append(result)
 
     return all(res[0] for res in results), " \n".join(res[1] for res in results)
+"""
+
+# GPT-4 version, not yet DEBUGGED
+def apply_validations(s_answ, i_answ, validations, options):
+    results = []
+
+    for validation in validations:
+        if 'inner_functions' in validation:
+            # Handle complex validations with outer and inner function calls
+            outer_function = globals()[validation['outer_function']]
+            outer_args = [options.get(arg, None) for arg in validation['args']]  # Extract outer args based on keys or positions
+            inner_results = []
+
+            for inner_func in validation['inner_functions']:
+                func = globals()[inner_func['function']]
+                # Prepare inner function arguments, might involve nested data handling
+                inner_args = [s_answ, i_answ] + inner_func['args']
+                result = func(*inner_args)
+                inner_results.append(result)
+
+            # Apply the outer function on the results of inner functions if necessary
+            # This depends on what outer_function is supposed to do; you might adjust this logic
+            final_result = outer_function(*outer_args, inner_results)
+            results.append(final_result)
+        else:
+            # Simple validation handling
+            func = globals()[validation['function']]
+            args = [s_answ, i_answ] + [options.get(arg, None) for arg in validation['args']]
+            result = func(*args)
+            results.append(result)
+
+    # Evaluate all results: status (all must be True) and concatenated messages
+    return all(res[0] for res in results), "\n".join(res[1] for res in results)
+
 
 
 def check_msg_status(status, msg_list, status_, msg_):
