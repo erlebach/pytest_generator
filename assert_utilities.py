@@ -16,6 +16,7 @@ def apply_validations(s_answ, i_answ, validations, options):
     results = []
 
     for validation in validations:
+        print("validations; ", validations)
         if 'inner_functions' in validation:
             # Handling complex validations with nested key handling
             inner_results = []
@@ -31,54 +32,42 @@ def apply_validations(s_answ, i_answ, validations, options):
                         value_i = i_answ[index][key]
                         # Apply each inner validation function to these values
                         for inner_func in validation['inner_functions']:
-                            # func = globals()[inner_func['function']]
-                            # args = [value_s, value_i] + inner_func['args']
-                            # result = func(*args)
-                            # inner_results.append(result)
                             result = apply_single_validation(value_s, value_i, inner_func, options)
                             inner_results.append(result)
+            elif key_pos == 'outer':
+                print("outer key, key_pos: ", key_pos)
+                s_answ_keys = list(s_answ.keys())
+                i_answ_keys = list(i_answ.keys())
+                for inner_func in validation['inner_functions']:
+                    result = apply_single_validation(i_answ_keys, i_answ_keys, inner_func, options)
+                    inner_results.append(result)
+
+            else:
+                print("key_pos ({key_pos}) is not handled")
+                continue
 
             # Here, you could apply an outer function to aggregate the results from inner functions if needed
             outer_function = globals()['outer_aggregator']
-            print(f"{outer_function=}")
-            print(f"{inner_results=}")
             final_result = outer_function(inner_results)
-            print(f"{final_result=}")
             results.append(final_result)
-            print(f"{results=}")
 
         else:
             # Simple validation handling
-            # print("... simple validation handling")
-            # func = globals()[validation['function']]
-            # args = [s_answ, i_answ] + [options.get(arg, None) for arg in validation['args']]
-            # result = func(*args)
-            # results.append(result)
             result = apply_single_validation(s_answ, i_answ, validation, options)
             results.append(result)
 
     # Returns a list of results from each validation
-    # print("exit apply_validations")
     return results
 
 def apply_single_validation(s_answ, i_answ, validation, options):
     func = globals()[validation['function']]
-    print("single validation, func= ", func)
+    # print("single validation, func= ", func)
     args = [s_answ, i_answ] + validation['args'] #[options.get(arg, None) for arg in validation['args']]
     return func(*args)
 
 def outer_aggregator(results):
     # Example of a simple outer function that might aggregate results
     return all(res[0] for res in results), "\n".join(res[1] for res in results)
-
-
-##def apply_single_validation(s_answ, i_answ, validation, options):
-##    func = globals()[validation['function']]
-##    print("... apply_single_validation, func= ", func)
-##    args = [s_answ, i_answ] + validation['args'] 
-##    #[options.get(arg, None) for arg in validation['args']]
-##    print("args= ", args[2:])
-##    return func(*args)
 
 
 # ----------------------------------------------------------------------
@@ -133,9 +122,7 @@ def check_missing_keys(missing_keys, msg_list):
 # ----------------------------------------------------------------------
 # All low-level check functions take s_el, i_el as first two parameters
 def check_float_range(s_el, i_el, mn, mx):
-    # print("===> inside check_float_range")
-    #mn, mx = frange
-    print(f"==> inside check_float_range, {s_el=}, {i_el=}, {mn=}, {mx=}")
+    # print(f"==> inside check_float_range, {s_el=}, {i_el=}, {mn=}, {mx=}")
     status = True
     msg_= ""
     if s_el <= mn or s_el >= mx:
@@ -151,14 +138,13 @@ def check_float(s_el, i_el, rel_tol=1.e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
 
-    print(f"==> inside check_float, {s_el=}, {i_el=}, {rel_tol=}, {abs_tol=}")
-    print(f"==>         {type(s_el)=}, {type(i_el)=}")
+    # print(f"==> inside check_float, {s_el=}, {i_el=}, {rel_tol=}, {abs_tol=}")
+    # print(f"==>         {type(s_el)=}, {type(i_el)=}")
 
     if rel_tol < 0:
         print(f"==>    rel_tol < 0, {status=}, {msg=}")
         return status, msg
 
-    # print("==== check_float, rel_tol= ", rel_tol)
     if math.fabs(i_el) <= abs_tol:
         abs_err = math.fabs(i_el - s_el)
         status = True if abs_err < abs_tol else False
@@ -170,7 +156,10 @@ def check_float(s_el, i_el, rel_tol=1.e-2, abs_tol=1.0e-5):
     return status, msg
 
 # ----------------------------------------------------------------------
-# def check_at_least(i_list
+#def check_keys_at_least(key_list, nb_el)
+   #""" check that the number of keys is at least `nb_el` """
+   #status = True
+   #msg = ""
 
 # ----------------------------------------------------------------------
 
@@ -185,8 +174,12 @@ def check_int(i_el, s_el):
 
 
 # ----------------------------------------------------------------------
-def check_list_at_least(s_arr, nb_el):
+def check_list_at_least(s_arr, i_arr, nb_el):
     """ Check that the list is has at least nb_el elements"""
+    print("===> inside check_list_at_least")
+    print(f"   {s_arr=}")
+    print(f"   {i_arr=}")
+    print(f"   {nb_el=}")
     len_arr = len(s_arr)
     if len_arr < nb_el:
         status = False

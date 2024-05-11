@@ -39,7 +39,7 @@ validation_function_templates = {
         'parameters': ['rel_tol', 'abs_tol']
     },
     'at_least_count': {
-        'function': 'check_at_least',
+        'function': 'check_list_at_least',
         'parameters': ['count']
     },
     # Apply validations on a particular key

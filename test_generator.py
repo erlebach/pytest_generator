@@ -45,7 +45,7 @@ def validate_complex_function(key, value):
     options_list = value['options_list']
 
     if loc_key == "":
-        print("Missing key")
+        print("validate_complex_function: missing key 'key' in function definition")
         validation_details = {}
 
     inner_functions = []
@@ -110,9 +110,11 @@ def generate_validations(part):
         if isinstance(value, list):
             for value_el in value:
                 if 'validation_list' in value_el and 'options_list' in value_el:
+                    print(".... if")
                     details = validate_complex_function(key, value_el)
                     validations.append(details)
         else:
+            print(".... else")
             details = validate_simple_function(key, value)
             validations.append(details)
 
