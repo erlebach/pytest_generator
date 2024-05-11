@@ -15,9 +15,12 @@ def apply_validations(s_answ, i_answ, validations, options):
     """ """
     results = []
 
+    print("=======>>>> ENTER apply_validations <<<===================")
+
+    # print(f"{validations=}")
     for validation in validations:
-        print("validations; ", validations)
-        if 'inner_functions' in validation:
+        # print(f"{validation=}")
+        if 'inner_functions' in validation:  # (A)
             # Handling complex validations with nested key handling
             inner_results = []
             key = validation['args'][1]  # assuming 'key' is always the second argument in 'args'
@@ -25,6 +28,7 @@ def apply_validations(s_answ, i_answ, validations, options):
 
             # Iterate through nested dictionary structures based on key and key_pos
             if key_pos == 'inner':
+                inner_results = []
                 for index in s_answ:
                     if key in s_answ[index] and key in i_answ[index]:
                         # Extract values for both student and instructor answers for the given key
@@ -34,30 +38,37 @@ def apply_validations(s_answ, i_answ, validations, options):
                         for inner_func in validation['inner_functions']:
                             result = apply_single_validation(value_s, value_i, inner_func, options)
                             inner_results.append(result)
+                results.extend(inner_results)
+                # print(f"RETURN from 'inner': {inner_results=}")
+
             elif key_pos == 'outer':
-                print("outer key, key_pos: ", key_pos)
+                inner_results = []
+                # print("outer key, key_pos: ", key_pos)
                 s_answ_keys = list(s_answ.keys())
                 i_answ_keys = list(i_answ.keys())
                 for inner_func in validation['inner_functions']:
                     result = apply_single_validation(i_answ_keys, i_answ_keys, inner_func, options)
                     inner_results.append(result)
+                    # print(f"RETURN from 'outer': {result=}")
+                results.extend(inner_results)
+                # print(f"RETURN from 'outer': {inner_results=}")
 
             else:
                 print("key_pos ({key_pos}) is not handled")
                 continue
 
-            # Here, you could apply an outer function to aggregate the results from inner functions if needed
-            outer_function = globals()['outer_aggregator']
-            final_result = outer_function(inner_results)
-            results.append(final_result)
-
-        else:
-            # Simple validation handling
+        else: # (A)
+            # print("(A) else")
+            # print(f"{validation=}")
             result = apply_single_validation(s_answ, i_answ, validation, options)
             results.append(result)
 
     # Returns a list of results from each validation
-    return results
+    outer_function = globals()['outer_aggregator']
+    # results: [ [(status, msg), (status, msg)...], [(status, msg), (status, msg)], ...]
+    final_result = outer_function(results)
+    results.extend(final_result)
+    return final_result
 
 def apply_single_validation(s_answ, i_answ, validation, options):
     func = globals()[validation['function']]
@@ -72,6 +83,7 @@ def outer_aggregator(results):
 
 # ----------------------------------------------------------------------
 # arguments inconsistent with signature in function_call_list.py .
+"""
 def apply_validations_to_key(s_answ, i_answ, inner_functions, options, key_pos, key):
     # What if some keys are to be excluded? In that case, exclude the keys before calling
     # this function?
@@ -91,7 +103,7 @@ def apply_validations_to_key(s_answ, i_answ, inner_functions, options, key_pos, 
         # for k, v in s_answ
         print("apply_validations_to_key: IMPLEMENT 'outer' later")
         raise "ERROR"
-
+"""
 
 # ----------------------------------------------------------------------
 
@@ -128,8 +140,8 @@ def check_float_range(s_el, i_el, mn, mx):
     if s_el <= mn or s_el >= mx:
         status = False
         msg_ = f"Value is {s_el} outside the range [{mn},{mx}]."
-    else:
-        msg_ = f"Value is {s_el}, within the range [{mn},{mx}]."
+    #else:
+        #msg_ = f"Value is {s_el}, within the range [{mn},{mx}]."
     return status, msg_
 
 
@@ -186,7 +198,10 @@ def check_list_at_least(s_arr, i_arr, nb_el):
         msg = f"The number of elements in the list ({len_arr}) is less than required ({nb_el})"
     else:
         status = True
-        msg = f"The number of elements in the list ({len_arr}) is greater or equal than required ({nb_el})"
+        #msg = f"The number of elements in the list ({len_arr}) is greater or equal than required ({nb_el})"
+    print("... return from check_list_at_least")
+    print(f"...... {msg=}")
+    print(f"...... {status=}")
     return status, msg
 
 def check_list_float_monotone_increasing(s_arr):
@@ -741,11 +756,11 @@ def check_answer_dict_str_dict_str_float(
     range_val = options.get('range_validation', None) # read from spectral_yaml
     at_least_val = options.get("at_least_validation", None)
 
-
     results = apply_validations(student_answer, instructor_answer, validation_functions, options)
-    status, msg = results[0]
+    status, msg = results
     return return_value(status, [msg], student_answer, instructor_answer)
 
+    """
     msg_list = []
     ps_dict = init_partial_score_dict()
 
@@ -810,6 +825,7 @@ def check_answer_dict_str_dict_str_float(
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
+    """
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

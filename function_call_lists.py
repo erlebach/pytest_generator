@@ -6,12 +6,6 @@ def load_yaml_file(file_path):
         questions_data = yaml.safe_load(file)
     return questions_data
 
-# I should allow chaining of multiple validation functions. 
-
-# in spectral.yaml
-#       options:
-#           float_error: {'rel_tol': 3.e-2, 'abs_tol': 1.e-5}
-#           float_range: {'min': -3., 'max': 4.}
 
 # assert_utilities prepends student_answer and instructor_answer
 validation_function_templates = {
@@ -55,12 +49,15 @@ validation_function_templates = {
     # Other predefined functions...
 }
 
+### CODE BELOW NOT USED EXCEPT when executing this file.
+"""
 def parse_yaml(data):
     questions = data["questions"]
     for question in questions:
         parts = question["parts"]
         for part in parts:
             print(f"\n{part=}")
+"""
 
 def validate(data, validation_type):
     validation_info = validation_functions[validation_type]
@@ -98,34 +95,4 @@ if __name__ == '__main__':
     data = load_yaml_file("validation.yaml")
     parse_yaml(data)
 
-
-"""
-def check_msg_status(status, msg_list, status_, msg_):
-def init_partial_score_dict() -> dict[str, float | int]:
-def check_missing_keys(missing_keys, msg_list):
-def check_float_range(s_el, frange):
-def check_float(i_el, s_el, rel_tol=1.0e-2, abs_tol=1.0e-5):
-def check_int(i_el, s_el):
-def check_list_float_monotone_increasing(s_arr):
-def check_list_float_monotone_decreasing(s_arr):
-def check_list_float_is_probability(s_arr, rel_tol, abs_tol):
-def check_list_float(i_arr, s_arr, rel_tol, abs_tol, ps_dict: dict[str, float | int], exclude_indices: list[int]=[]):
-def check_list_int(i_arr, s_arr, ps_dict: dict[str, float | int]):
-def check_set_int(i_set: set[int], s_set: set[int], ps_dict: dict[str, float | int]):
-def check_str(i_str, s_str, str_choices: list[str] | None =None, remove_spaces: bool=None):
-def check_list_str(i_list, s_list, ps_dict: dict[str, float | int]):
-def check_dict_str_str(
-def update_score(ps_dict: dict[str, float | int]) -> None:
-def check_dict_str_float_range(keys, s_dict, range_val, ps_dict):
-def check_dict_str_float(
-def check_dict_int(keys, i_dict, s_dict, ps_dict: dict[str, float | int]):
-def is_explain(answer):
-def clean_str_answer(answer):
-def load_yaml_file(file_path):
-def extract_config_dict():
-def fmt_ifstr(x):
-def return_value(status, msg_list, s_answ, i_answ):
-def are_sets_equal(set1, set2, rtol=1e-5, atol=1e-6):
-def check_key_structure(s_dict, i_dict):
-"""
 

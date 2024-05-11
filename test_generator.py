@@ -63,6 +63,7 @@ def validate_complex_function(key, value):
             'args': args
         })
 
+    # In the future, there could be other complex functions beyond 'apply_validations_to_key'
     # Assemble the complex function details including both the outer and inner function calls
     validation_details = {
         'outer_function': 'apply_validations_to_key',
