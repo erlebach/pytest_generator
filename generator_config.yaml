@@ -6,7 +6,8 @@ all_tests:
 
   # Where is answer taken from?
   i_answer_source: instructor_file
-  s_answer_source: student_file
+  # s_answer_source: student_file
+  s_answer_source: yaml_file
 
   # Folders are relative to the base project folder. 
   # Do not include slashes!
