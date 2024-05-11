@@ -193,6 +193,7 @@ gen_config = config["test_answers"]
 assert_false = gen_config.get("assert_false", False)
 fixture_import_file = gen_config.get("fixture_import_file", None)
 
+# Import files for test function files
 function_header_str = f"""
 from pytest_utils.decorators import max_score, visibility, hide_errors
 import assert_utilities  # <<< SHOULD be specified in config
