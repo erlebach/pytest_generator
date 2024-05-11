@@ -45,8 +45,13 @@ def load_data_labels(nb_slices: int):
         base_path / "question1_cluster_labels.npy"
     )  # Adjust the file name as needed
 
-    data = np.load(data_file_path)[:nb_slices]
-    labels = np.load(labels_file_path)[:nb_slices]
+    try:
+        data = np.load(data_file_path)[:nb_slices]
+        labels = np.load(labels_file_path)[:nb_slices]
+    except FileNotFoundError as e:
+        data = []
+        labels = []
+
     return data, labels
 
 
@@ -148,7 +153,7 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
                 *args
             )  # Removed **kwargs for simplification in this example
         else:
-            raise AttributeError(f"{function_name} not found in {module_name}")
+            raise AttributeError(f"Function {repr(function_name)} not found in module {repr(module_name)}")
 
 
 # ----------------------------------------------------------------------
@@ -222,6 +227,7 @@ def patch_functions(directory, module_name, function_dict, arg1=None, arg2=None,
         slice_lg = 200
 
     # module = importlib.import_module("student_code_with_answers." + module_name)  # NEW
+    print(f"{module_name=}")  # spectral_clustering
     module = importlib.import_module(directory + "." + module_name)  
     patches = []
 
