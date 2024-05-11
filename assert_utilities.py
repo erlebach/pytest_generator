@@ -10,66 +10,101 @@ import yaml
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
-"""
-# Original version
+
 def apply_validations(s_answ, i_answ, validations, options):
-    results = []
-    for validation in validations:
-        # Directly use the function name to get the function object
-        # No need to use the following line since I am in assert_utilities
-        func = globals()[validation['function']]  # using globals() to access the function by name
-        args = [s_answ, i_answ]
-
-        # Append additional arguments from options based on what each validation requires
-        for arg_spec in validation['args']:  
-            if isinstance(arg_spec, tuple):
-                tuple_args = tuple(options.get(arg_name, None) for arg_name in arg_spec)
-                args.extend([arg_spec])  # Extend args with the contents of the tuple
-            else:
-                # Handle single arguments by appending them from options or using a default
-                args.append(arg_spec)
-
-        # result[0] : status
-        # result[1] : message
-        result = func(*args)
-        results.append(result)
-
-    return all(res[0] for res in results), " \n".join(res[1] for res in results)
-"""
-
-# GPT-4 version, not yet DEBUGGED
-def apply_validations(s_answ, i_answ, validations, options):
+    """ """
     results = []
 
     for validation in validations:
         if 'inner_functions' in validation:
-            # Handle complex validations with outer and inner function calls
-            outer_function = globals()[validation['outer_function']]
-            outer_args = [options.get(arg, None) for arg in validation['args']]  # Extract outer args based on keys or positions
+            # Handling complex validations with nested key handling
             inner_results = []
+            key = validation['args'][1]  # assuming 'key' is always the second argument in 'args'
+            key_pos = validation['args'][0]  # assuming 'key_pos' is always the first argument in 'args'
 
-            for inner_func in validation['inner_functions']:
-                func = globals()[inner_func['function']]
-                # Prepare inner function arguments, might involve nested data handling
-                inner_args = [s_answ, i_answ] + inner_func['args']
-                result = func(*inner_args)
-                inner_results.append(result)
+            # Iterate through nested dictionary structures based on key and key_pos
+            if key_pos == 'inner':
+                for index in s_answ:
+                    if key in s_answ[index] and key in i_answ[index]:
+                        # Extract values for both student and instructor answers for the given key
+                        value_s = s_answ[index][key]
+                        value_i = i_answ[index][key]
+                        # Apply each inner validation function to these values
+                        for inner_func in validation['inner_functions']:
+                            # func = globals()[inner_func['function']]
+                            # args = [value_s, value_i] + inner_func['args']
+                            # result = func(*args)
+                            # inner_results.append(result)
+                            result = apply_single_validation(value_s, value_i, inner_func, options)
+                            inner_results.append(result)
 
-            # Apply the outer function on the results of inner functions if necessary
-            # This depends on what outer_function is supposed to do; you might adjust this logic
-            final_result = outer_function(*outer_args, inner_results)
+            # Here, you could apply an outer function to aggregate the results from inner functions if needed
+            outer_function = globals()['outer_aggregator']
+            print(f"{outer_function=}")
+            print(f"{inner_results=}")
+            final_result = outer_function(inner_results)
+            print(f"{final_result=}")
             results.append(final_result)
+            print(f"{results=}")
+
         else:
             # Simple validation handling
-            func = globals()[validation['function']]
-            args = [s_answ, i_answ] + [options.get(arg, None) for arg in validation['args']]
-            result = func(*args)
+            # print("... simple validation handling")
+            # func = globals()[validation['function']]
+            # args = [s_answ, i_answ] + [options.get(arg, None) for arg in validation['args']]
+            # result = func(*args)
+            # results.append(result)
+            result = apply_single_validation(s_answ, i_answ, validation, options)
             results.append(result)
 
-    # Evaluate all results: status (all must be True) and concatenated messages
+    # Returns a list of results from each validation
+    # print("exit apply_validations")
+    return results
+
+def apply_single_validation(s_answ, i_answ, validation, options):
+    func = globals()[validation['function']]
+    print("single validation, func= ", func)
+    args = [s_answ, i_answ] + validation['args'] #[options.get(arg, None) for arg in validation['args']]
+    return func(*args)
+
+def outer_aggregator(results):
+    # Example of a simple outer function that might aggregate results
     return all(res[0] for res in results), "\n".join(res[1] for res in results)
 
 
+##def apply_single_validation(s_answ, i_answ, validation, options):
+##    func = globals()[validation['function']]
+##    print("... apply_single_validation, func= ", func)
+##    args = [s_answ, i_answ] + validation['args'] 
+##    #[options.get(arg, None) for arg in validation['args']]
+##    print("args= ", args[2:])
+##    return func(*args)
+
+
+# ----------------------------------------------------------------------
+# arguments inconsistent with signature in function_call_list.py .
+def apply_validations_to_key(s_answ, i_answ, inner_functions, options, key_pos, key):
+    # What if some keys are to be excluded? In that case, exclude the keys before calling
+    # this function?
+    print("..ENTER apply_validations_to_key")
+    results = []
+    args = []
+    if key_pos == 'inner':   # CHECKED
+        print(f" .... {len(i_answ.keys())=}")
+        for ko, vo in i_answ.items():
+            if key in vo:
+                # s_answ[ko] is a float
+                print(f"{inner_functions=}")
+                print(f"{vo[key]=}, {s_answ[ko][key]=}")
+                apply_validations(vo[key], s_answ[ko][key], inner_functions, options)
+
+    elif key_pos == 'outer':
+        # for k, v in s_answ
+        print("apply_validations_to_key: IMPLEMENT 'outer' later")
+        raise "ERROR"
+
+
+# ----------------------------------------------------------------------
 
 def check_msg_status(status, msg_list, status_, msg_):
     msg_list.append("\n" + msg_)
@@ -98,10 +133,9 @@ def check_missing_keys(missing_keys, msg_list):
 # ----------------------------------------------------------------------
 # All low-level check functions take s_el, i_el as first two parameters
 def check_float_range(s_el, i_el, mn, mx):
-#def check_float_range(s_el, i_el, frange):
     # print("===> inside check_float_range")
     #mn, mx = frange
-    print("==> inside check_float_range")
+    print(f"==> inside check_float_range, {s_el=}, {i_el=}, {mn=}, {mx=}")
     status = True
     msg_= ""
     if s_el <= mn or s_el >= mx:
@@ -117,8 +151,8 @@ def check_float(s_el, i_el, rel_tol=1.e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
 
-    print(f"==> inside check_float {s_el=}, {type(i_el)=}")
-    print(f"{rel_tol=}, {type(abs_tol)=}")
+    print(f"==> inside check_float, {s_el=}, {i_el=}, {rel_tol=}, {abs_tol=}")
+    print(f"==>         {type(s_el)=}, {type(i_el)=}")
 
     if rel_tol < 0:
         print(f"==>    rel_tol < 0, {status=}, {msg=}")
@@ -711,32 +745,14 @@ def check_answer_dict_str_dict_str_float(
     """
     The type is a dict[str, dict[str, list]]
     """
-    # print("\n===> ENTER check_answer_dict_str_dict_str_float, options= ", options)
-    # print("\n==> options keys: ", list(options.keys()))
     range_val = options.get('range_validation', None) # read from spectral_yaml
     at_least_val = options.get("at_least_validation", None)
 
-    # print("options= ", options)
-    # print(f"{validation_functions=}")
 
-    # print("==> before apply_validations")
-    # print(f"{options['student_answer']=}")
-    # apply_validations(student_answer, instructor_answer, validation_functions, options)
-    # print("==> after apply_validations")
-    # print("==== AFTER apply_validations ===")
+    results = apply_validations(student_answer, instructor_answer, validation_functions, options)
+    status, msg = results[0]
+    return return_value(status, [msg], student_answer, instructor_answer)
 
-    dict_float_choices = options.get('dict_float_choices', {})
-    rel_tol = options.get('rel_tol', 1.e-2)  # this will change in the future
-    abs_tol = options.get('abs_tol', 1.e-5)
-
-
-    # Create get_rules, which returns a list of rules. 
-    # Ideally, it should return a list of rule functions, 
-    #    which take a rule dictionary as an argument. . 
-    # rules = get_rules()
-
-    # print("==> enter check_answer_dict_str_dict_str_float")
-    status = True
     msg_list = []
     ps_dict = init_partial_score_dict()
 
