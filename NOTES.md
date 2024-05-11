@@ -219,3 +219,7 @@ How to break out of a look in a pytest, and continue student code after loop.?
 2024-05-07_23:42
 - Look at output of `generate_all_homeworks.py`. Analyze errors. 
 Look at output. 
+----------------------------------------------------------------------
+2024-05-11_17:53
+- TODO: fix file so answers can be taken from yaml file rather than instructor folder. 
+----------------------------------------------------------------------

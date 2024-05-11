@@ -6,16 +6,13 @@ all_tests:
 
   # Where is answer taken from?
   i_answer_source: instructor_file
-  # s_answer_source: student_file
-  s_answer_source: yaml_file
+  s_answer_source: student_file
 
   # Folders are relative to the base project folder. 
   # Do not include slashes!
   student_folder_name: student_code_with_answers
-  # student_folder_name: student_MWE
-  # student_folder_name: deevesh
-  # student_folder_name: anand
-  instructor_folder_name: instructor_code_with_answers
+  # instructor_folder_name: instructor_code_with_answers
+  instructor_folder_name: yaml
 
   fixtures: 
     # file that contains all the fixtures
