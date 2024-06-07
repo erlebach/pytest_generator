@@ -55,6 +55,8 @@ def sanitize_function_name(name):
 def get_decoded_str(questions_data, part, answer_key, source_file):
     # Ensure the encoded answer is properly escaped for inclusion in a double-quoted string
     # keys 'i_answer_source' and 's_answer_source' should be in yaml file
+    print("ENTER get_decoded_str")
+    ### WHY WAS THIS WORKING IN THE FIRST PLACE?
     if questions_data.get(answer_key+'_source', 'yaml_file') == source_file:
         encoded_answer_str = None
     else:
@@ -74,6 +76,7 @@ def get_decoded_str(questions_data, part, answer_key, source_file):
         # Construct the call to decode_data as a string
         # encoded_answer_str not yet defined. 
         # So I need to handle multiple answers. 
+        print(f"====> {encoded_answer_str=}")
         decode_call_str = f'''u.decode_data("{encoded_answer_str}")''' if encoded_answer_str else None
         #print(f"{decode_call_str=}")
         return decode_call_str
@@ -91,7 +94,14 @@ def evaluate_answers(questions_data, question, test_code, is_fixture, is_instruc
     part_question_id = question.get("id", None)
     question_id = part_id = part["id"]
 
-    if not is_fixture and not is_instructor_file:  # yaml file
+    print("==> TOP IF STATEMENT")
+    #          True              False
+    test_code += f"\n    # INSTRUCTOR ANSWER\n"
+    print("is_fixture= ", is_fixture) # True
+    print("is_instructor_file= ", is_instructor_file)
+    # if not is_fixture and not is_instructor_file:  # yaml file
+    if not is_instructor_file:  # yaml file
+        print("++++ decode_i_call_str= ", decode_i_call_str)
         test_code += f"    correct_answer = eval('{decode_i_call_str}')\n"
     elif not is_fixture and is_instructor_file:
         test_code +=  "    print('not is_fixture and is_instructor_file: not implemented')\n"
@@ -123,19 +133,24 @@ def evaluate_answers(questions_data, question, test_code, is_fixture, is_instruc
         test_code += f"    else:\n"
         test_code += f"        correct_answer = correct_answer[{part_id}]\n"
     else:  # fixture, yaml file
+        print("===> ELSE")
         test_code += f"    correct_answer = eval('{decode_i_call_str}')\n"
 
+    test_code += f"\n    # STUDENT ANSWER\n"
+    print(f"==> STUDENT ANSWER, {is_fixture=}, {is_student_file=}")
     if not is_fixture and not is_student_file:  # yaml file
         test_code += f"    student_answer = eval('{decode_s_call_str}')\n"
     elif not is_fixture and is_student_file:
         test_code +=  "    print('not is_fixture and is_student_file: not implemented')\n"
         #test_code += f"    student_answer = eval('{decode_call_str}')\n"
     elif is_fixture and is_student_file:
+        print(".... STUDENT in elif")
         fixture_args = fixture['args']
         #fixture_name = fixture['name']
         fixture_name = fixture['name']
         module_function_name = part_question_id   # name of function in student/instructor module
         part_id = f"{repr(part['id'])}"
+        test_code += f"    kwargs = {{'student_directory': {repr(student_directory)} , 'instructor_directory': {repr(instructor_directory)}}}\n"
         # Original code
         # test_code += f"    student_answer = {fixture_name}({repr(fixture_args[0])}, {repr(module_function_name)}, 's', **kwargs)\n"
         # New patch mechanism
@@ -155,6 +170,7 @@ def evaluate_answers(questions_data, question, test_code, is_fixture, is_instruc
         test_code += f"        student_answer = student_answer[{part_id}]\n"
     else:  # fixture, yaml file
         test_code += f"    student_answer = eval('{decode_s_call_str}')\n"
+    test_code += f"\n    # END ANSWER ANALYSIS\n\n"
     return test_code
 
 #----------------------------------------------------------------------
