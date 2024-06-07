@@ -1,3 +1,5 @@
+# !! ERROR: i_answer_source should be "yaml_file", but is "instructor_file". ERROR!!!
+
 from pprint import pprint
 import re
 import yaml
@@ -18,31 +20,32 @@ from function_call_lists import validation_function_templates as validation_func
 #        'parameters': [('rel_tol', 'abs_tol')]
 #    },
 
+
 # GPT-4 version
 def validate_complex_function(key, value):
     """
     (Every 'function' key is a key in `validation_functions`)
-    Parameters: 
+    Parameters:
     ----------
     value: {
-        'key': 'ARI', 'key_pos': 'inner', 
-        'options_list': [{'max': 1, 'min': -1}, {'abs_tol': '1e-5', 'rel_tol': 0.03}], 
+        'key': 'ARI', 'key_pos': 'inner',
+        'options_list': [{'max': 1, 'min': -1}, {'abs_tol': '1e-5', 'rel_tol': 0.03}],
         'validation_list': ['float_range', 'float_error']
            }
     Return: dict
     ------
        {
-          'outer_function': 'apply_validations_to_key', 'args': ['inner', 'ARI'], 
+          'outer_function': 'apply_validations_to_key', 'args': ['inner', 'ARI'],
           'inner_functions': [
-              {'function': 'fct1', 'args': [.01, .3]},  
+              {'function': 'fct1', 'args': [.01, .3]},
               {'function': 'fct2', 'args': [-1., 3.]}
           ]
        }
     """
-    loc_key = value.get('key', "")
-    key_pos = value.get('key_pos', "inner")
-    validation_list = value['validation_list']
-    options_list = value['options_list']
+    loc_key = value.get("key", "")
+    key_pos = value.get("key_pos", "inner")
+    validation_list = value["validation_list"]
+    options_list = value["options_list"]
 
     if loc_key == "":
         print("validate_complex_function: missing key 'key' in function definition")
@@ -53,26 +56,22 @@ def validate_complex_function(key, value):
     # Generate a list of functions to apply
     for function_key, params in zip(validation_list, options_list):
         function_template = validation_functions[function_key]
-        function_name = function_template['function']
-        parameters = function_template['parameters']
+        function_name = function_template["function"]
+        parameters = function_template["parameters"]
         args = [params[param] for param in parameters]
 
         # Append the details of each validation function
-        inner_functions.append({
-            'function': function_name,
-            'args': args
-        })
+        inner_functions.append({"function": function_name, "args": args})
 
     # In the future, there could be other complex functions beyond 'apply_validations_to_key'
     # Assemble the complex function details including both the outer and inner function calls
     validation_details = {
-        'outer_function': 'apply_validations_to_key',
-        'args': [key_pos, loc_key],
-        'inner_functions': inner_functions
+        "outer_function": "apply_validations_to_key",
+        "args": [key_pos, loc_key],
+        "inner_functions": inner_functions,
     }
 
     return validation_details
-
 
 
 def validate_simple_function(key, value):
@@ -82,40 +81,41 @@ def validate_simple_function(key, value):
         {'function': 'check_float', 'args': [0.01, 1e-05]}
     """
     args = []
-    for k,v in value.items():
+    for k, v in value.items():
         args.append(k)
 
     # Handle simple validation configurations
     function_template = validation_functions[key]
-    function_name = function_template['function']
-    function_args = [value[param] for param in function_template['parameters']]
+    function_name = function_template["function"]
+    function_args = [value[param] for param in function_template["parameters"]]
 
-    validation_details = {
-        'function': function_name,
-        'args': function_args
-    }
+    validation_details = {"function": function_name, "args": function_args}
     return validation_details
 
 
 def generate_validations(part):
     """
-    Return: 
+    The returned `validations` are used along with `options` as arguments to functions in `assert_utilities.py`. 
+    If there are no options in time, return validations={}
+
+    Return:
     ------
     validation_functions=[{'function': 'check_float', 'args': [0.01, 1e-05]}, {'function': 'check_float_range', 'args': [-1.0, 2]}]
     """
-    options = part.get('options', {})
+    options = part.get("options", {})
+    print("=====> options= ", options)
     validations = []
+
+    # If options == {}, skip the following loop
 
     # Iterate over all entries in the options dictionary
     for key, value in options.items():
         if isinstance(value, list):
             for value_el in value:
-                if 'validation_list' in value_el and 'options_list' in value_el:
-                    print(".... if")
+                if "validation_list" in value_el and "options_list" in value_el:
                     details = validate_complex_function(key, value_el)
                     validations.append(details)
         else:
-            print(".... else")
             details = validate_simple_function(key, value)
             validations.append(details)
 
@@ -131,28 +131,34 @@ def add_attribute(name, attr):
         test_code = ""
     return test_code
 
+
 def apply_options(defaults: dict, overrides: dict) -> dict:
     result = defaults.copy()  # Start with the defaults
     result.update(overrides)  # Apply overrides
     return result
 
+
 with open("type_handlers.yaml") as f:
     type_handlers = yaml.safe_load(f)
+
 
 def load_yaml_file(file_path):
     with open(file_path, "r") as file:
         questions_data = yaml.safe_load(file)
     return questions_data
 
+
 def load_validations_options_file(file_path):
     with open(file_path, "r") as file:
         validations_options = yaml.safe_load(file)
     return validations_options
 
+
 def load_configuration_file(file_path):
     with open(file_path, "r") as file:
         config = yaml.safe_load(file)
     return config
+
 
 def create_config_dict():
     with open("generator_config.yaml", "r") as f:
@@ -161,32 +167,32 @@ def create_config_dict():
     option_defaults = config.get("option_defaults", {})
     types = config.get("types", {})
     config_dict = {}
-    config_dict['answer_type'] = config.get("all_tests").get("type", "float")
+    config_dict["answer_type"] = config.get("all_tests").get("type", "float")
     config_dict["partial_score_frac"] = config.get("all_tests", {}).get(
         "partial_score_frac", {}
     )
 
+    # Only a single student and instructor folder name per assignment
     config_dict["student_folder_name"] = config.get("all_tests").get(
         "student_folder_name", "student_code_with_answers"
     )
     config_dict["instructor_folder_name"] = config.get("all_tests").get(
         "instructor_folder_name", "instructor_code_with_answers"
     )
+    # The answer source can be set at the configuration level (for the entire assignment) ,
+    # at the yaml file level, and for each question in the yaml file (out `id` level).
     config_dict["i_answer_source"] = config.get("all_tests").get(
         "instructor_answer", "instructor_file"
     )
     config_dict["s_answer_source"] = config.get("all_tests").get(
         "student_answer", "student_file"
     )
+
+    print(f"===> {config_dict['i_answer_source']=}")
     return config, config_dict
 
+
 config, config_dict = create_config_dict()
-
-# student_folder_name: student_code_with_answers
-# instructor_folder_name: instructor_code_with_answers
-
-# i_answer_source: instructor_file
-# s_answer_source: student_file
 
 # How to access an element of config dict and set to default value for non-existent key?
 gen_config = config["test_answers"]
@@ -202,6 +208,7 @@ from {fixture_import_file} import *
 from function_dictionaries import *
 #import {fixture_import_file}
 import numpy as np
+import test_utils as u
 from tests.pytest_utilities import get_current_function
 import yaml
 # pytest might change the python path. Make sure to import it last. 
@@ -213,11 +220,11 @@ with open('type_handlers.yaml', 'r') as f:
 
 # ----------------------------------------------------------------------
 
+
 def generate_test_answers_code(questions_data, sim_type, output_file="test_answers.py"):
-    """
-    """
+    """ """
     # Update the questions_data with the keys of config_dict that are not present in questions_data
-    for k, v in config['all_tests'].items():
+    for k, v in config["all_tests"].items():
         if k not in questions_data:
             questions_data[k] = v
 
@@ -236,36 +243,60 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
     test_code = function_header_str
     max_score = questions_data.get("max_score", 0.0)
 
-    fixture = questions_data.get("fixtures", {})
-    fixture_name = fixture.get("name", "")
-    fixture_args = fixture.get("args", [])
-
+    # Check the header of the input yaml file
     if "fixtures" in questions_data:
-        fixture = questions_data["fixtures"]["fixture"]
-        fixture_name = fixture["name"]
-        fixture_args = fixture["args"]  # list of strings
-    else:
-        fixture = None
+        _fixture = questions_data["fixtures"].get("fixture", {})
+        fixture_name = _fixture.get("name", "")
+        fixture_args = _fixture.get("args", [])
+        print("1 ===> fixture_args: ", fixture_args)
+
+    i_answer_source = questions_data.get(
+        "i_answer_source", config_dict["i_answer_source"]
+    )
+    s_answer_source = questions_data.get(
+        "s_answer_source", config_dict["s_answer_source"]
+    )
+    print(f"===> {i_answer_source=}")
+    print(f"===> {config_dict['i_answer_source']=}")
 
     for question in questions_data["questions"]:
         max_score_q = question.get("max_score", max_score)
         part_question_id = question.get("id", None)
+
+        if "fixtures" in question:
+            fixture = question["fixtures"].get("fixture", _fixture)
+            print("fixture: ", fixture)
+            fixture_name = fixture["name"]
+            fixture_args = fixture["args"]  # list of strings
+            print("1 ===> fixture_args: ", fixture_args)
+
         if part_question_id == None:
             print("Question does not have an id")
             quit()
 
-        # print("==> question_id: ", part_question_id)
-        if "fixture" in question:
-            fixture = question["fixture"]
-            fixture_name = fixture["name"]
-            fixture_args = fixture["args"]  # list of strings
+        # print("......question: ", question)
 
         for part in question["parts"]:
-            options = part.get('options', {})
+            print("***********  part  *****************")
+            print(part)
+            print("************************************")
+            i_answer_source = part.get("i_answer_source", i_answer_source)
+            s_answer_source = part.get("s_answer_source", s_answer_source)
+            print(f"for loop ===> part ====> {i_answer_source=}")
+            print(f"{i_answer_source == 'instructor_file'=}")
+            is_instructor_file = True if i_answer_source == "instructor_file" else False
+            is_student_file = True if s_answer_source == "student_file" else False
+            print(f"{is_instructor_file=}")
+            # quit()
+
+            if "fixtures" in part:
+                raise Exception("Fixtures not allowed at the subquestion level")
+
+            options = part.get("options", {})
             print("=========================================")
             print(f"\n===> {part=}")
 
-            answer_type = config_dict['answer_type']
+            answer_type = config_dict["answer_type"]
             part_type = part.get("type", answer_type)
             # I will need all fields in lower-level function
             part["type"] = part_type
@@ -296,7 +327,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
             function_name = sanitize_function_name(function_name)
 
-            # print("==> part: ", part)
             decode_i_call_str = get_decoded_str(
                 questions_data, part, "i_answer", "instructor_file"
             )
@@ -320,12 +350,17 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 and isinstance(fixture_args, list)
                 and len(fixture_args) > 0
             )
+
+            """
             is_instructor_file = (
                 questions_data.get("i_answer_source", "yaml_file") == "instructor_file"
             )
             is_student_file = (
                 questions_data.get("s_answer_source", "yaml_file") == "student_file"
             )
+            """
+
+            print(f"==> {is_fixture=}, {is_instructor_file=}, {is_student_file=}")
 
             if decode_i_call_str is None:
                 # get instructor answer from instructor file
@@ -340,6 +375,13 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             fixture_name = fixture["name"] if is_fixture else None
             if is_fixture and fixture_name is None:
                 raise "Fixture name is not defined"
+
+            print("=====> fixture= ", fixture)
+            print(f"=====> evaluate_answers, {is_instructor_file=}")
+            print(f"=====> evaluate_answers, {i_answer_source=}")
+            # NOT SURE WHY THE FOLLOWING TWO LINES ARE REQUIRED, 
+            is_instructor_file = True if i_answer_source == 'Instructor_file' else False
+            is_student_file = True if s_answer_source == 'student_file' else False
 
             test_code = evaluate_answers(
                 questions_data,
