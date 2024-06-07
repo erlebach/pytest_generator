@@ -5,6 +5,8 @@ all_tests:
   partial_score_frac: 1.
 
   # Where is answer taken from?
+  # i_answer_source: instructor_file
+  # Provile error checking
   i_answer_source: instructor_file
   s_answer_source: student_file
 
@@ -12,7 +14,7 @@ all_tests:
   # Do not include slashes!
   student_folder_name: student_code_with_answers
   # instructor_folder_name: instructor_code_with_answers
-  instructor_folder_name: yaml
+  instructor_folder_name: instructor_code_with_answers
 
   fixtures: 
     # file that contains all the fixtures
@@ -20,13 +22,15 @@ all_tests:
     # Necessary for fixtures to work
     fixture:
       name: run_compute
-      # Fixure arguments in a list
+      # Fixure arguments in a list. Function to execute in the module. 
       args: [expectation_maximization]
 
 test_structure:
   # set all tests to fail
   assert_false: False
   max_nb_words: 5
+
+  # import this file in the tests. The files must exist within tests/
   fixture_import_file: my_fixtures
 
 # list of options that apply to all types. Sometimes
@@ -92,6 +96,10 @@ test_answers:
 
   # The minimum number of words required in an answer that is explanatory.
   mix_nb_words: 5
+
+# ***************************
+# I should create options for each type that would hold for an entire yaml file
+# unless overwritten in a question `part`.
 
 # Options related to type
 types:
