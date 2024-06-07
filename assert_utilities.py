@@ -150,11 +150,8 @@ def check_float(s_el, i_el, rel_tol=1.e-2, abs_tol=1.0e-5):
     status = True
     msg = ""
 
-    # print(f"==> inside check_float, {s_el=}, {i_el=}, {rel_tol=}, {abs_tol=}")
-    # print(f"==>         {type(s_el)=}, {type(i_el)=}")
-
     if rel_tol < 0:
-        print(f"==>    rel_tol < 0, {status=}, {msg=}")
+        msg = f"The relative error is not checked."
         return status, msg
 
     if math.fabs(i_el) <= abs_tol:
@@ -556,7 +553,7 @@ def check_answer_float_exp(student_answer, instructor_answer, options, validatio
 
     rel_tol = options.get('rel_tol', 1.e-2)
     abs_tol = options.get('abs_tol', 1.e-6)
-    range_val = options.get('range_validation', None) # read from spectral_yaml
+    range_val = options.get('range_validation', None)
 
     functions = {
             'check_float_range': [check_float, [frange]],
@@ -591,26 +588,18 @@ def check_answer_float(student_answer, instructor_answer, options, validation_fu
     status = True
     msg_list = []
 
+    # Setting the options here will not generate validation_functions, so they should have been set already
+    # options = options.get("float_error",  {'rel_tol': -1., 'abs_tol': 1.e-5})
+    # if "float_error" not in options: 
+        # options["float_error"] = {'rel_tol': -1., 'abs_tol': 1.e-5})
+    #print("check_answer_float, options= ", options)
+    # print("==> check_answer_float, options= ", options)
+
     status, msg = apply_validations(student_answer, instructor_answer, validation_functions, options)
 
-    """
-    s_answ = student_answer
-    i_answ = instructor_answer
-    rel_tol = options.get('rel_tol', 1.e-2)
-    abs_tol = options.get('abs_tol', 1.e-6)
-    range_val = options.get('range_validation', None) # read from spectral_yaml
-
-    if range_val is not None:
-        status_, msg_ = check_float_range(s_answ, i_answ, range_val['min'], range_val['max'])
-        status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
-
-    if status is True:
-        status_, msg_ = check_float(
-            # i_answ, s_answ, rel_tol=rel_tol, abs_tol=abs_tol
-            s_answ, i_answ, rel_tol, abs_tol
-        )
-        status, msg_lst = check_msg_status(status, msg_list, status_, msg_)
-    """
+    # There are no checks on float
+    if options == {}:
+        status, msg = check_float(student_answer, instructor_answer)
 
     return return_value(status, [msg], student_answer, instructor_answer)
 
