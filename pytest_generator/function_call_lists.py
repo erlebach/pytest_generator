@@ -1,4 +1,4 @@
-import assert_utilities as au
+import pytest_generator.assert_utilities as au
 import yaml
 
 def load_yaml_file(file_path):

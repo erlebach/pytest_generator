@@ -4,8 +4,8 @@ Expand a yaml file that contains answer lists so that there is only a single ans
 
 import yaml
 import pytest
-from generator_utils import sanitize_function_name
 import argparse
+from pytest_generator.generator_utils import sanitize_function_name
 from copy import deepcopy
 
 
@@ -32,7 +32,7 @@ def load_yaml_file(file_path):
     return questions_data
 
 
-def main(f_in: str, f_out: str):
+def main():
     """
     Main function to expand a YAML file.
 
@@ -40,6 +40,20 @@ def main(f_in: str, f_out: str):
         f_in (str): The path to the input YAML file.
         f_out (str): The path to the output YAML file.
     """
+
+    parser = argparse.ArgumentParser(
+        description="Pass in the name of the input yaml file."
+    )
+    parser.add_argument("-y", "--yaml", help="Name of the yaml file", required=True)
+    parser.add_argument(
+        "-o", "--out", help="Name of the output yaml file", required=True
+    )
+    args = parser.parse_args()
+
+    f_in = args.yaml
+    f_out = args.out
+
+
     # Read the yaml file f_in
     questions_data = load_yaml_file(f_in)
     expanded_questions_data = deepcopy(questions_data)
@@ -104,7 +118,7 @@ def main(f_in: str, f_out: str):
 
 # ----------------------------------------------------------------------
 if __name__ == "__main__":
-
+    main()
     parser = argparse.ArgumentParser(
         description="Pass in the name of the input yaml file."
     )

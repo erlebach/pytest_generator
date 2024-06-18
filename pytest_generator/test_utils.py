@@ -127,10 +127,7 @@ def decode_data(encoded):
         return eval(decoded)
     return decoded
 
-
-
-#----------------------------------------------------------------------
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Description of your script and what it does.")
 
     # Add the arguments
@@ -143,3 +140,8 @@ if __name__ == "__main__":
     input_file = args.filename  + ".yaml"
     output_file = f"preprocessed_{input_file}"
     preprocess_yaml(input_file, output_file)
+
+
+#----------------------------------------------------------------------
+if __name__ == "__main__":
+    main()

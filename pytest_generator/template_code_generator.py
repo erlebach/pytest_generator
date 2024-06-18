@@ -58,10 +58,13 @@ with open('type_handlers.yaml', 'r') as f:
 # questions_data = load_yaml_file('path_to_questions_answers.yaml')
 # generate_test_structure_code(questions_data)
 
-# ----------------------------------------------------------------------
-if __name__ == "__main__":
+def main():
     # Usage example:
     # >>> all_questions.yaml might change <<<
     questions_data = load_yaml_file('hw4.yaml')
     #questions_data = load_yaml_file('all_questions_hw3.yaml')
     generate_test_structure_code(questions_data)
+
+# ----------------------------------------------------------------------
+if __name__ == "__main__":
+    main()

@@ -1,13 +1,16 @@
 # !! ERROR: i_answer_source should be "yaml_file", but is "instructor_file". ERROR!!!
 
+# I am running the script from root
+ROOT="."
+
 from pprint import pprint
 import re
 import yaml
 import pytest
 import argparse
-from types_list import types_list
-from generator_utils import sanitize_function_name, get_decoded_str, evaluate_answers
-from function_call_lists import validation_function_templates as validation_functions
+from pytest_generator.types_list import types_list
+from pytest_generator.generator_utils import sanitize_function_name, get_decoded_str, evaluate_answers
+from pytest_generator.function_call_lists import validation_function_templates as validation_functions
 
 # In spectral.yaml
 #     options:
@@ -95,7 +98,7 @@ def validate_simple_function(key, value):
 
 def generate_validations(part):
     """
-    The returned `validations` are used along with `options` as arguments to functions in `assert_utilities.py`. 
+    The returned `validations` are used along with `options` as arguments to functions in `assert_utilities.py`.
     If there are no options in time, return validations={}
 
     Return:
@@ -244,11 +247,16 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
     max_score = questions_data.get("max_score", 0.0)
 
     # Check the header of the input yaml file
+    # fixture = questions_data.get("fixtures", {})
+    # fixture_name = fixture.get("name", "")
+    # fixture_args = fixture.get("args", [])
     if "fixtures" in questions_data:
         _fixture = questions_data["fixtures"].get("fixture", {})
         fixture_name = _fixture.get("name", "")
         fixture_args = _fixture.get("args", [])
         print("1 ===> fixture_args: ", fixture_args)
+    else:
+        _fixture = {}
 
     i_answer_source = questions_data.get(
         "i_answer_source", config_dict["i_answer_source"]
@@ -265,10 +273,13 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
         if "fixtures" in question:
             fixture = question["fixtures"].get("fixture", _fixture)
-            print("fixture: ", fixture)
-            fixture_name = fixture["name"]
-            fixture_args = fixture["args"]  # list of strings
-            print("1 ===> fixture_args: ", fixture_args)
+        else:
+            fixture = _fixture
+
+        print("fixture: ", fixture)
+        fixture_name = fixture["name"]
+        fixture_args = fixture["args"]  # list of strings
+        print("1 ===> fixture_args: ", fixture_args)
 
         if part_question_id == None:
             print("Question does not have an id")
@@ -379,9 +390,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             print("=====> fixture= ", fixture)
             print(f"=====> evaluate_answers, {is_instructor_file=}")
             print(f"=====> evaluate_answers, {i_answer_source=}")
-            # NOT SURE WHY THE FOLLOWING TWO LINES ARE REQUIRED, 
-            is_instructor_file = True if i_answer_source == 'Instructor_file' else False
-            is_student_file = True if s_answer_source == 'student_file' else False
+            # NOT SURE WHY THE FOLLOWING TWO LINES ARE REQUIRED,
+            is_instructor_file = True if i_answer_source == "Instructor_file" else False
+            is_student_file = True if s_answer_source == "student_file" else False
 
             test_code = evaluate_answers(
                 questions_data,
@@ -479,25 +490,16 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
             test_code += f"\n\n"
 
-    with open(f"tests/{output_file}", "w") as file:
+    with open(f"{ROOT}/tests/{output_file}", "w") as file:
         file.write(test_code)
 
 
 # ----------------------------------------------------------------------
-def main(yaml_name, sim_type):
+def main():
     """
     sim_type = ['answers', 'structure']
     """
 
-    print("\n******* main ******")
-    questions_data = load_yaml_file(yaml_name)
-    generate_test_answers_code(
-        questions_data, sim_type, f"test_{sim_type}_{yaml_name[:-5]}.py"
-    )
-
-
-# ----------------------------------------------------------------------
-if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Pass in the name of the input yaml file."
     )
@@ -510,4 +512,20 @@ if __name__ == "__main__":
     # print("++++++++++++++++++++++++++++++++++++++++++++++")
     # print("++++++++++++++++++++++++++++++++++++++++++++++")
     # print("+++++ START MAIN ++++")
-    main(args.yaml, args.simtype)
+
+    yaml_name = args.yaml
+    sim_type = args.simtype
+
+    print("\n******* main ******")
+    questions_data = load_yaml_file(yaml_name)
+    print("***** xxxxxxxxxxxxxxxxxxxxxxxx")
+    print(questions_data)
+    print("**** xxxxxxxxxxxxxxxxxxxxxxxxx")
+    generate_test_answers_code(
+        questions_data, sim_type, f"test_{sim_type}_{yaml_name[:-5]}.py"
+    )
+
+
+# ----------------------------------------------------------------------
+if __name__ == "__main__":
+    main()
