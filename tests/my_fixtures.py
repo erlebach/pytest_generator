@@ -1,26 +1,28 @@
 ## My fixtures
 
-import sys
-import os
-import inspect
 import functools
-from pathlib import Path
-from contextlib import contextmanager, ExitStack
-
-
-import pytest
-import numpy as np
-import matplotlib.pyplot as plt
-from functools import wraps
-from unittest.mock import patch
 import importlib
+import inspect
+import os
+import sys
+from contextlib import ExitStack, contextmanager
+from functools import wraps
+from pathlib import Path
+from typing import Any
+from unittest.mock import patch
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pytest
 
 # Don't I have to import this in the patching software?
 # import spectral_clustering
 
 
 ### NEW
+"""
 def load_data_labels(data_filename, labels_filename, nb_slices):
+    print("==> load_data_labels")
     base_path = Path(__file__).parent
     data_file_path = base_path / data_filename
     labels_file_path = base_path / labels_filename
@@ -28,26 +30,28 @@ def load_data_labels(data_filename, labels_filename, nb_slices):
     data = np.load(data_file_path)[:nb_slices]
     labels = np.load(labels_file_path)[:nb_slices]
     return data, labels
-
+"""
 
 
 # @pytest.fixture
-def load_data_labels(nb_slices: int):
+def load_data_labels(nb_slices: int) -> tuple[Any, Any] | None:
+    print("==> load_data_labels fixture")
     # I should be able to control the dataset to load
     # Load your data here, using numpy or any suitable library
     base_path = Path(__file__).parent
 
     # Define the paths to your data and labels files
-    data_file_path = (
-        base_path / "question1_cluster_data.npy"
-    )  # Adjust the file name as needed
-    labels_file_path = (
-        base_path / "question1_cluster_labels.npy"
-    )  # Adjust the file name as needed
+    data_file_path = base_path / "question1_cluster_data.npy"  # Adjust the file name as needed
+    labels_file_path = base_path / "question1_cluster_labels.npy"  # Adjust the file name as needed
 
-    data = np.load(data_file_path)[:nb_slices]
-    labels = np.load(labels_file_path)[:nb_slices]
-    return data, labels
+    try:
+        data = np.load(data_file_path)[:nb_slices]
+        labels = np.load(labels_file_path)[:nb_slices]
+    except (FileNotFoundError, OSError, ValueError) as e:
+        print(f"Error loading data_labels: {e}")
+        return None, None
+    else:
+        return data, labels
 
 
 # ----------------------------------------------------------------------
@@ -59,10 +63,10 @@ def disable_plot_show(mocker):
 
     with ExitStack() as stack:
         # Mock plt.show() with no specific side effect
-        mock_show = stack.enter_context(patch('matplotlib.pyplot.show'))
+        mock_show = stack.enter_context(patch("matplotlib.pyplot.show"))
 
         # Replace plt.clf() with plt.close()
-        stack.enter_context(patch('matplotlib.pyplot.clf', new=lambda: plt.close()))
+        stack.enter_context(patch("matplotlib.pyplot.clf", new=lambda: plt.close()))
 
         yield mock_show
 
@@ -144,9 +148,7 @@ def load_and_run_module(module_name, directory, function_name, *args, **kwargs):
         module = importlib.import_module(folder_path)
         if hasattr(module, function_name):
             func_to_run = getattr(module, function_name)
-            return func_to_run(
-                *args
-            )  # Removed **kwargs for simplification in this example
+            return func_to_run(*args)  # Removed **kwargs for simplification in this example
         else:
             raise AttributeError(f"{function_name} not found in {module_name}")
 
@@ -165,6 +167,7 @@ def substitute_args_decorator(arg1, arg2):
         return wrapper
 
     return decorator
+
 
 def modify_args_using_slice(args, kwargs, slice_lg=300):
     modified_args = []
@@ -191,7 +194,9 @@ def modify_args_decorator(slice_lg=300):
             """
             Once the decorated function is called, the arguments revert to their original size
             """
-            modified_args, modified_kwargs = modify_args_using_slice(args, kwargs, slice_lg=slice_lg)
+            modified_args, modified_kwargs = modify_args_using_slice(
+                args, kwargs, slice_lg=slice_lg
+            )
 
             return func(*modified_args, **modified_kwargs)
 
@@ -207,46 +212,46 @@ def modify_args_decorator(slice_lg=300):
 # Context manager to manage multiple patches
 @contextmanager
 def apply_patches(*patches):
+    # print("==> patches: ", patches)
     patched_objects = []
     try:
         for patch_obj in patches:
-            patched_objects.append(patch_obj.start())
+            try:
+                # print(f"Attempting to patch: {patch_obj}")  # Just print the patch object
+                patched_obj = patch_obj.start()
+                patched_objects.append(patched_obj)
+            except AttributeError as e:
+                print(f"Failed to patch {patch_obj}: {e}")
+                continue  # Skip failed patches
         yield patched_objects
     finally:
         for patch_obj in patches:
-            patch_obj.stop()
+            try:
+                patch_obj.stop()
+            except Exception as e:
+                print(f"Error stopping patch {patch_obj}: {e}")
 
 
-def patch_functions(directory, module_name, function_dict, arg1=None, arg2=None, slice_lg=None):
+def patch_functions(
+    directory, module_name: str, function_dict: dict, arg1=None, arg2=None, slice_lg=None
+):
     if slice_lg is None:
         slice_lg = 200
 
-    # module = importlib.import_module("student_code_with_answers." + module_name)  # NEW
-    module = importlib.import_module(directory + "." + module_name)  
+    module = importlib.import_module(directory + "." + module_name)
     patches = []
 
     for func_name, provided_func in function_dict.items():
         # Use the provided function directly or fetch from module if None
-        func = (
-            provided_func if provided_func is not None else getattr(module, func_name)
-        )
+        func = provided_func if provided_func is not None else getattr(module, func_name)
 
-        # Decide which decorator to apply based on whether specific arguments are provided
-        # if func_name == 'spectral':
-        if True:
-            if arg1 is not None and arg2 is not None:
-                # Apply substitute_args_decorator for 'spectral' function if arg1 and arg2 are provided
-                patched_func = substitute_args_decorator(arg1, arg2)(func)
-            else:
-                # Apply modify_args_decorator for other cases or when slice_lg is specified
-                patched_func = modify_args_decorator(slice_lg=slice_lg)(func)
+        # Always use modify_args_decorator if no specific args provided
+        patched_func = modify_args_decorator(slice_lg=slice_lg)(func)
 
-        # Determine the patching strategy based on function origin (matplotlib or custom module)
+        # Create patch based on function type
         if func in [plt.scatter, plt.plot]:
-            # Patch matplotlib plotting functions directly
             patcher = patch("matplotlib.pyplot." + func_name, new=patched_func)
         else:
-            # Patch other functions from the provided module
             patcher = patch.object(module, func_name, new=patched_func)
 
         patches.append(patcher)
@@ -255,28 +260,41 @@ def patch_functions(directory, module_name, function_dict, arg1=None, arg2=None,
 
 @pytest.fixture(scope="module")
 def run_compute():
-    def _module(patch_dict, ret, *args, **kwargs):
-        module_name = patch_dict["module"]
-        function_name = patch_dict["function_name"]
-        function_dict = patch_dict["patched_functions"]
+    # def _module(patch_dict, ret, *args, **kwargs): # orig: 2025-01-05
+    def _module(patch_dict, function_name, ret, *args, **kwargs):  # 2025-01-06
+        # module_name = patch_dict["module"] # old
+        module_dict = patch_dict  # new
+        # function_name = patch_dict["function_name"]
+        # print("++==> run_compute")
+        # print(f"  {module_dict=}")
+        # print(f"  {function_name=}")
+        # print(f"  {module_dict[function_name]=}")
+        function_dict = patch_dict[function_name]
+        module_name = patch_dict["module_name"]
+        # print(f"{module_name=}")
+        # print("after patch_dict")
 
         directories = kwargs.get("student_directory"), kwargs.get("instructor_directory")
 
-        if ret == 's':
+        if ret == "s":
             directory = directories[0]
-        elif ret == 'i':
+        elif ret == "i":
             directory = directories[1]
         else:
             print("Only ret='i' or 's' implemented")
             raise NotImplementedError("Only 'i' or 's' implemented")
 
-
         # Replace first two arguments of spectral by my own data
+        # CHECK THAT SPECTRAL EXISTS
         nb_samples = 200
 
         ### My patches are not applied. WHY?
 
-        data, labels = load_data_labels(nb_slices=nb_samples)
+        ## load_data_labels is not normally required.
+        try:
+            data, labels = load_data_labels(nb_slices=nb_samples)
+        except (FileNotFoundError, OSError, ValueError) as e:
+            print(f"Error loading data_labels: {e}")
         # Replace the first two args of spectral by my own data. This avoids some randomness.
 
         # Only work with modification module
@@ -306,7 +324,7 @@ def run_compute():
 def get_module_results(module_name, function_name, ret="both", *args, **kwargs):
     directories = kwargs.get("student_directory"), kwargs.get("instructor_directory")
     results = []
-    if ret == 's':
+    if ret == "s":
         results = with_custom_sys_path(
             directories[0],
             load_and_run_module,
@@ -315,8 +333,8 @@ def get_module_results(module_name, function_name, ret="both", *args, **kwargs):
             function_name,
             *args,
             **kwargs,
-    )
-    elif ret == 'i':
+        )
+    elif ret == "i":
         results = with_custom_sys_path(
             directories[1],  # arguments passed to with_custom_sys_path
             load_and_run_module,
@@ -330,7 +348,7 @@ def get_module_results(module_name, function_name, ret="both", *args, **kwargs):
     else:
         print("return not handled: 'both'")
         raise NotImplementedError("Only 'i' or 's' implemented")
-    
+
     return results
 
 

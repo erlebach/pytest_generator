@@ -1,6 +1,44 @@
 import matplotlib.pyplot as plt
 
+# Address each question. Ideally, there should be a default question
+#   if there are no patches and no attributes: 
+module_name = {
+    'default_question': {
+        # changed attributes
+        # 'nb_samples': 200,
+        'patched_functions': {}
+    }
+}
+
+all_questions = {
+    'module_name': 'all_questions',
+    'question1': {
+        'nb_samples': 200,
+        'patched_functions': {}
+    },
+   'question2': {
+     'another_attrib': 3,
+     'patched_functions': {}
+   }
+}
+
 # More generally, I should provide the container module for each patched function
+#all_questions_dict = [{
+#    'module': 'all_questions',
+#    'function_name': 'question1',
+#    'patched_functions': {}
+#},{
+#    'module': 'all_questions',
+#    'function_name': 'question2',
+#    'patched_functions': {}
+#}
+
+spectral_patch_dict = {
+    'module': 'all_questions',
+    'function_name': 'question2',
+    'patched_functions': {}
+}
+
 spectral_patch_dict = {
     'module': 'spectral_clustering',
     'function_name': 'spectral_clustering',

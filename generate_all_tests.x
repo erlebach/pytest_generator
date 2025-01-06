@@ -12,5 +12,5 @@ if [[ $1 == *.yaml ]]; then
     exit 1
 fi
 
-# $1 is the yaml file or yaml files (without the extention)
+# $1 is the yaml file or yaml files (without the extension)
 ./generate_homework_tests.x $1
