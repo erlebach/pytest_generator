@@ -1181,7 +1181,8 @@ def check_structure_dict_str_float(student_answer, instructor_answer, keys=None)
     msg_list = []
 
     if status and not isinstance(student_answer, dict):
-        msg_list += ["Student answer should be a dict"]
+        msg_list += ["Student answer should be a dict.\n"]
+        msg_list += ["Instead, your answer is of type {type(student_answer).__name__}"]
         status = False
 
     if status:
