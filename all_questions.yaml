@@ -1,0 +1,60 @@
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 20
+# I don't think the next line is used. 
+module: all_questions
+
+
+# Folders are relative to the base project folder
+#student_folder_name: student_github_template
+student_folder_name: student_code_with_answers
+instructor_folder_name: instructor_code_with_answers
+
+# choices: instructor_file, student_file, yaml_file
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixture arguments in a list
+    # What is the 'module above'
+    args: [all_questions]
+
+questions:
+- id: question1
+  parts:
+    - id: q1
+      type: int
+      answer: 10
+      note:
+
+    - id: q2
+      type: list[int]
+      answer: [0, 1, 1, 2, 3, 5, 8, 13]
+
+    - id: plot_original_cluster
+      type:
+      answer:
+
+    - id: Two gaussians
+      type: list[float]
+      answer: [1.5, 2.3]
+
+#----------------------------------------------------------------------
+- id: question2
+  parts:
+    - id: Two gaussians_a
+      # REMOVE SPACES from types
+      # CAN the same id appear in multiple questions
+      type: dict[str,float]
+      answer: {'mean': 1.5, 'std': 2.5}
+
+#----------------------------------------------------------------------

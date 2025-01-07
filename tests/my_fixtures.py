@@ -35,7 +35,6 @@ def load_data_labels(data_filename, labels_filename, nb_slices):
 
 # @pytest.fixture
 def load_data_labels(nb_slices: int) -> tuple[Any, Any] | None:
-    print("==> load_data_labels fixture")
     # I should be able to control the dataset to load
     # Load your data here, using numpy or any suitable library
     base_path = Path(__file__).parent
