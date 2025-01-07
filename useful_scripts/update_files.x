@@ -4,7 +4,7 @@
 
 \cp pytest_generator/generator_config.yaml .
 \cp pytest_generator/type_handlers.yaml .
-\cp pytest_generator/*hw5*.yaml .
+\cp pytest_generator/*.yaml .
 \cp pytest_generator/assert_utilities.py .
 \cp pytest_generator/function_dictionaries.py .
 \cp pytest_generator/testing_utilities.py .
