@@ -2720,6 +2720,7 @@ def check_structure_lineplot(student_answer):
     s_fig = s_plt.figure
     s_dict = fig_dict(s_answ)
     s_grid = check_grid_status(s_dict['ax'])
+    print("plot: s_dict= ", s_dict)
 
     if s_grid is False:
         msg_list.append("Missing plot grid")

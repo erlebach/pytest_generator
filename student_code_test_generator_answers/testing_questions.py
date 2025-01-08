@@ -122,7 +122,16 @@ def question1():
     x = list(range(10))
     y = list(range(10))
     plot = plt.plot(x, y)
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.title("My title")
+    plt.grid(True)
+
     scat = plt.scatter(x, y)
+    plt.xlabel("xs")
+    plt.ylabel("ys")
+    plt.title("Your title")
+    plt.grid(True)
 
     # type: lineplot
     an['lineplot_1'] = plot # pass

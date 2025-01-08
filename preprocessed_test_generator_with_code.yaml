@@ -1,0 +1,119 @@
+visibility: visible
+max_score: 20
+module: testing_questions
+student_folder_name: student_code_test_generator_answers
+instructor_folder_name: instructor_code_test_generator_answers
+i_answer_source: instructor_file
+s_answer_source: student_file
+fixtures:
+  fixture:
+    name: run_compute
+    args:
+    - testing_questions
+questions:
+- id: question1
+  parts:
+  - id: ls_1
+    type: list[str]
+  - id: ls_2
+    type: list[str]
+  - id: ls_3
+    type: list[str]
+  - id: ls_4
+    type: list[str]
+  - id: llf_1
+    type: list[list[float]]
+  - id: llf_2
+    type: list[list[float]]
+  - id: llf_3
+    type: list[list[float]]
+  - id: llf_4
+    type: list[list[float]]
+  - id: dilf_1
+    type: dict[int,list[float]]
+  - id: dilf_2
+    type: dict[int,list[float]]
+  - id: dilf_3
+    type: dict[int,list[float]]
+  - id: dilf_4
+    type: dict[int,list[float]]
+  - id: ss_1
+    type: set[str]
+  - id: ss_2
+    type: set[str]
+  - id: ss_3
+    type: set[str]
+  - id: ss_4
+    type: set[str]
+  - id: ss_5
+    type: set[str]
+  - id: dss_1
+    type: dict[str,set]
+  - id: dss_2
+    type: dict[str,set]
+  - id: dss_3
+    type: dict[str,set]
+  - id: dtnda_1
+    type: dict[str,tuple[ndarray]]
+  - id: dtnda_2
+    type: dict[str,tuple[ndarray]]
+  - id: dtnda_3
+    type: dict[str,tuple[ndarray]]
+  - id: dtnda_4
+    type: dict[str,tuple[ndarray]]
+  - id: dtnda_5
+    type: dict[str,tuple[ndarray]]
+  - id: dinda_1
+    type: dict[int,ndarray]
+  - id: dinda_2
+    type: dict[int,ndarray]
+  - id: dinda_3
+    type: dict[int,ndarray]
+  - id: dtinda_1
+    type: dict[tuple[int],ndarray]
+  - id: dtinda_2
+    type: dict[tuple[int],ndarray]
+  - id: dtinda_3
+    type: dict[tuple[int],ndarray]
+  - id: lnda_1
+    type: list[ndarray]
+  - id: lnda_2
+    type: list[ndarray]
+  - id: lnda_3
+    type: list[ndarray]
+  - id: lnda_4
+    type: list[ndarray]
+  - id: lnda_5
+    type: list[ndarray]
+  - id: dssi_1
+    type: dict[str,set[int]]
+  - id: dssi_2
+    type: dict[str,set[int]]
+  - id: dssi_3
+    type: dict[str,set[int]]
+  - id: dssi_4
+    type: dict[str,set[int]]
+  - id: dssi_5
+    type: dict[str,set[int]]
+  - id: fct_1
+    type: function
+  - id: fct_2
+    type: function
+  - id: lineplot_1
+    type: lineplot
+  - id: lineplot_2
+    type: lineplot
+  - id: lineplot_3
+    type: lineplot
+  - id: scatter2d_1
+    type: scatterplot2d
+  - id: scatter2d_2
+    type: scatterplot2d
+  - id: scatter2d_3
+    type: scatterplot2d
+  - id: scatter3d_1
+    type: scatterplot3d
+  - id: scatter3d_2
+    type: scatterplot3d
+  - id: scatter3d_3
+    type: scatterplot3d

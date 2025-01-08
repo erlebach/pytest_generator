@@ -115,6 +115,11 @@ def question1():
     x = list(range(10))
     y = list(range(10))
     plot = plt.plot(x, y)
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.title( "title")
+    plt.grid(True)
+
     scat = plt.scatter(x, y)
 
     # type: lineplot
