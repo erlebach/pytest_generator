@@ -1259,6 +1259,7 @@ def check_structure_dict_str_ndarray(student_answer, instructor_answer, keys=Non
     instructor answer: dictionary with keys:str, values: a set of objects
     keys: None if all keys should be considered
     """
+    print("==> student_answer= ", student_answer)
     status = True
     msg_list = []
 
@@ -1775,7 +1776,7 @@ def check_structure_list_int(student_answer, instructor_answer):
             f"- The answer should be of type 'list'; your type is {type(student_answer).__name__}"
         )
     else:
-        msg_list.append("- The answer is type list. Correct.")
+        msg_list.append("- The answer is of type list as expected. ")
 
     # Check length of list
     if status:
@@ -1852,10 +1853,10 @@ def check_structure_list_float(student_answer, instructor_answer):
     if not isinstance(student_answer, list):
         status = False
         msg_list.append(
-            f"- The answer should be of type 'list'; your type is {type(student_answer).__name__}"
+            f"- The answer should have type 'list'; your type is {type(student_answer).__name__}"
         )
     else:
-        msg_list.append("- The answer is type list. Correct.")
+        msg_list.append("- The answer has type list. Correct.")
 
     # Check length of list
     if status:

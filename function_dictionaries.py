@@ -17,9 +17,74 @@ all_questions = {
         'patched_functions': {}
     },
    'question2': {
-     'another_attrib': 3,
      'patched_functions': {}
-   }
+   },
+   'question3': {
+     'patched_functions': {}
+   },
+   'question4': {
+     'patched_functions': {}
+   },
+   'question5': {
+     'patched_functions': {}
+   },
+   'question6': {
+     'patched_functions': {}
+   },
+   'question7': {
+     'patched_functions': {}
+   },
+   'question8': {
+     'patched_functions': {}
+   },
+   'question9': {
+     'patched_functions': {}
+   },
+   'question10': {
+     'patched_functions': {}
+   },
+   'question11': {
+     'patched_functions': {}
+   },
+   'question12': {
+     'patched_functions': {}
+   },
+   'question13': {
+     'patched_functions': {}
+   },
+   'question14': {
+     'patched_functions': {}
+   },
+   'question15': {
+     'patched_functions': {}
+   },
+   'question16': {
+     'patched_functions': {}
+   },
+   'question17': {
+     'patched_functions': {}
+   },
+   'question18': {
+     'patched_functions': {}
+   },
+   'question19': {
+     'patched_functions': {}
+   },
+   'question20': {
+     'patched_functions': {}
+   },
+}
+
+# Stress test the typing system
+# Uniformize the feedback messages
+testing_questions = {
+    'module_name': 'testing_questions',
+    'question1': {
+        'patched_functions': {}
+    },
+    'question2': {
+        'patched_functions': {}
+    }
 }
 
 # More generally, I should provide the container module for each patched function
