@@ -1959,8 +1959,8 @@ def check_structure_list_ndarray(student_answer, instructor_answer):
         else:
             msg_list.append("- The length of the list is correct.")
 
-    if status:
-        for s_arr in instructor_answer:
+    if status: # THERE MIGHT BE A BUG
+        for s_arr in student_answer:
             if not isinstance(s_arr, type(np.zeros(1))):
                 status = False
                 msg_list.append(
@@ -2834,7 +2834,7 @@ def check_structure_scatterplot2d(student_answer):
     if not isinstance(student_answer, PathCollection):
         status = False
         msg_list.append(
-            "The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'."
+            "The answer type should be 'PathCollection', the type of the output of 'plt.scatter'."
         )
 
     xy = s_answ.get_offsets()
@@ -2885,7 +2885,6 @@ def check_answer_scatterplot3d(student_answer, instructor_answer, rel_tol):
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-
 def check_structure_scatterplot3d(student_answer):
     from matplotlib.collections import PathCollection
 
@@ -2897,7 +2896,7 @@ def check_structure_scatterplot3d(student_answer):
     if not isinstance(student_answer, PathCollection):
         status = False
         msg_list.append(
-            "The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'."
+            "The answer type should be 'PathCollection', the type of the output of 'plt.scatter'."
         )
 
     x, y, z = s_answ._offsets3d

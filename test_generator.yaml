@@ -198,7 +198,7 @@ questions:
   # Type list[float]
   parts:
     - id: q1
-      type: list[int]
+      type: list[float]
       i_answer: [10.2, 20.3]
       s_answer: [10.2, 20.3]
     - id: q2

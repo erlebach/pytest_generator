@@ -1,0 +1,223 @@
+# Test generator feedback by creating tests with correct and 
+# wrong answers stored in python files. 
+
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 20
+# I don't think the next line is used. 
+module: testing_questions
+
+
+# Folders are relative to the base project folder
+#student_folder_name: student_github_template
+student_folder_name: student_code_test_generator_answers
+instructor_folder_name: instructor_code_test_generator_answers
+
+# choices: instructor_file, student_file, yaml_file
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixture arguments in a list
+    # What is the 'module above'
+    args: [testing_questions]
+
+questions:
+- id: question1
+  # Type int
+  parts:
+    - id: ls_1
+      type: list[str]
+    - id: ls_2
+      type: list[str]
+    - id: ls_3
+      type: list[str]
+    - id: ls_4
+      type: list[str]
+
+    - id: llf_1
+      type: list[list[float]]
+    - id: llf_2
+      type: list[list[float]]
+    - id: llf_3
+      type: list[list[float]]
+    - id: llf_4
+      type: list[list[float]]
+
+    - id: dilf_1
+      type: dict[int,list[float]]
+    - id: dilf_2
+      type: dict[int,list[float]]
+    - id: dilf_3
+      type: dict[int,list[float]]
+    - id: dilf_4
+      type: dict[int,list[float]]
+
+    - id: ss_1
+      type: set[str]
+    - id: ss_2
+      type: set[str]
+    - id: ss_3
+      type: set[str]
+    - id: ss_4
+      type: set[str]
+    - id: ss_5
+      type: set[str]
+
+##    set of set is unhashable. Not allowed for now. 
+##    - id: ssi_1
+##      type: set[set[int]]
+##    - id: ssi_2
+##      type: set[set[int]]
+##    - id: ssi_3
+##      type: set[set[int]]
+##    - id: ssi_4
+##      type: set[set[int]]
+##
+    - id: dss_1
+      type: dict[str,set]
+    - id: dss_2
+      type: dict[str,set]
+    - id: dss_3
+      type: dict[str,set]
+
+#    - id: snda_1
+#      type: set[ndarray]
+#    - id: snda_2
+#      type: set[ndarray]
+#    - id: snda_3
+#      type: set[ndarray]
+
+    - id: dtnda_1
+      type: dict[str,tuple[ndarray]]
+    - id: dtnda_2
+      type: dict[str,tuple[ndarray]]
+    - id: dtnda_3
+      type: dict[str,tuple[ndarray]]
+    - id: dtnda_4
+      type: dict[str,tuple[ndarray]]
+    - id: dtnda_5
+      type: dict[str,tuple[ndarray]]
+
+    - id: dinda_1
+      type: dict[int,ndarray]
+    - id: dinda_2
+      type: dict[int,ndarray]
+    - id: dinda_3
+      type: dict[int,ndarray]
+
+    - id: dtinda_1
+      type: dict[tuple[int],ndarray]
+    - id: dtinda_2
+      type: dict[tuple[int],ndarray]
+    - id: dtinda_3
+      type: dict[tuple[int],ndarray]
+
+    - id: lnda_1
+      type: list[ndarray]
+    - id: lnda_2
+      type: list[ndarray]
+    - id: lnda_3
+      type: list[ndarray]
+    - id: lnda_4
+      type: list[ndarray]
+    - id: lnda_5
+      type: list[ndarray]
+
+    - id: dssi_1
+      type: dict[str,set[int]]
+    - id: dssi_2
+      type: dict[str,set[int]]
+    - id: dssi_3
+      type: dict[str,set[int]]
+    - id: dssi_4
+      type: dict[str,set[int]]
+    - id: dssi_5
+      type: dict[str,set[int]]
+
+    - id: fct_1
+      type: function
+    - id: fct_2
+      type: function
+
+    - id: lineplot_1
+      type: lineplot
+    - id: lineplot_2
+      type: lineplot
+    - id: lineplot_3
+      type: lineplot
+
+    - id: scatter2d_1
+      type: scatterplot2d
+    - id: scatter2d_2
+      type: scatterplot2d
+    - id: scatter2d_3
+      type: scatterplot2d
+   
+    - id: scatter3d_1
+      type: scatterplot3d
+    - id: scatter3d_2
+      type: scatterplot3d
+    - id: scatter3d_3
+      type: scatterplot3d
+
+##    - id: dendo_1
+##      type: dendogram
+##    - id: dendo_2
+##      type: dendogram
+##    - id: dendo_3
+##      type: dendogram
+
+
+#    "dict[int,list[float]]",
+#    "eval_float",
+#    "explain_str", 
+#    "function",
+#    "lineplot",
+#    "list[float]",
+#    "list[int]",
+#    "list[list[float]]", 
+#    "list[str]",
+
+#    "scatterplot3d", 
+#    "scatterplot2d",
+#    "dendrogram", 
+#    "set[str]",
+#    "dict[str,set]",
+#    "set[set[int]]",
+#    "dict[str,tuple[ndarray]]", 
+#    "dict[int,ndarray]",
+#    "dict[tuple[int],ndarray]",
+#    "list[ndarray]", 
+#    "set[ndarray]", 
+#    "dict[str,set[int]]"
+
+#----------------------------------------------------------------------
+#    "dict[int,list[float]]",
+#    "eval_float",
+#    "explain_str", 
+#    "function",
+#    "lineplot",
+#    "list[list[float]]", 
+#    "list[str]",
+#    "scatterplot3d", 
+#    "scatterplot2d",
+
+#    "set[str]",
+#    "set[set[int]]",
+#    "dendrogram", 
+#    "dict[str,tuple[ndarray]]", 
+#    "dict[int,ndarray]",
+#    "dict[tuple[int],ndarray]",
+#    "list[ndarray]", 
+#    "set[ndarray]", 
+#    "dict[str,set]",

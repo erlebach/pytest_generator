@@ -112,6 +112,7 @@ from function_dictionaries import *
 #import {fixture_import_file}
 import numpy as np
 import yaml
+import matplotlib.pyplot as plt
 import test_utils as u  # for decode_data()
 # pytest might change the python path. Make sure to import it last. 
 # import pytest
@@ -293,7 +294,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 function_name,
             )
 
+            print(f"{part_type=}")
             if part_type in types_list:
+                print("part_type is in types_list")
                 test_code += "    local_namespace = {}\n"
 
                 import_file = f"type_handlers['types']['{part_type}']['import']"
@@ -350,6 +353,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
                 test_code += f"    local_namespace['rel_tol'] = rel_tol\n"
                 test_code += f"    local_namespace['abs_tol'] = abs_tol\n"
+
+                strg = f"type_handlers['types']['{part_type}']['assert_answer']"
+                print(f"... {str=} DEBUG DEBUG")
 
                 assertion_answer = eval(
                     f"type_handlers['types']['{part_type}']['assert_answer']"
