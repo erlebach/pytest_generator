@@ -834,6 +834,10 @@ def check_answer_dict_str_dict_str_float(
         status_ = True  # Default to True
         msg_list_ = []  # Empty list to start
 
+        msg_list.append(f"DEBUG: {dict_float_choices=}")
+        msg_list.append("fDEBUG: {instructor_answer=}")
+        msg_list.append("fDEBUG: {student_answer==}")
+
         if len(dict_float_choices) > 0 and k in dict_float_choices:
             for val in dict_float_choices[k]:
                 status_, msg_list_ = check_dict_str_float(
