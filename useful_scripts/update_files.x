@@ -19,3 +19,4 @@
 \cp pytest_generator/instructor_code_with_answers/*.py instructor_code_with_answers/
 #\cp pytest_generator/student_code_with_answers/*.py student_code_with_answers/
 \cp pytest_generator/student_github_template/*.py student_github_template/
+git add tests

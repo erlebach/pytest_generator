@@ -6,3 +6,4 @@
   date could be read from Gradescope to avoid inconsistencies. 
 - (2025-01-21): copy (from parent folder), the homework definition file(s)
 - (2025-01-21): copy from parent folder the contents of instructor_with_answers/ and student_with_answers/
+- (2025-01-21): Make sure that all the files in tests/ are uploaded to grading repository. Perhaps in update.x? 
