@@ -16,6 +16,7 @@ def add_attribute(name, attr):
 
 def apply_options(defaults: dict, overrides: dict) -> dict:
     result = defaults.copy()  # Start with the defaults
+    print(f"{overrides=}")
     result.update(overrides)  # Apply overrides
     return result
 
@@ -215,6 +216,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 fixture_args = fixture["args"]  # list of strings
 
             part_id = part["id"]
+            print("==> part_id= ", part_id)
             part_id_sanitized = (
                 part_id.replace(" ", "_")
                 .replace("(", "")
@@ -355,7 +357,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += f"    local_namespace['abs_tol'] = abs_tol\n"
 
                 strg = f"type_handlers['types']['{part_type}']['assert_answer']"
-                print(f"... {str=} DEBUG DEBUG")
 
                 assertion_answer = eval(
                     f"type_handlers['types']['{part_type}']['assert_answer']"

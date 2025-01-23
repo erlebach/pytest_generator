@@ -47,7 +47,8 @@ def preprocess_yaml(input_file, output_file):
             #print(f"{len(parts)=}, {i=}")
             parts[i] = part
             #print("part= ", part)
-        question['parts'] = parts
+        question['==> parts'] = parts
+        print("parts= ", parts)
     
     with open(output_file, 'w') as file:
         yaml.dump(data, file, sort_keys=False)
