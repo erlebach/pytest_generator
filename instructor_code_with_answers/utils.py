@@ -66,6 +66,7 @@ def prepare_data(
     num_train: int = 60000,
     num_test: int = 10000,
     normalize: bool = True,
+    frac_train: float = 0.8,
 ) -> tuple[
     NDArray[np.float32],
     NDArray[np.int32],
@@ -82,6 +83,8 @@ def prepare_data(
         Number of testing samples. Default is 10000.
     normalize : bool, optional
         Whether to normalize the data. Default is True.
+    frac_train : float, optional
+        Fraction of training samples. Default is 0.8.
 
     Returns
     -------
@@ -110,6 +113,53 @@ def prepare_data(
     y = y.astype(np.int32)
     x_train, x_test = x[:num_train], x[num_train : num_train + num_test]
     y_train, y_test = y[:num_train], y[num_train : num_train + num_test]
+    return x_train, y_train, x_test, y_test
+
+
+def create_data(
+    n_rows: int,
+    n_features: int,
+    frac_train: float = 0.8,
+) -> None:
+    """Create synthetic data and make it available globally.
+
+    Parameters
+    ----------
+    n_rows : int
+        Number of total samples to generate
+    n_features : int
+        Number of features per sample
+    frac_train : float, optional
+        Fraction of training samples. Default is 0.8.
+
+    Notes
+    -----
+    Creates global variables:
+    - x_train: Training data subset
+    - x_test: Test data subset
+    - y_train: Training labels subset
+    - y_test: Test labels subset
+
+    Example
+    -------
+    >>> import utils as u
+    >>> u.create_data(120, 120)
+    >>> print(f"Training data shape: {x_train.shape}")
+
+    """
+    # Create random data
+    rng = np.random.default_rng(42)
+    x_full = rng.random((n_rows, n_features))
+    # Create labels (sum first 5 columns)
+    y_full = (x_full[:, :5].sum(axis=1) > 2.5).astype(int)
+
+    # Split into train/test
+    n_train = int(frac_train * n_rows)  # Use 80% for training
+    x_train = x_full[:n_train, :]
+    x_test = x_full[n_train:, :]
+    y_train = y_full[:n_train]
+    y_test = y_full[n_train:]
+
     return x_train, y_train, x_test, y_test
 
 
