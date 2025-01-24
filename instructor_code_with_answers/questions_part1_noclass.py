@@ -14,6 +14,7 @@ Students should be able to run this file.
 # https://chat.openai.com/share/b3fd7739-b691-48f2-bb5e-0d170be4428c
 
 # Fill in the appropriate import statements from sklearn to solve the homework
+from enum import Enum
 from typing import Any
 
 import new_utils as nu
@@ -27,6 +28,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import (
     BaseCrossValidator,
+    BaseShuffleSplit,
     GridSearchCV,
     KFold,
     ShuffleSplit,
@@ -34,19 +36,19 @@ from sklearn.model_selection import (
 )
 
 # import svm module
-from sklearn.svm import SVC  # , LinearSVC
+# ! from sklearn.svm import SVC  # , LinearSVC
 from sklearn.tree import DecisionTreeClassifier
+from utils import Normalization, PrintResults
 
 # ======================================================================
 seed = 42
 frac_train = 0.2
 
 
-# ======================================================================
 class Section1:
     def __init__(
         self,
-        normalize: bool = True,
+        normalize: Normalization = Normalization.APPLY_NORMALIZATION,
         seed: int | None = None,
         frac_train: float = 0.2,
     ) -> None:
@@ -72,29 +74,19 @@ class Section1:
         self.frac_train = frac_train
         self.seed = seed
 
-    # ---------------------------------------------------------
-    """
-    C. Train your first classifier using k-fold cross validation 
-       (see train_simple_classifier_with_cv function).  Use 5 splits 
-       and a Decision tree classifier. Print the mean and standard 
-       deviation for the accuracy scores in each validation set in 
-       cross validation. Also print the mean and std of the fit 
-       (or training) time.
-    """
 
-    # ======================================================================
+# ---------------------------------------------------------
 
 
 def train_simple_classifier_with_cv(
     # self,
     x: NDArray[np.floating],
     y: NDArray[np.int32],
-    cv: BaseCrossValidator,  # : BaseCrossValidator (class instance)
-    # cv: BaseCrossValidator,  # : BaseCrossValidator, (class instance)
+    cv: BaseCrossValidator | BaseShuffleSplit,  # : BaseCrossValidator (class instance)
     # estimator_class: Type[BaseEstimator],  # a class
     clf: BaseEstimator,  #: class instance of the estimator
     n_splits: int = 5,
-    print_results: bool = False,
+    print_results: PrintResults = PrintResults.SKIP_PRINT_RESULTS,
     seed: int = 42,
 ) -> dict[str, float]:
     """Train a simple classifier using k-fold cross-validation.
@@ -126,17 +118,6 @@ def train_simple_classifier_with_cv(
         - std_fit_time: Standard deviation of training time
 
     """
-    # clf = estimator_class(random_state=seed)
-    # Not all cross validators have a shuffle parameter. Therefore, passing
-    # the class as an argument does not always work. Passing the estimator,
-    # where the class was instantiated in the calling function will be more flebile.
-    # cv = cv_class(n_splits=n_splits, shuffle=True, random_state=seed)
-
-    # FOR DEBUGGING
-    # cv_results: dict[str, NDArray[np.floating]] = cross_validate(
-    # clf, X, y, cv=cv,
-    # )
-    # FOR DEBUGGING
     clf1 = DecisionTreeClassifier(random_state=62)
     clf1.fit(x, y)
 
@@ -209,17 +190,8 @@ def partA():
     answers["starter_code"] = u.starter_code()
     return answers
 
-    # ----------------------------------------------------------------------
-    """
-    B. Load and prepare the mnist dataset, i.e., call the prepare_data and
-       `filter_out_7_9s` functions in utils.py, to obtain a data matrix X consisting of
-       only the digits 7 and 9. Make sure that every element in the data matrix is a
-       floating point number and scaled between 0 and 1 (write a function to
-       achieve this. Checking is not sufficient.)
-       Also check that the labels are integers. Print out the length of the filtered
-       `x` and `y`, and the maximum value of `x` for both training and test sets. Use
-       the routines provided in utils.
-    """
+
+# ----------------------------------------------------------------------
 
 
 def partB() -> dict[Any, Any]:
@@ -242,6 +214,15 @@ def partB() -> dict[Any, Any]:
         - y_train: Filtered training labels
         - x_test: Filtered and scaled test data
         - y_test: Filtered test labels
+
+    B. Load and prepare the mnist dataset, i.e., call the prepare_data and
+       `filter_out_7_9s` functions in utils.py, to obtain a data matrix X consisting of
+       only the digits 7 and 9. Make sure that every element in the data matrix is a
+       floating point number and scaled between 0 and 1 (write a function to
+       achieve this. Checking is not sufficient.)
+       Also check that the labels are integers. Print out the length of the filtered
+       `x` and `y`, and the maximum value of `x` for both training and test sets. Use
+       the routines provided in utils.
 
     """
     x, y, x_test, y_test = u.prepare_data()
@@ -270,14 +251,6 @@ def partB() -> dict[Any, Any]:
     print("EXIT partB")
     return answers
 
-    """
-        C. Train your first classifier using k-fold cross validation (see
-        train_simple_classifier_with_cv function). Use 5 splits and a Decision tree
-        classifier. Print the mean and standard deviation for the accuracy scores
-        in each validation set in cross validation. Also print the mean and std
-        of the fit (or training) time.  (Be more specific about the output format)
-        """
-
 
 # ----------------------------------------------------------------------
 def partC(
@@ -304,6 +277,12 @@ def partC(
             - std_accuracy: Standard deviation of accuracy
             - mean_fit_time: Mean training time
             - std_fit_time: Standard deviation of training time
+
+    C. Train your first classifier using k-fold cross validation (see
+    train_simple_classifier_with_cv function). Use 5 splits and a Decision tree
+    classifier. Print the mean and standard deviation for the accuracy scores
+    in each validation set in cross validation. Also print the mean and std
+    of the fit (or training) time.  (Be more specific about the output format)
 
     """
     print(f"partC, {x.shape=}, {y.shape=}")
@@ -339,9 +318,6 @@ def partC(
     return answers
 
     # ---------------------------------------------------------
-    """
-        D. Repeat Part C with a random permutation (Shuffle-Split) k-fold cross-validator.
-        """
 
 
 def partD(
@@ -368,6 +344,8 @@ def partD(
             - std_accuracy: Standard deviation of accuracy
             - mean_fit_time: Mean training time
             - std_fit_time: Standard deviation of training time
+
+    D. Repeat Part C with a random permutation (Shuffle-Split) k-fold cross-validator.
 
     """
     n_splits = 5
@@ -400,11 +378,6 @@ def partD(
     return answers
 
     # ----------------------------------------------------------------------
-    """
-        E. Repeat part D for `k=2,5,8,16`, but do not print the training time.
-        Note that this may take a long time (2-5 mins) to run. Do you notice
-        anything about the mean and/or standard deviation of the scores for each `k`?
-        """
 
 
 def partE(
@@ -432,6 +405,10 @@ def partE(
             - 'std_fit_time': float, Standard deviation of training time
         - 'cv': ShuffleSplit instance used for cross-validation
         - 'clf': DecisionTreeClassifier instance used for training
+
+    E. Repeat part D for `k=2,5,8,16`, but do not print the training time.
+    Note that this may take a long time (2-5 mins) to run. Do you notice
+    anything about the mean and/or standard deviation of the scores for each `k`?
 
     """
     n_splits = [2, 5, 8, 16]
@@ -475,27 +452,13 @@ def partE(
     return answers
 
     # ----------------------------------------------------------------------
-    """
-        F. Repeat part D with a Random Forest classifier with default parameters.
-        Make sure the train test splits are the same for both models when performing
-        cross-validation. Use ShuffleSplit for cross-validation. Which model has
-        the highest accuracy on average?
-        Which model has the lowest variance on average? Which model is faster
-        to train? (compare results of part D and part F)
-
-        Make sure your answers are calculated and not copy/pasted. Otherwise, the 
-        automatic grading will generate the wrong answers.
-
-        Use a Random Forest classifier (an ensemble of DecisionTrees).
-
-        """
 
 
 def partF(
     # x: NDArray[np.floating],
     # y: NDArray[np.int32],
 ) -> dict[str, Any]:
-    """Return a dictionary with data for both Random Forest and Decision Tree classifiers.
+    """Return a dictionary with data for Random Forest and Decision Tree classifiers.
 
     Parameters
     ----------
@@ -522,6 +485,18 @@ def partF(
     -----
     - The suffix _RF and _DT are used to distinguish between the Random Forest
         and Decision Tree models.
+
+    F. Repeat part D with a Random Forest classifier with default parameters.
+    Make sure the train test splits are the same for both models when performing
+    cross-validation. Use ShuffleSplit for cross-validation. Which model has
+    the highest accuracy on average?
+    Which model has the lowest variance on average? Which model is faster
+    to train? (compare results of part D and part F)
+
+    Make sure your answers are calculated and not copy/pasted. Otherwise, the
+    automatic grading will generate the wrong answers.
+
+    Use a Random Forest classifier (an ensemble of DecisionTrees).
 
     """
     results_dict = {}
@@ -596,27 +571,11 @@ def partF(
     )
 
     # The type is a string, one of "decision-tree" or "random-forest"
-    answers["model_fastest"] = ("decision-tree" if fit_time_dt < fit_time_rf else "random-forest",)
+    answers["model_fastest"] = "decision-tree" if fit_time_dt < fit_time_rf else "random-forest"
 
-    print("EXIT partF")
     return answers
 
     # ----------------------------------------------------------------------
-    """
-        G. For the Random Forest classifier trained in part F, manually (or systematically, 
-        i.e., using grid search), modify hyperparameters, and see if you can get 
-        a higher mean accuracy.  Finally train the classifier on all the training 
-        data and get an accuracy score on the test set.  Print out the training 
-        and testing accuracy and comment on how it relates to the mean accuracy 
-        when performing cross validation. Is it higher, lower or about the same?
-
-        Choose among the following hyperparameters:
-            1) criterion,
-            2) max_depth,
-            3) min_samples_split,
-            4) min_samples_leaf,
-            5) max_features
-        """
 
 
 def partG(
@@ -650,13 +609,27 @@ def partG(
         - test accuracy
         - cross validation mean accuracy
 
+    G. For the Random Forest classifier trained in part F, manually (or systematically,
+    i.e., using grid search), modify hyperparameters, and see if you can get
+    a higher mean accuracy.  Finally train the classifier on all the training
+    data and get an accuracy score on the test set.  Print out the training
+    and testing accuracy and comment on how it relates to the mean accuracy
+    when performing cross validation. Is it higher, lower or about the same?
+
+    Choose among the following hyperparameters:
+        1) criterion,
+        2) max_depth,
+        3) min_samples_split,
+        4) min_samples_leaf,
+        5) max_features
+
     """
     # Notice: no seed since I can't predict how
     # the student will use the grid search
     # Ask student to use at least two parameters per
     #  parameters for three parameters,  minimum of 8 tests.
     # (SVC can be found in the documention. So uses another search).
-    # clf = RandomForestClassifier(random_state=self.seed)
+    # ! clf = RandomForestClassifier(random_state=self.seed)
 
     # Test: What are the possible parameters to vary for LogisticRegression
     # or SVC
@@ -694,7 +667,7 @@ def partG(
     clf = RandomForestClassifier(random_state=seed)
     n_splits = 5
     # Uses stratified cross-validator by default
-    # cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    # ! cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
     # THERE IS SOME UNCONTROLLED RANDOMESS!
     # return_train_score is False by default
@@ -710,7 +683,6 @@ def partG(
     best_estimator = grid_search.best_estimator_
     best_params = grid_search.best_params_
     best_score = grid_search.best_score_
-    results = grid_search.cv_results_
 
     clf.fit(x, y)
     best_estimator.fit(x, y)
@@ -784,7 +756,8 @@ if __name__ == "__main__":
 
     ################################################
     # In real code, read MNIST files and define Xtrain and xtest appropriately
-    x = np.random.rand(120, 120)  # 100 samples, 100 features
+    rng = np.random.default_rng(seed)
+    x = rng.random((120, 120))  # 100 samples, 100 features
     # Fill labels with 0 and 1 (mimic 7 and 9s)
     y = (x[:, :5].sum(axis=1) > 2.5).astype(int)
     n_train = 100
@@ -833,7 +806,6 @@ if __name__ == "__main__":
     answer["1G"] = answer1G
 
     u.save_dict("section1.pkl", answer)
-    pass
     """
     Run your code and produce all your results for your report. We will spot check the
     reports, and grade your code with automatic tools.

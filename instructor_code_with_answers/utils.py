@@ -1,6 +1,7 @@
 """Utility functions for the homework."""
 
 import pickle
+from enum import Enum
 from pathlib import Path
 
 import numpy as np
@@ -13,6 +14,44 @@ from sklearn.model_selection import (
     cross_validate,
 )
 from sklearn.tree import DecisionTreeClassifier
+
+
+class Normalization(Enum):
+    """Enum class to control data normalization.
+
+    This enum provides boolean flags to indicate whether normalization
+    should be applied to data or skipped.
+
+    Attributes
+    ----------
+    APPLY_NORMALIZATION : bool
+        Flag indicating normalization should be applied (True)
+    SKIP_NORMALIZATION : bool
+        Flag indicating normalization should be skipped (False)
+
+    """
+
+    APPLY_NORMALIZATION = True
+    SKIP_NORMALIZATION = False
+
+
+class PrintResults(Enum):
+    """Enum class to control the printing of results.
+
+    This enum provides options to determine whether results should be printed
+    or skipped during the execution of the program.
+
+    Attributes
+    ----------
+    PRINT_RESULTS : bool
+        Flag indicating that results should be printed (True).
+    SKIP_PRINT_RESULTS : bool
+        Flag indicating that results should be skipped (False).
+
+    """
+
+    PRINT_RESULTS = True
+    SKIP_PRINT_RESULTS = False
 
 
 def load_mnist_dataset(
@@ -120,8 +159,13 @@ def create_data(
     n_rows: int,
     n_features: int,
     frac_train: float = 0.8,
-) -> None:
-    """Create synthetic data and make it available globally.
+) -> tuple[
+    NDArray[np.floating],
+    NDArray[np.int32],
+    NDArray[np.floating],
+    NDArray[np.int32],
+]:
+    """Create synthetic data for testing and training.
 
     Parameters
     ----------
@@ -132,20 +176,19 @@ def create_data(
     frac_train : float, optional
         Fraction of training samples. Default is 0.8.
 
+    Returns
+    -------
+    tuple[NDArray[np.floating], NDArray[np.int32], NDArray[np.floating], NDArray[np.int32]]
+        x_train : Training data matrix
+        y_train : Training labels array
+        x_test : Testing data matrix
+        y_test : Testing labels array
+
     Notes
     -----
-    Creates global variables:
-    - x_train: Training data subset
-    - x_test: Test data subset
-    - y_train: Training labels subset
-    - y_test: Test labels subset
-
-    Example
-    -------
-    >>> import utils as u
-    >>> u.create_data(120, 120)
-    >>> print(f"Training data shape: {x_train.shape}")
-
+    Creates synthetic data by generating random features and computing binary labels
+    based on the sum of the first 5 features. Data is split into training and test
+    sets according to frac_train.
     """
     # Create random data
     rng = np.random.default_rng(42)
