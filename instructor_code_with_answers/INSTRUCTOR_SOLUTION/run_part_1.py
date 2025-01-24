@@ -1,8 +1,8 @@
 #######################################################################
-from numpy.typing import NDArray
 import numpy as np
-from part_1_template_solution import Section1 as Part1
 import utils as u
+from numpy.typing import NDArray
+from part_1_template_solution import Section1 as Part1
 
 #######################################################################
 
@@ -187,12 +187,12 @@ if __name__ == "__main__":
     answer1G = part_G(part1, X, y, Xtest, ytest)
 
     answer = {}
-    answer['1A'] = answer1A
-    answer['1B'] = answer1B
-    answer['1C'] = answer1C
-    answer['1D'] = answer1D
-    answer['1E'] = answer1E
-    answer['1F'] = answer1F
-    answer['1G'] = answer1G
+    answer["1A"] = answer1A
+    answer["1B"] = answer1B
+    answer["1C"] = answer1C
+    answer["1D"] = answer1D
+    answer["1E"] = answer1E
+    answer["1F"] = answer1F
+    answer["1G"] = answer1G
 
     u.save_dict("section1.pkl", answer)

@@ -51,7 +51,7 @@ def load_mnist_dataset(
         x = np.array(bunch[0], dtype=np.float32)
         y = np.array(bunch[1], dtype=np.int32)
 
-    if nb_samples is not None and nb_samples < X.shape[0]:
+    if nb_samples is not None and nb_samples < x.shape[0]:
         x = x[0:nb_samples, :]
         y = y[0:nb_samples]
 
@@ -62,21 +62,42 @@ def load_mnist_dataset(
     return x, y
 
 
-def prepare_data(num_train: int = 60000, num_test: int = 10000, normalize: bool = True):
+def prepare_data(
+    num_train: int = 60000,
+    num_test: int = 10000,
+    normalize: bool = True,
+) -> tuple[
+    NDArray[np.float32],
+    NDArray[np.int32],
+    NDArray[np.float32],
+    NDArray[np.int32],
+]:
     """Prepare the data.
 
     Parameters
     ----------
-        num_train: Number of training samples.
-        num_test: Number of testing samples.
-        normalize: Boolean indicating whether to normalize the data.
+    num_train : int, optional
+        Number of training samples. Default is 60000.
+    num_test : int, optional
+        Number of testing samples. Default is 10000.
+    normalize : bool, optional
+        Whether to normalize the data. Default is True.
 
     Returns
     -------
-        Tuple containing the training data matrix (Xtrain), training labels (ytrain),
-            testing data matrix (Xtest), and testing labels (ytest).
-    Side effects: Updates the variables Xtrain, ytrain, Xtest, and ytest with the
-        prepared data.
+    x_train : NDArray[np.float32]
+        Training data matrix
+    y_train : NDArray[np.int32]
+        Training labels array
+    x_test : NDArray[np.float32]
+        Testing data matrix
+    y_test : NDArray[np.int32]
+        Testing labels array
+
+    Notes
+    -----
+    The function loads the MNIST dataset, optionally normalizes it, and splits it into
+    training and testing sets based on the specified sizes.
 
     """
     # Check in case the data is already on the computer.
@@ -93,7 +114,8 @@ def prepare_data(num_train: int = 60000, num_test: int = 10000, normalize: bool 
 
 
 def filter_out_7_9s(
-    x: NDArray[np.floating], y: NDArray[np.int32]
+    x: NDArray[np.floating],
+    y: NDArray[np.int32],
 ) -> tuple[NDArray[np.floating], NDArray[np.int32]]:
     """Filter the dataset to include only the digits 7 and 9.
 
@@ -228,15 +250,13 @@ def save_dict(filenm: str, dct: dict) -> None:
 
 
 # Loading from a pickle file
-def load_dict(filenm: str, dct: dict) -> dict:
+def load_dict(filenm: str) -> dict:
     """Load a dictionary from a pickle file.
 
     Parameters
     ----------
     filenm : str
         The filename to load the dictionary from
-    dct : dict
-        The dictionary to load into
 
     Returns
     -------
