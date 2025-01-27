@@ -4,6 +4,7 @@ types_list = [
     "dict[str,dict[str,float]]",
     "dict[str,dict[str,list]]",
     "dict[str,float]", 
+    "dict[str,int]", 
     "dict[str,ndarray]", 
     "dict[str,set[int]]", 
     "dict[str,tuple[ndarray]]", 
@@ -40,4 +41,7 @@ types_list = [
     # "dict",
     "DecisionTreeClassifier",
     "KFold",
+    "ShuffleSplit",
+    "RandomForestClassifier",
+    "GridSearchCV",
 ]

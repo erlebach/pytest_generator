@@ -124,6 +124,12 @@ types:
                       rel_tol, keys, dict_float_choices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, instructor_answer, keys)"
 
+  dict[str,int]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_str_int(student_answer, instructor_answer,
+                      rel_tol, keys, dict_int_choices, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_str_int(student_answer, instructor_answer, keys)"
+
   dict[str,ndarray]:
     import: "" 
     #assert: "isinstance({answer_var}, list) and isinstance({answer_var}[0], type(np.zeros(3)))"
@@ -172,28 +178,39 @@ types:
       with either '^' or '**'. Except for this, the string must be a valid Python expression.
 
   DecisionTreeClassifier:
+    # The next statement gets sent to eval and the result included in the pytest code.
     import: "from sklearn.tree import DecisionTreeClassifier"
     assert: "isinstance({answer_var}, DecisionTreeClassifier)"
+    assert_answer: "assert_utilities.check_answer_decisiontreeclassifier(student_answer, instructor_answer, local_vars_dict)"
+    assert_structure: "assert_utilities.check_structure_decisiontreeclassifier(student_answer)"
     struct_msg: Answer should be an instance of DecisionTreeClassifier.
 
   GridSearchCV:
     import: "from sklearn.model_selection import GridSearchCV"
     assert: "isinstance({answer_var}, GridSearchCV)"
+    assert_answer: "assert_utilities.check_answer_gridsearchcv(student_answer, instructor_answer, local_vars_dict)"
+    assert_structure: "assert_utilities.check_structure_gridsearchcv(student_answer)"
     struct_msg: Answer should be an instance of GridSearchCV.
 
   RandomForestClassifier:
     import: "from sklearn.ensemble import RandomForestClassifier"
     assert: "isinstance({answer_var}, RandomForestClassifier)"
+    assert_answer: "assert_utilities.check_answer_randomforestclassifier(student_answer, instructor_answer, local_vars_dict)"
+    assert_structure: "assert_utilities.check_structure_randomforestclassifier(student_answer)"
     struct_msg: Answer should be an instance of RandomForestClassifier.
 
   KFold:
     import: "from sklearn.model_selection import KFold"
     assert: "isinstance({answer_var}, DecisionTreeClassifier)"
+    assert_answer: "assert_utilities.check_answer_kfold(student_answer, instructor_answer, local_vars_dict)"
+    assert_structure: "assert_utilities.check_structure_kfold(student_answer)"
     struct_msg: Answer should be an instance of KFold. 
 
   ShuffleSplit:
     import: "from sklearn.model_selection import ShuffleSplit"
     assert: "isinstance({answer_var}, ShuffleSplit)"
+    assert_answer: "assert_utilities.check_answer_shufflesplit(student_answer, instructor_answer, local_vars_dict)"
+    assert_structure: "assert_utilities.check_structure_shufflesplit(student_answer)"
     struct_msg: Answer should be an instance of ShuffleSplit. 
 
   lineplot:
@@ -259,3 +276,5 @@ types:
     import: ""
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
     truct_msg: "Answer should be dictionary, specifically: dict[str, str]."
+
+
