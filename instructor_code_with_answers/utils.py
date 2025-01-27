@@ -291,7 +291,7 @@ def print_cv_result_dict(
         print(f"mean_{key}: {array.mean()}, std_{key}: {array.std()}")
 
 
-def starter_code() -> None:
+def starter_code() -> int:
     """Run a basic machine learning pipeline on MNIST data.
 
     This function:
@@ -299,6 +299,7 @@ def starter_code() -> None:
     2. Filters to keep only digits 7 and 9
     3. Trains a decision tree classifier using cross-validation
     4. Prints the cross-validation results
+    5. Return 100 if there is no error
 
     Parameters
     ----------
@@ -320,6 +321,7 @@ def starter_code() -> None:
     )
     print("running cross validation...")
     u.print_cv_result_dict(out_dict)
+    return 100
 
 
 def save_dict(filenm: str, dct: dict) -> None:

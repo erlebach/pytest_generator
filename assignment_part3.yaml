@@ -1,0 +1,383 @@
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 20
+module: all_questions
+
+# choices: instructor_file, student_file, yaml_file
+
+# Folders are relative to the base project folder
+#student_folder_name: student_github_template
+student_folder_name: student_code_with_answers
+instructor_folder_name: instructor_code_with_answers
+
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixure arguments in a list
+    args: [all_questions]
+
+questions:
+- id: part_1a
+  parts:
+    - id: starter_code
+      type: int
+      answer: 100
+      note:
+
+    - id:
+      type:
+      answer:
+
+- id: part_1b
+  parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+  - id: part_1c
+    parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+  - id: part_1d
+    parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+- id: part_1d
+  parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+#----------------------------------------------------------------------
+- id: part_e
+  parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+- id: part_f
+  parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+- id: part_g
+  parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+
+#----------------------------------------------------------------------
+- id:
+  parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+
+#----------------------------------------------------------------------
+- id:
+  parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+#----------------------------------------------------------------------
+
+- id:
+  parts:
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+      explanation: 
+
+    - id:
+      type:
+      answer:
+      note:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+      explanation: 
+
+    - id:
+      type:
+      answer:
+      explanation: 
+#----------------------------------------------------------------------
+- id:
+  parts:
+    - id:
+      type:
+      answer:
+      note:
+
+    - id:
+      type:
+      answer:
+
+    - id:
+      type:
+      answer:
+      note:
+
+    - id:
+      type:
+      answer:
+
+
+#----------------------------------------------------------------------
+- id:
+  parts:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+  
+    - id:
+      type:
+      answer:
+      note:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+  
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+  
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+  
+  
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+    - id:
+      type:
+      answer:
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+  

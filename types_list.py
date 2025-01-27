@@ -38,4 +38,6 @@ types_list = [
     #"dict[int,list]",
     #list[tuples[float]]
     # "dict",
+    "DecisionTreeClassifier",
+    "KFold",
 ]

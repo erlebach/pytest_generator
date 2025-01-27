@@ -174,7 +174,27 @@ types:
   DecisionTreeClassifier:
     import: "from sklearn.tree import DecisionTreeClassifier"
     assert: "isinstance({answer_var}, DecisionTreeClassifier)"
-    struct_msg: Answer should be a DecisionTreeClassifier instance. 
+    struct_msg: Answer should be an instance of DecisionTreeClassifier.
+
+  GridSearchCV:
+    import: "from sklearn.model_selection import GridSearchCV"
+    assert: "isinstance({answer_var}, GridSearchCV)"
+    struct_msg: Answer should be an instance of GridSearchCV.
+
+  RandomForestClassifier:
+    import: "from sklearn.ensemble import RandomForestClassifier"
+    assert: "isinstance({answer_var}, RandomForestClassifier)"
+    struct_msg: Answer should be an instance of RandomForestClassifier.
+
+  KFold:
+    import: "from sklearn.model_selection import KFold"
+    assert: "isinstance({answer_var}, DecisionTreeClassifier)"
+    struct_msg: Answer should be an instance of KFold. 
+
+  ShuffleSplit:
+    import: "from sklearn.model_selection import ShuffleSplit"
+    assert: "isinstance({answer_var}, ShuffleSplit)"
+    struct_msg: Answer should be an instance of ShuffleSplit. 
 
   lineplot:
     import: ""

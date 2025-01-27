@@ -14,7 +14,8 @@ Students should be able to run this file.
 # https://chat.openai.com/share/b3fd7739-b691-48f2-bb5e-0d170be4428c
 
 # Fill in the appropriate import statements from sklearn to solve the homework
-from enum import Enum
+import pickle
+from pprint import pprint
 from typing import Any
 
 import new_utils as nu
@@ -24,7 +25,7 @@ from numpy.typing import NDArray
 from sklearn.base import BaseEstimator
 from sklearn.ensemble import RandomForestClassifier
 
-# import logistic regresssion module
+# ! from sklearn.svm import SVC  # , LinearSVC
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import (
     BaseCrossValidator,
@@ -34,45 +35,13 @@ from sklearn.model_selection import (
     ShuffleSplit,
     cross_validate,
 )
-
-# import svm module
-# ! from sklearn.svm import SVC  # , LinearSVC
 from sklearn.tree import DecisionTreeClassifier
-from utils import Normalization, PrintResults
+from utils import PrintResults
 
 # ======================================================================
 seed = 42
 frac_train = 0.2
-
-
-class Section1:
-    def __init__(
-        self,
-        normalize: Normalization = Normalization.APPLY_NORMALIZATION,
-        seed: int | None = None,
-        frac_train: float = 0.2,
-    ) -> None:
-        """Initialize an instance of Section1.
-
-        Parameters
-        ----------
-        normalize : bool, optional
-            Whether to normalize the data, by default True
-        seed : int or None, optional
-            Random seed for reproducibility. If None, results will be randomized.
-            If int, results will be reproducible, by default None
-        frac_train : float, optional
-            Fraction of data to use for training, by default 0.2
-
-        Notes
-        -----
-        This class implements various machine learning experiments from Section 1
-        of the assignment, including cross-validation and classifier comparisons.
-
-        """
-        self.normalize = normalize
-        self.frac_train = frac_train
-        self.seed = seed
+max_iter = 500
 
 
 # ---------------------------------------------------------
@@ -121,6 +90,7 @@ def train_simple_classifier_with_cv(
     clf1 = DecisionTreeClassifier(random_state=62)
     clf1.fit(x, y)
 
+    # NOT DONE: return 'accuracy', 'recall', 'precision', 'f1'
     cv_results: dict[str, NDArray[np.floating]] = cross_validate(
         estimator=clf,
         X=x,
@@ -184,9 +154,13 @@ def print_cv_result_dict(cv_dict: dict, msg: str | None = None) -> None:
     """
 
 
-def partA():
+# ----------------------------------------------------------------------
+
+
+def part_1a() -> dict[str, Any]:
     """Import and print the mnist_assignment_starter.py module."""
     answers = {}
+    # Answer type: int
     answers["starter_code"] = u.starter_code()
     return answers
 
@@ -194,7 +168,12 @@ def partA():
 # ----------------------------------------------------------------------
 
 
-def partB() -> dict[Any, Any]:
+def part_1b(
+    x_train_: NDArray[np.floating] | None = None,
+    y_train_: NDArray[np.int32] | None = None,
+    x_test_: NDArray[np.floating] | None = None,
+    y_test_: NDArray[np.int32] | None = None,
+) -> dict[str, Any]:
     """Load and prepare MNIST dataset, filtering for digits 7 and 9.
 
     Loads MNIST data, filters for digits 7 and 9, scales values between 0-1,
@@ -215,16 +194,34 @@ def partB() -> dict[Any, Any]:
         - x_test: Filtered and scaled test data
         - y_test: Filtered test labels
 
-    B. Load and prepare the mnist dataset, i.e., call the prepare_data and
+    B. Load and prepare the mnist dataset, i.e., call the `prepare_data` and
        `filter_out_7_9s` functions in utils.py, to obtain a data matrix X consisting of
        only the digits 7 and 9. Make sure that every element in the data matrix is a
        floating point number and scaled between 0 and 1 (write a function to
        achieve this. Checking is not sufficient.)
-       Also check that the labels are integers. Print out the length of the filtered
+       The training data must be stored in x_train, y_traina.
+       The testing data must be stored in x_test, y_test.
+       The MNIST dataset has a total of 70,000 samples.
+       Check that the labels are integers. Print out the length of the filtered
        `x` and `y`, and the maximum value of `x` for both training and test sets. Use
        the routines provided in utils.
 
     """
+    # The following line makes these variables global.
+    global x_train, y_train, x_test, y_test  # noqa: PLW0603
+
+    if x_train_ is not None:
+        x_train = x_train_
+    if y_train_ is not None:
+        y_train = y_train_
+    if x_test_ is not None:
+        x_test = x_test_
+    if y_test_ is not None:
+        y_test = y_test_
+
+    # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
+    # ==========================================
+
     x, y, x_test, y_test = u.prepare_data()
     x_train, y_train = u.filter_out_7_9s(x, y)
     x_test, y_test = u.filter_out_7_9s(x_test, y_test)
@@ -234,37 +231,53 @@ def partB() -> dict[Any, Any]:
     answers = {}
 
     # Type type is int
-    answers["length_x_train"] = len(x_train)
-    answers["length_x_test"] = len(x_test)
-    answers["length_y_train"] = len(y_train)
-    answers["length_y_test"] = len(y_test)
+    # The number of samples in x_train and y_train should be the same
+    # The number of samples in x_test and y_test should be the same
+    # Answer type: dict[str, int]
+    # Dictionary keys:
+    #    "length_x_train", "length_x_test", "length_y_train", "length_y_test"
+    dct1: dict[str, int] = {}
+    dct1["length_x_train"] = len(x_train)
+    dct1["length_x_test"] = len(x_test)
+    dct1["length_y_train"] = len(y_train)
+    dct1["length_y_test"] = len(y_test)
+    answers["number_of_samples"] = dct1
 
     # The type is np.float32
-    answers["max_x_train"] = np.max(x_train)
-    answers["max_x_test"] = np.max(x_test)
+    dct2: dict[str, float] = {}
+    dct2["max_x_train"] = float(np.max(x_train))
+    dct2["max_x_test"] = float(np.max(x_test))
+    answers["data_bounds"] = dct2
 
     # The type should be NDArray[np.float32]
-    answers["x_train"] = x_train
-    answers["y_train"] = y_train
-    answers["x_test"] = x_test
-    answers["y_test"] = y_test
-    print("EXIT partB")
+    # These arrays are used for partC
+    # answers["x_train"] = x_train
+    # answers["y_train"] = y_train
+    # answers["x_test"] = x_test
+    # answers["y_test"] = y_test
+    print("EXIT part_b")
     return answers
 
 
 # ----------------------------------------------------------------------
-def partC(
-    # x: NDArray[np.floating],
-    # y: NDArray[np.int32],
-) -> dict[Any, Any]:
+def part_1c(
+    x_train_: NDArray[np.floating] | None = None,
+    y_train_: NDArray[np.int32] | None = None,
+    x_test_: NDArray[np.floating] | None = None,
+    y_test_: NDArray[np.int32] | None = None,
+) -> dict[str, Any]:
     """Train a Decision Tree classifier using k-fold cross validation.
 
     Parameters
     ----------
-    x : NDArray[np.floating]
+    x_train_ : NDArray[np.floating] | None, optional
         Training data matrix with floating point values
-    y : NDArray[np.int32]
-        Integer class labels
+    y_train_ : NDArray[np.int32] | None, optional
+        Integer class labels for training data
+    x_test_ : NDArray[np.floating] | None, optional
+        Test data matrix with floating point values
+    y_test_ : NDArray[np.int32] | None, optional
+        Integer class labels for test data
 
     Returns
     -------
@@ -285,12 +298,31 @@ def partC(
     of the fit (or training) time.  (Be more specific about the output format)
 
     """
-    print(f"partC, {x.shape=}, {y.shape=}")
+    global x_train, y_train, x_test, y_test  # noqa: PLW0603
+
+    if x_train_ is not None:
+        x_train = x_train_
+    if y_train_ is not None:
+        y_train = y_train_
+    if x_test_ is not None:
+        x_test = x_test_
+    if y_test_ is not None:
+        y_test = y_test_
+
+    # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
+    # ==========================================
+
     n_splits = 5
     clf = DecisionTreeClassifier(random_state=seed)
     cv = KFold(n_splits=n_splits, shuffle=True, random_state=seed)
 
-    scores = cross_validate(clf, x, y, cv=cv, return_train_score=True)
+    scores = cross_validate(
+        clf,
+        x_train,
+        y_train,
+        cv=cv,
+        return_train_score=False,
+    )
     mean_accuracy = scores["test_score"].mean()
     std_accuracy = scores["test_score"].std()
     mean_fit_time = scores["fit_time"].mean()
@@ -314,23 +346,30 @@ def partC(
     # The type is a dict[str, float] with keys:
     #   "mean_accuracy", "std_accuracy", "mean_fit_time", "std_fit_time"
     answers["scores"] = scores_dict
-    print("EXIT partC")
+    print("EXIT part_1c")
     return answers
 
-    # ---------------------------------------------------------
+
+# ---------------------------------------------------------
 
 
-def partD(
-    # x: NDArray[np.floating],
-    # y: NDArray[np.int32],
-) -> dict[Any, Any]:
+def part_1d(
+    x_train_: NDArray[np.floating] | None = None,
+    y_train_: NDArray[np.int32] | None = None,
+    x_test_: NDArray[np.floating] | None = None,
+    y_test_: NDArray[np.int32] | None = None,
+) -> dict[str, Any]:
     """Train a decision tree classifier using ShuffleSplit cross-validation.
 
     Parameters
     ----------
-    x : NDArray[np.floating]
+    x_train_ : NDArray[np.floating]
         Training data matrix
-    y : NDArray[np.int32]
+    y_train_ : NDArray[np.int32]
+        Integer class labels
+    x_test_ : NDArray[np.floating]
+        Test data matrix
+    y_test_ : NDArray[np.int32]
         Integer class labels
 
     Returns
@@ -348,12 +387,31 @@ def partD(
     D. Repeat Part C with a random permutation (Shuffle-Split) k-fold cross-validator.
 
     """
+    global x_train, y_train, x_test, y_test  # noqa: PLW0603
+    if x_train_ is not None:
+        x_train = x_train_
+    if y_train_ is not None:
+        y_train = y_train_
+    if x_test_ is not None:
+        x_test = x_test_
+    if y_test_ is not None:
+        y_test = y_test_
+
+    # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
+    # ==========================================
+
     n_splits = 5
     clf = DecisionTreeClassifier(random_state=seed)
     # Check that the student does not use KFold again with Shuffle=True
     cv = ShuffleSplit(n_splits=n_splits, random_state=seed)
 
-    scores = cross_validate(clf, x, y, cv=cv, return_train_score=True)
+    scores = cross_validate(
+        clf,
+        x_train,
+        y_train,
+        cv=cv,
+        return_train_score=True,
+    )
     mean_accuracy = scores["test_score"].mean()
     std_accuracy = scores["test_score"].std()
     mean_fit_time = scores["fit_time"].mean()
@@ -366,31 +424,44 @@ def partD(
         "std_fit_time": std_fit_time,
     }
 
-    answers = {}
+    answers: dict[str, Any] = {}
+
     # The type is an instance of DecisionTreeClassifier
     answers["clf"] = clf
+
     # The type is an instance of ShuffleSplit
     answers["cv"] = cv
+
     # The type is a dict[str, float] with keys:
     #   "mean_accuracy", "std_accuracy", "mean_fit_time", "std_fit_time"
     answers["scores"] = scores_dict
-    print("EXIT partD")
+    # fmt: off
+
+    # Explain the difference between a KFold and a Shuffle Split
+    #   cross-validator strategies
+    answers["explain_kfold_vs_shuffle_split"] = (
+        "KFold and shuffle techniques are "
+        "both used for model evaluation and validation."
+    )
+    # fmt: on
+    print("EXIT part_1d")
     return answers
 
-    # ----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
 
 
-def partE(
-    # x: NDArray[np.floating],
-    # y: NDArray[np.int32],
+def part_1e(
+    x_train_: NDArray[np.floating] | None = None,
+    y_train_: NDArray[np.int32] | None = None,
 ) -> dict[str, Any]:
     """Perform cross-validation using a Decision Tree classifier.
 
     Parameters
     ----------
-    x : NDArray[np.floating]
+    x_train_ : NDArray[np.floating]
         Data matrix containing features
-    y : NDArray[np.int32]
+    y_train_ : NDArray[np.int32]
         Integer class labels
 
     Returns
@@ -411,60 +482,74 @@ def partE(
     anything about the mean and/or standard deviation of the scores for each `k`?
 
     """
+    global x_train, y_train  # noqa: PLW0603
+    if x_train_ is not None:
+        x_train = x_train_
+    if y_train_ is not None:
+        y_train = y_train_
+
+    # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
+    # ==========================================
+
     n_splits = [2, 5, 8, 16]
-    answers = {}
+    answers: dict[str, Any] = {}
+    split_scores: dict[int, dict[str, float]] = {}
 
     for n_split in n_splits:
-        cv = ShuffleSplit(n_splits=n_split, random_state=seed)
         clf = DecisionTreeClassifier(random_state=seed)
+        cv = ShuffleSplit(n_splits=n_split, random_state=seed)
         scores = train_simple_classifier_with_cv(
-            x,
-            y,
+            x_train,
+            y_train,
             cv=cv,
             clf=clf,
         )
 
-        scores = cross_validate(clf, x, y, cv=cv, return_train_score=True)
+        scores = cross_validate(clf, x_train, y_train, cv=cv, return_train_score=True)
         mean_accuracy = scores["test_score"].mean()
         std_accuracy = scores["test_score"].std()
         mean_fit_time = scores["fit_time"].mean()
         std_fit_time = scores["fit_time"].std()
 
-        scores_dict = {
+        # The clf should all be the same
+        # The cv only differences are random_seed (maybe) and n_split
+        scores_dict: dict[str, Any] = {
             "mean_accuracy": mean_accuracy,
             "std_accuracy": std_accuracy,
             "mean_fit_time": mean_fit_time,
             "std_fit_time": std_fit_time,
+            "cv": cv,
+            "clf": clf,
         }
 
-        answers = {}
-        # The type is a dict[str, float] with keys:
-        #   "mean_accuracy", "std_accuracy", "mean_fit_time", "std_fit_time"
-        answers["scores"] = scores_dict
+        split_scores[n_split] = scores_dict
 
-        # The type is an instance of ShuffleSplit
-        answers["cv"] = cv
+    answers: dict[str, Any] = {}
+    # The type is a dict[int, dict[str, Any]] with keys:
+    # Outer level keys is the number of splits as integers
+    # Inner level keys are:
+    #   "mean_accuracy", "std_accuracy", "mean_fit_time", "std_fit_time" with float values,
+    #   "clf" of type DecisionTreeClassifier, "cv" of type ShuffleSplit
+    answers["scores"] = split_scores
 
-        # The type is an instance of DecisionTreeClassifier
-        answers["clf"] = clf
-
-    print("exit partE")
+    print("exit part_1e")
     return answers
 
-    # ----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
 
 
-def partF(
-    # x: NDArray[np.floating],
-    # y: NDArray[np.int32],
+def part_1f(
+    x_train_: NDArray[np.floating] | None = None,
+    y_train_: NDArray[np.int32] | None = None,
 ) -> dict[str, Any]:
     """Return a dictionary with data for Random Forest and Decision Tree classifiers.
 
     Parameters
     ----------
-    x : NDArray[np.floating]
+    x_train_ : NDArray[np.floating]
         Data matrix with shape (n_samples, n_features)
-    y : NDArray[np.int32]
+    y_train_ : NDArray[np.int32]
         Labels with shape (n_samples,)
 
     Returns
@@ -486,8 +571,8 @@ def partF(
     - The suffix _RF and _DT are used to distinguish between the Random Forest
         and Decision Tree models.
 
-    F. Repeat part D with a Random Forest classifier with default parameters.
-    Make sure the train test splits are the same for both models when performing
+    F. Repeat part E with a Random Forest classifier with default parameters.
+    Make sure the train test-splits are the same for both models when performing
     cross-validation. Use ShuffleSplit for cross-validation. Which model has
     the highest accuracy on average?
     Which model has the lowest variance on average? Which model is faster
@@ -499,6 +584,15 @@ def partF(
     Use a Random Forest classifier (an ensemble of DecisionTrees).
 
     """
+    global x_train, y_train  # noqa: PLW0603
+    if x_train_ is not None:
+        x_train = x_train_
+    if y_train_ is not None:
+        y_train = y_train_
+
+    # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
+    # ==========================================
+
     results_dict = {}
 
     # Logistic Regression
@@ -508,8 +602,8 @@ def partF(
 
     scores = cross_validate(
         clf,
-        x,
-        y,
+        x_train,
+        y_train,
         cv=cv,
         return_train_score=True,
     )
@@ -525,7 +619,7 @@ def partF(
         "std_fit_time": std_fit_time,
     }
 
-    answers = {}
+    answers: dict[str, Any] = {}
 
     # The type is an instance of RandomForestClassifier
     answers["clf_RF"] = clf
@@ -537,7 +631,8 @@ def partF(
     #   "mean_accuracy", "std_accuracy", "mean_fit_time", "std_fit_time"
     answers["scores_RF"] = scores_dict
 
-    answer_dt = partD()  # x, y)
+    # Retrieve the answers from part_1d (Decision Tree classifier)
+    answer_dt = part_1d()  # x, y)
 
     # The type is an instance of DecisionTreeClassifier
     answers["clf_DT"] = answer_dt["clf"]
@@ -573,16 +668,19 @@ def partF(
     # The type is a string, one of "decision-tree" or "random-forest"
     answers["model_fastest"] = "decision-tree" if fit_time_dt < fit_time_rf else "random-forest"
 
+    print("==> exit part_1f")
+
     return answers
 
-    # ----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
 
 
-def partG(
-    # x: NDArray[np.floating],
-    # y: NDArray[np.int32],
-    # x_test: NDArray[np.floating],
-    # y_test: NDArray[np.int32],
+def part_1g(
+    x_train_: NDArray[np.floating] | None = None,
+    y_train_: NDArray[np.int32] | None = None,
+    x_test_: NDArray[np.floating] | None = None,
+    y_test_: NDArray[np.int32] | None = None,
 ) -> dict[str, Any]:
     """Train a Random Forest classifier using grid search.
 
@@ -591,14 +689,17 @@ def partG(
 
     Parameters
     ----------
-    x : NDArray[np.floating]
+    x_train_ : NDArray[np.floating]
         Training data features
-    y : NDArray[np.int32]
+    y_train_ : NDArray[np.int32]
         Training data labels
-    x_test : NDArray[np.floating]
+    x_test_: NDArray[np.floating]
         Test data features
-    y_test : NDArray[np.int32]
+    y_test_ : NDArray[np.int32]
         Test data labels
+
+    If the four arguments are None, use the global variables x_train, y_train,
+       x_test, y_test
 
     Returns
     -------
@@ -615,6 +716,7 @@ def partG(
     data and get an accuracy score on the test set.  Print out the training
     and testing accuracy and comment on how it relates to the mean accuracy
     when performing cross validation. Is it higher, lower or about the same?
+    Compute the confusion matrix and accuracy for the training and testing data.
 
     Choose among the following hyperparameters:
         1) criterion,
@@ -638,65 +740,136 @@ def partG(
 
     # refit=True: fit with the best parameters when complete
     # A test should look at best_index_, best_score_ and best_params_
-    """
-         1) criterion,
-         2) max_depth,
-         3) min_samples_split,
-         4) min_samples_leaf,
-         5) max_features
-         5) n_estimators
-    """
+
+    global x_train, y_train, x_test, y_test  # noqa: PLW0603
+    if x_train_ is not None:
+        x_train = x_train_
+    if y_train_ is not None:
+        y_train = y_train_
+    if x_test_ is not None:
+        x_test = x_test_
+    if y_test_ is not None:
+        y_test = y_test_
+
+    # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
+    # ==========================================
+
+    print("ENTER part_1g")
+    print("part_1g, x_test.shape: ", x_test.shape)
+    print("part_1g, x_train.shape: ", x_train.shape)
+    print("part_1g, y_test.shape: ", y_test.shape)
+    print("part_1g, y_train.shape: ", y_train.shape)
+    print("--------------------------------")
 
     clf = RandomForestClassifier(random_state=seed)
-    clf.fit(x, y)
-    print(f"{list(clf.__dict__.keys())=}")
+    clf.fit(x_train, y_train)
 
     # Look at documentation
     default_parameters = {
         "criterion": "gini",
         "max_features": 100,
         "n_estimators": 100,
+        "max_depth": 10,
+        "min_samples_split": 2,
+        "min_samples_leaf": 1,
     }
 
-    parameters = {
-        "criterion": ["entropy", "gini", "log_loss"],
+    # 12 (=2*3*2) runs: 2 criteria, 3 estimators, 2 depths
+    grid_parameters: dict[str, Any] = {
+        "criterion": ["entropy", "gini"],  # , "log_loss"],
         "max_features": [50],  # 5  (with low values, training is not improved  )
-        "n_estimators": [200],  # 20
+        "n_estimators": [10, 50, 100],  # 20
+        "max_depth": [10, 20],  # 20
     }
 
-    clf = RandomForestClassifier(random_state=seed)
     n_splits = 5
-    # Uses stratified cross-validator by default
+
+    # Use a stratified cross-validator
     # ! cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-    # THERE IS SOME UNCONTROLLED RANDOMESS!
-    # return_train_score is False by default
+    # Perform Grid search
     grid_search = GridSearchCV(
         clf,
-        param_grid=parameters,
-        refit=True,
+        param_grid=grid_parameters,
+        refit=True,  # ?
         cv=5,
         return_train_score=True,
     )
     # Performs grid search with cv, then fits the training data
-    grid_search.fit(x, y)
+    grid_search.fit(x_train, y_train)
+    # `best_estimator` is availalble because refit=True
     best_estimator = grid_search.best_estimator_
     best_params = grid_search.best_params_
     best_score = grid_search.best_score_
 
-    clf.fit(x, y)
-    best_estimator.fit(x, y)
+    print(f"**** part_1g, {y_train.shape=}, {x_train.shape=}")
+    clf.fit(x_train, y_train)
+    best_estimator.fit(x_train, y_train)
 
-    y_test_pred_best = best_estimator.predict(x_test)
-    y_test_pred_orig = clf.predict(x_test)
+    # predictions using the best estimator
+    y_train_pred_best = best_estimator.predict(x_train)
+    # original predictions
+    y_train_pred_orig = clf.predict(x_train)
+
+    # Store the best estimator in a pkl file
+    # Alternatively, create a function in utils.py to save and retrieve the
+    #   best estimator. This can be done with a class that can save and retreive
+    #   objects. But this will not work across invocations of different code.
+    with open("part_1g_best_estimator.pkl", "wb") as f:
+        pickle.dump(best_estimator, f)
+
+    print("part_1g, x_test.shape: ", x_test.shape)
+    print("part_1g, type(x_test): ", type(x_test))
+    # original predictions
+    y_test_pred_orig: NDArray[np.int32] = clf.predict(x_test)
+    # predictions using the best estimator
+    y_test_pred_best: NDArray[np.int32] = best_estimator.predict(x_test)
+
+    # The `cm` prefix refers to `confusion_matrix`
+    print("part_1g, y_train_pred_orig.shape: ", y_train_pred_orig.shape)  # 100
+    print("part_1g, y_train_pred_best.shape: ", y_train_pred_best.shape)  # 100
+    print("part_1g, y_train.shape: ", y_train.shape)  # 96
+    print("part_1g, y_test_pred_orig.shape: ", y_test_pred_orig.shape)  # 24
+    print("part_1g, y_test_pred_best.shape: ", y_test_pred_best.shape)  # 24
+    print("part_1g, y_test.shape: ", y_test.shape)  #  24
+    cm_train_pred_orig = confusion_matrix(y_train, y_train_pred_orig)
+    cm_train_pred_best = confusion_matrix(y_train, y_train_pred_best)
+    cm_test_pred_orig = confusion_matrix(y_test, y_test_pred_orig)
+    cm_test_pred_best = confusion_matrix(y_test, y_test_pred_best)
+
+    def accuracy(cm: NDArray[np.int32]) -> float:
+        return (cm[0, 0] + cm[1, 1]) / cm.sum()
+
+    def precision(cm: NDArray[np.int32]) -> float:
+        return cm[0, 0] / (cm[0, 0] + cm[1, 0])
+
+    # Compute the accuracy from the confusion matrix
+    accuracy_train_pred_orig = accuracy(cm_train_pred_orig)
+    accuracy_train_pred_best = accuracy(cm_train_pred_best)
+    accuracy_test_pred_orig = accuracy(cm_test_pred_orig)
+    accuracy_test_pred_best = accuracy(cm_test_pred_best)
+
+    # Compute the precision from the confusion matrix
+    precision_train_pred_orig = precision(cm_train_pred_orig)
+    precision_train_pred_best = precision(cm_train_pred_best)
+    precision_test_pred_orig = precision(cm_test_pred_orig)
+    precision_test_pred_best = precision(cm_test_pred_best)
 
     # Confusion matrix is improved with the best estimator
-    print(confusion_matrix(y_test, y_test_pred_best))
+    print("confusion matrix on original test predictor")
+    print(cm_test_pred_orig)
+    print()
+    print("confusion matrix on best test predictor")
+    print(cm_test_pred_best)
+    print()
+    print("confusion matrix on original train predictor")
+    print(cm_train_pred_orig)
+    print()
+    print("confusion matrix on best train predictor")
+    print(cm_train_pred_best)
+    print()
 
-    y_train_pred_best = best_estimator.predict(x)
-    y_train_pred_orig = clf.predict(x)
-
-    answers = {}
+    answers: dict[str, Any] = {}
 
     # The type is an instance of RandomForestClassifier
     answers["clf"] = clf
@@ -713,37 +886,42 @@ def partG(
     # The type is a float
     answers["mean_accuracy_cv"] = None
 
-    cm_train_orig = confusion_matrix(y_train_pred_orig, y)
-    cm_train_best = confusion_matrix(y_train_pred_best, y)
-    cm_test_orig = confusion_matrix(y_test_pred_orig, y_test)
-    cm_test_best = confusion_matrix(y_test_pred_best, y_test)
-
-    score_train_orig = (cm_train_orig[0, 0] + cm_train_orig[1, 1]) / y.size
-    score_train_best = (cm_train_orig[0, 0] + cm_train_best[1, 1]) / y.size
-    score_test_orig = (cm_test_orig[0, 0] + cm_test_orig[1, 1]) / y_test.size
-    score_test_best = (cm_test_orig[0, 0] + cm_test_best[1, 1]) / y_test.size
-
     # The answer type is a numpy.ndarray
-    answers["confusion_matrix_train_orig"] = cm_train_orig
-    answers["confusion_matrix_train_best"] = cm_train_best
-    answers["confusion_matrix_test_orig"] = cm_test_orig
-    answers["confusion_matrix_test_best"] = cm_test_best
+    # Return the 2x2 confusion matrix computed from the predictions
+    confusion_matrix_dict: dict[str, NDArray[np.int32]] = {}
+    confusion_matrix_dict["confusion_matrix_train_orig"] = cm_train_pred_orig
+    confusion_matrix_dict["confusion_matrix_train_best"] = cm_train_pred_best
+    confusion_matrix_dict["confusion_matrix_test_orig"] = cm_test_pred_orig
+    confusion_matrix_dict["confusion_matrix_test_best"] = cm_test_pred_best
+    answers["confusion_matrix"] = confusion_matrix
 
     # compute: C11 + C22 / |C|_1  (accuracy based on confusion)
     # The answer type is a float
-    answers["accuracy_orig_full_training"] = score_train_orig
-    answers["accuracy_best_full_training"] = score_train_best
-    answers["accuracy_orig_full_testing"] = score_test_orig
-    answers["accuracy_best_full_testing"] = score_test_best
+    # Return the accuracy computed from the confusion matrix
+    accuracy_full_training: dict[str, float] = {}
+    accuracy_full_training["accuracy_orig_full_training"] = accuracy_train_pred_orig
+    accuracy_full_training["accuracy_best_full_training"] = accuracy_train_pred_best
+    accuracy_full_training["accuracy_orig_full_testing"] = accuracy_test_pred_orig
+    accuracy_full_training["accuracy_best_full_testing"] = accuracy_test_pred_best
+    answers["accuracy_full_training"] = accuracy_full_training
+
+    # The answer type is a float
+    # Return the precision computed from the confusion matrix
+    precision_full_training: dict[str, float] = {}
+    precision_full_training["precision_orig_full_training"] = precision_train_pred_orig
+    precision_full_training["precision_best_full_training"] = precision_train_pred_best
+    precision_full_training["precision_orig_full_testing"] = precision_test_pred_orig
+    precision_full_training["precision_best_full_testing"] = precision_test_pred_best
+    answers["precision_full_training"] = precision_full_training
 
     # Train score is 1.0: (return_train_score=1). Overfitting?
 
-    # Questions to answer: Did confusion matrix improve? On both classes?
-    # Test: check the confusion matrices myself to confirm answer
-    # Question: is there overfitting? Why? How do you know?
-    # How would you fix overfitting?
+    # Questions to answer in your report:
+    # 1) Did confusion matrix improve for both classes? Why? Why not?
+    # 2) Is there overfitting? Why? How do you know?
+    # 3) How would you fix overfitting?
 
-    print("EXIT partG")
+    print("EXIT part_1g")
     return answers
 
 
@@ -756,26 +934,30 @@ if __name__ == "__main__":
 
     ################################################
     # In real code, read MNIST files and define Xtrain and xtest appropriately
-    rng = np.random.default_rng(seed)
-    x = rng.random((120, 120))  # 100 samples, 100 features
-    # Fill labels with 0 and 1 (mimic 7 and 9s)
-    y = (x[:, :5].sum(axis=1) > 2.5).astype(int)
-    n_train = 100
-    x_train = x[0:n_train, :]
-    x_test = x[n_train:, :]
-    y_train = y[0:n_train]
-    y_test = y[n_train:]
-    x = x_train
-    y = y_train
-
-    x_train, y_train, x_test, y_test = u.create_data(
-        n_rows=120,
+    (
+        x_train,
+        y_train,
+        x_test,
+        y_test,
+    ) = u.create_data(
+        n_rows=1200,
         n_features=120,
         frac_train=0.8,
     )
 
-    print(f"{x_train.shape=}, {y_train.shape=}")
-    print(f"{x_test.shape=}, {y_test.shape=}")
+    # x is x_train + x_test
+    # y is y_train + y_test
+    print("--------------------------------")
+    print("x_train.shape: ", x_train.shape)
+    print("x_test.shape: ", x_test.shape)
+    print("y_train.shape: ", y_train.shape)
+    print("y_test.shape: ", y_test.shape)
+    x = np.concatenate((x_train, x_test), axis=0)
+    y = np.concatenate((y_train, y_test), axis=0)
+    print("x.shape: ", x.shape)
+    print("y.shape: ", y.shape)
+    print("--------------------------------")
+
     ##############################################
 
     # Attention: the seed should never be changed. If it is, automatic grading
@@ -784,29 +966,83 @@ if __name__ == "__main__":
     # seed specified in the argument list, namely: `random_state=self.seed` if
     # you are inside the solution class.
 
-    answer1A = partA()
+    # Read the MNIST dataset
+    answer1_a = part_1a()
+    answer1_b = part_1b()
+
+    x_train = answer1_b["x_train"]
+    y_train = answer1_b["y_train"]
+    x_test = answer1_b["x_test"]
+    y_test = answer1_b["y_test"]
+
+    # Restrict the size of the dataset for debugging purposes.
+    # The full dataset must be used for the final submission.
+    # The dataset should only 7 and 9s.
+    """
+    n_train = 1000
+    n_test = 200
+    x_train = x_train[:n_train, :]
+    y_train = y_train[:n_train]
+    x_test = x_test[n_train : n_train + n_test, :]
+    y_test = y_test[n_train : n_train + n_test]
+    """
+    print("--------------------------------")
+    print("after answer_1a, before answer_1b")
+    print("x_train.shape: ", x_train.shape)
+    print("x_test.shape: ", x_test.shape)
+    print("y_train.shape: ", y_train.shape)
+    print("y_test.shape: ", y_test.shape)
 
     # x and Y are Mnist datasets
-    answer1B = partB()
-    answer1C = partC()  # x, y)
-    answer1C = partC()  # x, y)
-    answer1D = partD()  # x, y)
-    answer1E = partE()  # x, y)
-    answer1F = partF()  # x, y)
+    answer1_c = part_1c()
+    answer1_d = part_1d()
+    answer1_e = part_1e()
+    answer1_f = part_1f()
+    print("part_1g, x_test.shape: ", x_test.shape)
+    answer1_g = part_1g()
 
-    answer1G = partG()  # x, y, x_test, y_test)
+    print(f"{list(answer1_a.keys())=}")
+    print(f"{list(answer1_b.keys())=}")
+    print(f"{list(answer1_c.keys())=}")
+    print(f"{list(answer1_d.keys())=}")
+    print(f"{list(answer1_e.keys())=}")
+    print(f"{list(answer1_f.keys())=}")
+    print(f"{list(answer1_g.keys())=}")
+
+    del answer1_b["x_train"]
+    del answer1_b["y_train"]
+    del answer1_b["x_test"]
+    del answer1_b["y_test"]
 
     answer = {}
-    answer["1A"] = answer1A
-    answer["1B"] = answer1B
-    answer["1C"] = answer1C
-    answer["1D"] = answer1D
-    answer["1E"] = answer1E
-    answer["1F"] = answer1F
-    answer["1G"] = answer1G
+    answer["1a"] = answer1_a
+    answer["1b"] = answer1_b
+    answer["1c"] = answer1_c
+    answer["1d"] = answer1_d
+    answer["1e"] = answer1_e
+    answer["1f"] = answer1_f
+    answer["1g"] = answer1_g
+
+    print("\n==> answer1_a")
+    pprint(answer1_a)
+    print("\n==> answer1_b")
+    pprint(answer1_b)
+    print("\n==> answer1_c")
+    pprint(answer1_c)
+    print("\n==> answer1_d")
+    pprint(answer1_d)
+    print("\n==> answer1_e")
+    pprint(answer1_e)
+    print("\n==> answer1_f")
+    pprint(answer1_f)
+    print("\n==> answer1_g")
+    pprint(answer1_g)
 
     u.save_dict("section1.pkl", answer)
     """
     Run your code and produce all your results for your report. We will spot check the
     reports, and grade your code with automatic tools.
     """
+
+    print("==>answers(part1a)")
+    pprint(answer["1a"])
