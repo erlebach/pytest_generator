@@ -44,4 +44,5 @@ types_list = [
     "ShuffleSplit",
     "RandomForestClassifier",
     "GridSearchCV",
+    "LogisticRegression",
 ]

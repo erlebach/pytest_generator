@@ -185,6 +185,14 @@ types:
     assert_structure: "assert_utilities.check_structure_decisiontreeclassifier(student_answer)"
     struct_msg: Answer should be an instance of DecisionTreeClassifier.
 
+  LogisticRegression:
+    # The next statement gets sent to eval and the result included in the pytest code.
+    import: "from sklearn.linear_model import LogisticRegression"
+    assert: "isinstance({answer_var}, LogisticRegression)"
+    assert_answer: "assert_utilities.check_answer_logisticregression(student_answer, instructor_answer, local_vars_dict)"
+    assert_structure: "assert_utilities.check_structure_logisticregression(student_answer)"
+    struct_msg: Answer should be an instance of LogisticRegression.
+
   GridSearchCV:
     import: "from sklearn.model_selection import GridSearchCV"
     assert: "isinstance({answer_var}, GridSearchCV)"

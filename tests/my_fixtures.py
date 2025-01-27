@@ -232,7 +232,7 @@ def apply_patches(*patches):
 
 
 def patch_functions(
-    directory, module_name: str, function_dict: dict, arg1=None, arg2=None, slice_lg=None
+    directory, module_name: str, function_dict: dict, arg1=None, arg2=None, slice_lg=None, global_patches: dict=None
 ):
     if slice_lg is None:
         slice_lg = 200
@@ -252,8 +252,14 @@ def patch_functions(
             patcher = patch("matplotlib.pyplot." + func_name, new=patched_func)
         else:
             patcher = patch.object(module, func_name, new=patched_func)
-
         patches.append(patcher)
+
+    # Add global variable patches
+    if global_patches:
+        for var_name, value in global_patches.items():
+            patcher = patch.object(module, var_name, value)
+            patches.append(patcher)
+
     return patches
 
 
@@ -270,6 +276,7 @@ def run_compute():
         # print(f"  {module_dict[function_name]=}")
         function_dict = patch_dict[function_name]
         module_name = patch_dict["module_name"]
+        global_patches = patch_dict.get("global_patches", {})  # Get global patches if they exist
         # print(f"{module_name=}")
         # print("after patch_dict")
 
@@ -298,7 +305,7 @@ def run_compute():
 
         # Only work with modification module
         patches = patch_functions(
-            directory, module_name, function_dict, arg1=None, arg2=None, slice_lg=nb_samples
+            directory, module_name, function_dict, arg1=None, arg2=None, slice_lg=nb_samples, global_patches=global_patches
         )
         # patches = patch_functions(module_name, function_dict, arg1=data, arg2=labels, slice_lg=nb_samples)
 

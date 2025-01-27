@@ -3714,6 +3714,194 @@ def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> tuple[boo
 
     return status, "\n".join(msg_list)
 
+# ======================================================================
+def check_structure_decisiontreeclassifier(student_answer) -> tuple[bool, str]:
+    from sklearn.tree import DecisionTreeClassifier
+    if not isinstance(student_answer, DecisionTreeClassifier):
+        status = False
+        msg = (
+            f"Answer must be of type 'DecisionTreeClassifier'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'DecisionTreeClassifier' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_decisiontreeclassifier(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+    pass
+
+# ======================================================================
+
+def check_structure_logisticregression(student_answer) -> tuple[bool, str]:
+    from sklearn.tree import LogisticRegression
+    if not isinstance(student_answer, LogisticRegression):
+        status = False
+        msg = (
+            f"Answer must be of type 'LogisticRegression'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'LogisticRegression' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_decisiontreeclassifier(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+    pass
+
+# ======================================================================
+def check_structure_kfold(student_answer) -> tuple[bool, str]:
+    from sklearn.model_selection import KFold
+    if not isinstance(student_answer, KFold):
+        status = False
+        msg = (
+            f"Answer must be of type 'KFold'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'KFold' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_kfold(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+    pass
+
+# ======================================================================
+def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
+    from sklearn.model_selection import ShuffleSplit
+    if not isinstance(student_answer, ShuffleSplit):
+        status = False
+        msg = (
+            f"Answer must be of type 'ShuffleSplit'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'ShuffleSplit' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_shufflesplit(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+    pass
+
+
+# ======================================================================
+
+def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
+    from sklearn.model_selection import GridSearchCV
+
+    if not isinstance(student_answer, GridSearchCV):
+        status = False
+        msg = (
+            f"Answer must be of type 'GridSearchCV'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'GridSearchCV' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_gridsearchcv(student_answer, instructor_answer, local_vars_dict)->tuple[bool, str]:
+    pass
+
+# ======================================================================
+
+def check_structure_kfold(student_answer) -> tuple[bool, str]:
+    from sklearn.model_selection import KFold
+    if not isinstance(student_answer, KFold):
+        status = False
+        msg = (
+            f"Answer must be of type 'KFold'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'KFold' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_kfold(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+    pass
+
+# ======================================================================
+def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
+    from sklearn.model_selection import ShuffleSplit
+    if not isinstance(student_answer, ShuffleSplit):
+        status = False
+        msg = (
+            f"Answer must be of type 'ShuffleSplit'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'ShuffleSplit' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_shufflesplit(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+    pass
+
+
+# ======================================================================
+
+def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
+    from sklearn.model_selection import GridSearchCV
+
+    if not isinstance(student_answer, GridSearchCV):
+        status = False
+        msg = (
+            f"Answer must be of type 'GridSearchCV'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'GridSearchCV' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_gridsearchcv(student_answer, instructor_answer, local_vars_dict)->tuple[bool, str]:
+    pass
+
+# ======================================================================
+
+def check_structure_randomforestclassifier(student_answer) -> tuple[bool, str]:
+    from sklearn.ensemble import RandomForestClassifier
+
+    if not isinstance(student_answer, RandomForestClassifier):
+        status = False
+        msg = (
+            f"Answer must be of type 'RandomForestClassifier'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'RandomForestClassifier' as expected."]
+
+    return status, "\n".join(msg_list)
+
+def check_answer_randomforestclassifier(student_answer, instructor_answer, local_vars_dict)->tuple[bool, str]:
+    pass
 
 # ======================================================================
 
@@ -3897,3 +4085,4 @@ def check_structure_scatterplot3d(student_answer: matplotlib.scatter) -> tuple[b
 
 
 # ======================================================================
+
