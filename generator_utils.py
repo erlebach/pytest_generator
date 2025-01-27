@@ -117,6 +117,7 @@ def evaluate_answers(
         fixture_args = fixture["args"]
         fixture_name = fixture["name"]
         module_function_name = part_question_id  # name of function in student/instructor module
+        print(f"{module_function_name=}")
         part_id = f"{repr(part['id'])}"
         test_code += f"    kwargs = {{'student_directory': {repr(student_directory)} , 'instructor_directory': {repr(instructor_directory)}}}\n"
         # 2024-03-19
@@ -131,6 +132,8 @@ def evaluate_answers(
         print(f"==> correct_answer = {fixture_name}({fixture_args[0]}, {repr(module_function_name)}, 'i', **kwargs)\n")
         # 2025-01-06: added quotes around fixture_args[0]
         # 2025-01-06: the 2nd argument to {fixture_name} is the question name as a string
+        print(f"{module_function_name=}")
+        print(f"    correct_answer = {fixture_name}({fixture_args[0]}, {repr(module_function_name)}, 'i', **kwargs)\n")
         test_code += f"    correct_answer = {fixture_name}({fixture_args[0]}, {repr(module_function_name)}, 'i', **kwargs)\n"
         test_code += f"    if {part_id} not in correct_answer:\n"
         explanation = repr(

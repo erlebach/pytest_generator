@@ -22,6 +22,17 @@ testing_questions = {
     'question3': { 'patched_functions': {} },
 }
 
+questions_part1_noclass = {
+    'module_name': 'questions_part1_noclass',
+    'part_1a': { 'patched_functions': {} },
+    'part_1b': { 'patched_functions': {} },
+    'part_1c': { 'patched_functions': {} },
+    'part_1d': { 'patched_functions': {} },
+    'part_1e': { 'patched_functions': {} },
+    'part_1f': { 'patched_functions': {} },
+    'part_1g': { 'patched_functions': {} },
+}
+
 all_questions = {
     'module_name': 'all_questions',
     'question1': { 'nb_samples': 200, 'patched_functions': {} },
