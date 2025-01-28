@@ -33,6 +33,7 @@ def load_data_labels(data_filename, labels_filename, nb_slices):
 """
 
 
+'''
 # @pytest.fixture
 def load_data_labels(nb_slices: int) -> tuple[Any, Any] | None:
     # I should be able to control the dataset to load
@@ -51,6 +52,7 @@ def load_data_labels(nb_slices: int) -> tuple[Any, Any] | None:
         return None, None
     else:
         return data, labels
+'''
 
 
 # ----------------------------------------------------------------------
@@ -337,11 +339,13 @@ def run_compute():
 
         ### My patches are not applied. WHY?
 
+        '''
         ## load_data_labels is not normally required.
         try:
             data, labels = load_data_labels(nb_slices=nb_samples)
         except (FileNotFoundError, OSError, ValueError) as e:
             print(f"Error loading data_labels: {e}")
+        '''
         # Replace the first two args of spectral by my own data. This avoids some randomness.
 
         # Only work with modification module
@@ -354,7 +358,9 @@ def run_compute():
             slice_lg=nb_samples,
             global_patches=global_patches,
         )
-        # patches = patch_functions(module_name, function_dict, arg1=data, arg2=labels, slice_lg=nb_samples)
+        '''
+        patches = patch_functions(module_name, function_dict, arg1=data, arg2=labels, slice_lg=nb_samples)
+        '''
 
         with apply_patches(*patches):
             results = get_module_results(

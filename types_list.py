@@ -3,6 +3,7 @@ types_list = [
     "dendrogram", 
     "dict[str,dict[str,float]]",
     "dict[str,dict[str,list]]",
+    "dict[str,list]",
     "dict[str,float]", 
     "dict[str,int]", 
     "dict[str,ndarray]", 

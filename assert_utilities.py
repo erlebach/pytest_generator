@@ -744,6 +744,44 @@ def check_structure_eval_float(student_answer: str) -> tuple[bool, str]:
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
+def check_structure_dict_str_list_int(
+    student_answer: dict[str, list[int]],
+) -> tuple[bool, str]:
+    """Check the structure of the student's answer.
+
+    Args:
+        student_answer (dict[str, list[int]]): The student's submitted answer, expected to be a dictionary where each key is a string and each value is a list of integers.
+
+    Returns:
+        tuple[bool, str]: A tuple containing:
+            - bool: True if the structure is correct, False otherwise
+            - str: Message explaining the validation result
+
+    """
+    status: bool = True
+    msg_list: list[str] = []
+
+    if not isinstance(student_answer, dict):
+        return False, "Answer must be a dict"
+
+    for k, v in student_answer.items():
+        if not isinstance(v, list):
+            msg_list.append(f"Element {k} of your list should be of type 'list'")
+            status = False
+            continue
+
+    # Check that all list elements are ints
+    for v in student_answer.values():
+        for e in v:
+            if not isinstance(e, int):
+                msg_list.append(f"Element {e} of your list should be of type 'int'")
+                msg_list.append("Check all other list elements")
+                status = False
+                break
+
+    return status, "\n".join(msg_list)
+
+
 def check_structure_dict_str_dict_str_list(
     student_answer: dict[str, dict[str, list]],
     instructor_answer: dict[str, dict[str, list]],
@@ -1500,6 +1538,9 @@ def check_answer_dict_str_float(
         rel_tol (float): The relative tolerance for comparing floats
         keys (list[str] | None): Optional list of keys to check. If None, all keys are
             checked. If `keys` is provided, only the keys in `keys` are checked.
+            For examples, if the instructor answer is {'a': 1.0, 'b': 2.0, 'c': 3.0},
+            then keys = ['a', 'b', 'c'] will check all keys.
+            If keys = ['a', 'b'], then only keys 'a' and 'b' are checked.
         dict_float_choices (dict[str, float] | None): Optional dictionary of float choices
             for each key. If provided, validates that student_answer[k] is one of these choices.
         partial_score_frac (list[float]): The partial score fraction
@@ -1538,6 +1579,7 @@ def check_answer_dict_str_float(
         i_float = instructor_answer[k]
 
         if len(dict_float_choices) > 0 and k in dict_float_choices:
+            val = dict_float_choices[k]
             for val in dict_float_choices[k]:
                 if val == "i":  # use instructor answer
                     val = i_float
@@ -2735,12 +2777,10 @@ def check_structure_list_ndarray(
 
     if not isinstance(student_answer, list):
         status = False
-        msg = (
-            f"- The answer should be of type 'list'; your type is {type(student_answer).__name__}",  # noqa: E501
-        )
+        msg = f"The answer should be of type 'list'; your type is {type(student_answer).__name__}"  # noqa: E501
         msg_list.append(msg)
     else:
-        msg = "- The answer is type list. Correct."
+        msg = "The answer is type list. Correct."
         msg_list.append(msg)
 
     # Check length of list
@@ -2748,22 +2788,22 @@ def check_structure_list_ndarray(
         if len(student_answer) != len(instructor_answer):
             status = False
             msg = (
-                "- The length of your list is incorrect. Your list length is "
+                "The length of your list is incorrect. Your list length is "
                 f"{len(student_answer)}. The length should be {len(instructor_answer)}."
             )
             msg_list.append(msg)
         else:
-            msg = "- The length of the list is correct."
+            msg = "The length of the list is correct."
             msg_list.append(msg)
 
     if status:
         for s_arr in instructor_answer:
             if not isinstance(s_arr, type(np.zeros(1))):
                 status = False
-                msg_list.append("- Element {i} of your list should be of type 'numpy.array'.")
+                msg_list.append("Element {i} of your list should be of type 'numpy.array'.")
 
     if status:
-        msg_list.append("- All list elements are type ndarray.")
+        msg_list.append("All list elements are type ndarray.")
 
     return status, "\n".join(msg_list)
 
@@ -3714,9 +3754,11 @@ def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> tuple[boo
 
     return status, "\n".join(msg_list)
 
+
 # ======================================================================
 def check_structure_decisiontreeclassifier(student_answer) -> tuple[bool, str]:
     from sklearn.tree import DecisionTreeClassifier
+
     if not isinstance(student_answer, DecisionTreeClassifier):
         status = False
         msg = (
@@ -3731,13 +3773,18 @@ def check_structure_decisiontreeclassifier(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_decisiontreeclassifier(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+def check_answer_decisiontreeclassifier(
+    student_answer, instructor_answer, local_vars_dict
+) -> tuple[bool, str]:
     pass
+
 
 # ======================================================================
 
+
 def check_structure_logisticregression(student_answer) -> tuple[bool, str]:
-    from sklearn.tree import LogisticRegression
+    from sklearn.linear_model import LogisticRegression
+
     if not isinstance(student_answer, LogisticRegression):
         status = False
         msg = (
@@ -3752,12 +3799,16 @@ def check_structure_logisticregression(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_decisiontreeclassifier(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+def check_answer_decisiontreeclassifier(
+    student_answer, instructor_answer, local_vars_dict
+) -> tuple[bool, str]:
     pass
+
 
 # ======================================================================
 def check_structure_kfold(student_answer) -> tuple[bool, str]:
     from sklearn.model_selection import KFold
+
     if not isinstance(student_answer, KFold):
         status = False
         msg = (
@@ -3775,9 +3826,11 @@ def check_structure_kfold(student_answer) -> tuple[bool, str]:
 def check_answer_kfold(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
     pass
 
+
 # ======================================================================
 def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
     from sklearn.model_selection import ShuffleSplit
+
     if not isinstance(student_answer, ShuffleSplit):
         status = False
         msg = (
@@ -3792,11 +3845,14 @@ def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_shufflesplit(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+def check_answer_shufflesplit(
+    student_answer, instructor_answer, local_vars_dict
+) -> tuple[bool, str]:
     pass
 
 
 # ======================================================================
+
 
 def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
     from sklearn.model_selection import GridSearchCV
@@ -3815,13 +3871,18 @@ def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_gridsearchcv(student_answer, instructor_answer, local_vars_dict)->tuple[bool, str]:
+def check_answer_gridsearchcv(
+    student_answer, instructor_answer, local_vars_dict
+) -> tuple[bool, str]:
     pass
+
 
 # ======================================================================
 
+
 def check_structure_kfold(student_answer) -> tuple[bool, str]:
     from sklearn.model_selection import KFold
+
     if not isinstance(student_answer, KFold):
         status = False
         msg = (
@@ -3839,9 +3900,11 @@ def check_structure_kfold(student_answer) -> tuple[bool, str]:
 def check_answer_kfold(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
     pass
 
+
 # ======================================================================
 def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
     from sklearn.model_selection import ShuffleSplit
+
     if not isinstance(student_answer, ShuffleSplit):
         status = False
         msg = (
@@ -3856,11 +3919,14 @@ def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_shufflesplit(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+def check_answer_shufflesplit(
+    student_answer, instructor_answer, local_vars_dict
+) -> tuple[bool, str]:
     pass
 
 
 # ======================================================================
+
 
 def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
     from sklearn.model_selection import GridSearchCV
@@ -3879,10 +3945,14 @@ def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_gridsearchcv(student_answer, instructor_answer, local_vars_dict)->tuple[bool, str]:
+def check_answer_gridsearchcv(
+    student_answer, instructor_answer, local_vars_dict
+) -> tuple[bool, str]:
     pass
 
+
 # ======================================================================
+
 
 def check_structure_randomforestclassifier(student_answer) -> tuple[bool, str]:
     from sklearn.ensemble import RandomForestClassifier
@@ -3900,8 +3970,12 @@ def check_structure_randomforestclassifier(student_answer) -> tuple[bool, str]:
 
     return status, "\n".join(msg_list)
 
-def check_answer_randomforestclassifier(student_answer, instructor_answer, local_vars_dict)->tuple[bool, str]:
+
+def check_answer_randomforestclassifier(
+    student_answer, instructor_answer, local_vars_dict
+) -> tuple[bool, str]:
     pass
+
 
 # ======================================================================
 
@@ -4085,4 +4159,3 @@ def check_structure_scatterplot3d(student_answer: matplotlib.scatter) -> tuple[b
 
 
 # ======================================================================
-

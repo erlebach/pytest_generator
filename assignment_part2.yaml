@@ -2,7 +2,7 @@
 # max_score: per assert
 visibility: visible
 max_score: 20
-module: all_questions
+module: questions_part2_noclass
 
 # choices: instructor_file, student_file, yaml_file
 
@@ -24,360 +24,104 @@ fixtures:
   fixture:
     name: run_compute
     # Fixure arguments in a list
-    args: [all_questions]
+    args: [questions_part2_noclass]
 
 questions:
-- id: part_1a
+- id: part_2a
   parts:
-    - id: starter_code
-      type: int
-      answer: 100
-      note:
+    - id: nb_classes
+      type: dict[str,int]
+      answer: 
 
-    - id:
-      type:
-      answer:
+    - id: class_count
+      type: dict[str,ndarray]
+      note: specifying type of ndarray is not implemented
 
-- id: part_1b
+    - id: nb_samples_data
+      type: dic[str,int]
+      answer: 
+
+    - id: max_data
+      type: dct[str,float]
+      answer: 
+
+- id: part_2b
   parts:
-    - id:
-      type:
-      answer:
+    # - id: number_of_samples
+    #  type: dict[str,int]
+    #  answer:
 
-    - id:
-      type:
-      answer:
+    #- id: data_bounds
+    #  type: dict[str,float]
+    #  answer:
 
-  - id: part_1c
-    parts:
-    - id:
-      type:
-      answer:
+    - id: clf_1c
+      type: DecisionTreeClassifier
 
-    - id:
-      type:
-      answer:
+    - id: cv_1c
+      type: KFold
 
-  - id: part_1d
-    parts:
-    - id:
-      type:
-      answer:
+    - id: scores_1c
+      type: dict[str,float]
 
-    - id:
-      type:
-      answer:
+    - id: clf_1d
+      type: DecisionTreeClassifier
 
-- id: part_1d
-  parts:
-    - id:
-      type:
-      answer:
+    - id: cv_1d
+      type: ShuffleSplit
 
-    - id:
-      type:
-      answer:
-#----------------------------------------------------------------------
-- id: part_e
-  parts:
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-- id: part_f
-  parts:
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-- id: part_g
-  parts:
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
+    - id: scores_1d
+      type: dict[str,float]
 
 
-#----------------------------------------------------------------------
-- id:
-  parts:
-    - id:
-      type:
-      answer:
+    - id: accuracy_train_1f
+      type: float
 
-    - id:
-      type:
-      answer:
+    - id: accuracy_test_1f
+      type: float
 
-    - id:
-      type:
-      answer:
+    - id: mean_cv_accuracy_1f
+      type: float
 
-    - id:
-      type:
-      answer:
+    - id: clf_1f
+      type: LogisticRegression
 
-    - id:
-      type:
-      answer:
+    - id: cv_1f
+      type: ShuffleSplit
 
-    - id:
-      type:
-      answer:
+    - id: confusion_matrix_1f
+      type: dict[str,ndarray]
 
 
-#----------------------------------------------------------------------
-- id:
-  parts:
-    - id:
-      type:
-      answer:
+    - id: clf_1g
+      type: LogisticRegression
 
-    - id:
-      type:
-      answer:
+    - id: best_estimator_1g
+      type: LogisticRegression
 
-    - id:
-      type:
-      answer:
+    - id: grid_search_1g
+      type: GridSearchCV
 
-    - id:
-      type:
-      answer:
+    - id: default_parameters_1g
+      type: dict[str,Any]
 
-    - id:
-      type:
-      answer:
+    - id: confusion_matrix_1g
+      type: dict[str,ndarray]
 
-    - id:
-      type:
-      answer:
+    - id: accuracy_1g
+      type: dict[str,float]
 
-    - id:
-      type:
-      answer:
+    - id: precision_1g
+      type: dict[str,float]
 
-    - id:
-      type:
-      answer:
+    - id: class_count_1g
+      type: dict[str,ndarray]
+      note: ndarray[int]
 
-#----------------------------------------------------------------------
+    - id: hard_to_distinguish_pairs
+      type: list[tuple[int]]
+      note: Type not implemented.
 
-- id:
-  parts:
-    - id:
-      type:
-      answer:
+# class_count: dict[str, list[int]]
 
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-      explanation: 
-
-    - id:
-      type:
-      answer:
-      note:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-      explanation: 
-
-    - id:
-      type:
-      answer:
-      explanation: 
-#----------------------------------------------------------------------
-- id:
-  parts:
-    - id:
-      type:
-      answer:
-      note:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-      note:
-
-    - id:
-      type:
-      answer:
-
-
-#----------------------------------------------------------------------
-- id:
-  parts:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-  
-    - id:
-      type:
-      answer:
-      note:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-  
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-  
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-  
-  
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-#----------------------------------------------------------------------
-#----------------------------------------------------------------------
-#----------------------------------------------------------------------
-  
+# FAILED tests/test_structure_preprocessed_assignment_part2_expand.py::test_structure_part_2b_class_count_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack - assert False

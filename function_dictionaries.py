@@ -35,6 +35,42 @@ def initialize_globals_part1(ntrain: int = 1000, ntest: int = 200) -> tuple:
     )
     return x_train, y_train, x_test, y_test
 
+@cache
+def initialize_globals_part2(ntrain: int = 1000, ntest: int = 200) -> tuple:
+    """Initialize globals with limited MNIST data."""
+    x, y, x_test, y_test = u.prepare_data()
+    print(
+        f"initialize_globals_part1: x.shape={x.shape}, y.shape={y.shape}, x_test.shape={x_test.shape}, y_test.shape={y_test.shape}"
+    )
+    x_train = x[:ntrain, :]
+    y_train = y[:ntrain]
+    x_test = x_test[:ntest, :]
+    y_test = y_test[:ntest]
+    # x_train, y_train = u.filter_out_7_9s(x_train, y_train)
+    # x_test, y_test = u.filter_out_7_9s(x_test, y_test)
+    print(
+        f"initialize_globals_part2: x_train.shape={x_train.shape}, y_train.shape={y_train.shape}, x_test.shape={x_test.shape}, y_test.shape={y_test.shape}"
+    )
+    return x_train, y_train, x_test, y_test
+
+@cache
+def initialize_globals_part3(ntrain: int = 1000, ntest: int = 200) -> tuple:
+    """Initialize globals with limited MNIST data."""
+    x, y, x_test, y_test = u.prepare_data()
+    print(
+        f"initialize_globals_part3: x.shape={x.shape}, y.shape={y.shape}, x_test.shape={x_test.shape}, y_test.shape={y_test.shape}"
+    )
+    x_train = x[:ntrain, :]
+    y_train = y[:ntrain]
+    x_test = x_test[:ntest, :]
+    y_test = y_test[:ntest]
+    x_train, y_train = u.filter_out_7_9s(x_train, y_train)
+    x_test, y_test = u.filter_out_7_9s(x_test, y_test)
+    print(
+        f"initialize_globals_part3: x_train.shape={x_train.shape}, y_train.shape={y_train.shape}, x_test.shape={x_test.shape}, y_test.shape={y_test.shape}"
+    )
+    return x_train, y_train, x_test, y_test
+
 
 # TODO:
 #  The dictionary name should be unique
@@ -67,6 +103,35 @@ questions_part1_noclass = {
     "part_1f": {"patched_functions": {}},
     "part_1g": {"patched_functions": {}},
 }
+
+questions_part2_noclass = {
+    "module_name": "questions_part2_noclass",
+    "global_patches": {
+        "x_train": initialize_globals_part2(ntrain, ntest)[0],
+        "y_train": initialize_globals_part2(ntrain, ntest)[1],
+        "x_test": initialize_globals_part2(ntrain, ntest)[2],
+        "y_test": initialize_globals_part2(ntrain, ntest)[3],
+    },
+    "part_2a": {"patched_functions": {}},
+    "part_2b": {"patched_functions": {}},
+    "part_2c": {"patched_functions": {}},
+}
+
+questions_part3_noclass = {
+    "module_name": "questions_part3_noclass",
+    "global_patches": {
+        "x_train": initialize_globals_part3(ntrain, ntest)[0],
+        "y_train": initialize_globals_part3(ntrain, ntest)[1],
+        "x_test": initialize_globals_part3(ntrain, ntest)[2],
+        "y_test": initialize_globals_part3(ntrain, ntest)[3],
+    },
+    "part_3a": {"patched_functions": {}},
+    "part_3b": {"patched_functions": {}},
+    "part_3c": {"patched_functions": {}},
+    "part_3d": {"patched_functions": {}},
+}
+
+
 
 all_questions = {
     "module_name": "all_questions",

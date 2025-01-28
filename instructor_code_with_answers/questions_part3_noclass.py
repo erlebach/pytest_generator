@@ -32,6 +32,16 @@ from sklearn.svm import SVC
 from sklearn.utils.class_weight import compute_class_weight
 from utils import Normalization
 
+# The following global definitions guarantee that the variables are
+#   global and exist even if the code is not run interactively.
+
+x_train = None
+y_train = None
+x_test = None
+y_test = None
+ntrain = None
+ntest = None
+
 # ! import matplotlib.pyplot as plt
 # ! import warnings
 

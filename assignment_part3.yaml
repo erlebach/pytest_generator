@@ -2,7 +2,7 @@
 # max_score: per assert
 visibility: visible
 max_score: 20
-module: all_questions
+module: questions_part3_noclass
 
 # choices: instructor_file, student_file, yaml_file
 
@@ -24,360 +24,52 @@ fixtures:
   fixture:
     name: run_compute
     # Fixure arguments in a list
-    args: [all_questions]
+    args: [questions_part3_noclass]
 
 questions:
-- id: part_1a
+- id: part_3a
   parts:
     - id: starter_code
       type: int
       answer: 100
-      note:
 
-    - id:
-      type:
-      answer:
-
-- id: part_1b
+- id: part_3b
   parts:
-    - id:
-      type:
+    - id: number_of_samples
+      type: dict[str,int]
       answer:
 
-    - id:
-      type:
+    - id: data_bounds
+      type: dict[str,float]
       answer:
 
-  - id: part_1c
-    parts:
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-  - id: part_1d
-    parts:
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-- id: part_1d
+- id: part_3c
   parts:
-    - id:
-      type:
+    - id: clf
+      type: DecisionTreeClassifier
       answer:
 
-    - id:
-      type:
+    - id: cv
+      type: KFold
       answer:
-#----------------------------------------------------------------------
-- id: part_e
+
+    - id: scores
+      type: dict[str,float]
+
+- id: part_3d
   parts:
-    - id:
-      type:
+    - id: clf
+      type: DecisionTreeClassifier
       answer:
 
-    - id:
-      type:
+    - id: cv
+      type: ShuffleSplit
       answer:
 
-- id: part_f
-  parts:
-    - id:
-      type:
+    - id: scores
+      type: dict[str,float]
       answer:
 
-    - id:
-      type:
-      answer:
+    - id: explain_kfold_vs_shuffle_split
+      type: explain_str
 
-- id: part_g
-  parts:
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-
-#----------------------------------------------------------------------
-- id:
-  parts:
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-
-#----------------------------------------------------------------------
-- id:
-  parts:
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-#----------------------------------------------------------------------
-
-- id:
-  parts:
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-      explanation: 
-
-    - id:
-      type:
-      answer:
-      note:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-      explanation: 
-
-    - id:
-      type:
-      answer:
-      explanation: 
-#----------------------------------------------------------------------
-- id:
-  parts:
-    - id:
-      type:
-      answer:
-      note:
-
-    - id:
-      type:
-      answer:
-
-    - id:
-      type:
-      answer:
-      note:
-
-    - id:
-      type:
-      answer:
-
-
-#----------------------------------------------------------------------
-- id:
-  parts:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-  
-    - id:
-      type:
-      answer:
-      note:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-  
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-  
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-  
-  
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-    - id:
-      type:
-      answer:
-#----------------------------------------------------------------------
-#----------------------------------------------------------------------
-#----------------------------------------------------------------------
-  

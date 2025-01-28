@@ -44,6 +44,8 @@ x_train = None
 y_train = None
 x_test = None
 y_test = None
+ntrain = None
+ntest = None
 
 # ======================================================================
 seed = 42
@@ -217,9 +219,6 @@ def part_1b(
     # The following line makes these variables global.
     global x_train, y_train, x_test, y_test  # noqa: PLW0603
 
-    print(f"\n\nBEFORE START of part_1c, {x_train.shape=}")
-    print(f"\n\nBEFORE START of part_1c, {x_test.shape=}")
-
     if x_train_ is not None:
         x_train = x_train_
     if y_train_ is not None:
@@ -229,10 +228,13 @@ def part_1b(
     if y_test_ is not None:
         y_test = y_test_
 
+    print(f"\n\nBEFORE START of part_1c, {x_train.shape=}")
+    print(f"\n\nBEFORE START of part_1c, {x_test.shape=}")
+
+
     # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
     # ==========================================
     print(f"\n\nBEFORE START of part_1b, {x_train.shape=}")
-    print(f"\n\nBEFORE START of part_1b, {x_test.shape=}")
 
     x, y, x_test, y_test = u.prepare_data()
     x_train, y_train = u.filter_out_7_9s(x, y)
@@ -241,7 +243,6 @@ def part_1b(
     x_test = nu.scale_data(x_test)
 
     print(f"\n\nAFTER START of part_1b, {x_train.shape=}")
-    print(f"\n\nAFTER START of part_1b, {x_test.shape=}")
 
     answers = {}
 
@@ -326,7 +327,8 @@ def part_1c(
 
     # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
     # ==========================================
-    print(f"ENTERED part_1c, {x_train.shape=}, {x_test.shape=}")
+    print(f"ENTERED part_1c, {x_train.shape=}")
+    print(f"ENTERED part_1c, {x_test.shape=}")
     n_splits = 5
     clf = DecisionTreeClassifier(random_state=seed)
     cv = KFold(n_splits=n_splits, shuffle=True, random_state=seed)

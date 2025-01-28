@@ -33,12 +33,6 @@ import utils as u
 from numpy.typing import NDArray
 from questions_part1_noclass import part_1c as section1_part_c
 from questions_part1_noclass import part_1d as section1_part_d
-
-# ! from questions_part1_noclass import partE as section1_part_e
-# ! from questions_part1_noclass import partF as section1_part_f
-# !  from sklearn.base import BaseEstimator
-# ! from sklearn import datasets
-# ! from sklearn.base import BaseEstimator
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, top_k_accuracy_score
@@ -58,6 +52,16 @@ from sklearn.model_selection import (
 # ! from sklearn.svm import SVC  # , LinearSVC
 # ! from sklearn.tree import DecisionTreeClassifier
 from utils import Normalization
+
+# These definitions guarantee that the variables are global and exist even if
+# the code is not run interactively.
+x_train = None
+y_train = None
+x_test = None
+y_test = None
+ntrain = None
+ntest = None
+ntrain_list = None
 
 # ======================================================================
 
@@ -79,7 +83,7 @@ def part_b_sub(
 ) -> dict[Any, Any]:
     """Perform cross-validation and evaluation using logistic regression.
 
-    This function repeats parts C, D, and F from the previous analysis on
+    This function repeats parts C, D, F, and G from the previous analysis on
     the given data.  On part F, perform cross-validation using logistic regression
     and evaluates performance on both training and test sets.
 
@@ -101,32 +105,41 @@ def part_b_sub(
         - Results from part C (cross-validation scores and classifier)
         - Results from part D (cross-validation scores and classifier)
         - Results from part F (training/test scores and confusion matrices)
+        - Results from part G (training/test scores and confusion matrices)
 
     """
     x = x_train
     y = y_train
 
+    previous_answers = {}
+
     print("===> repeat part C")
     print(f"{x.shape=}, {y.shape=}, {x_test.shape=}, {y_test.shape=}")
-    # ! answer = section1_part_c(X, y)
     print("globals: ", list(globals().keys()))
 
     # Repeat part_c
-    return_part_c = section1_part_c(x, y)
+    return_part_c = section1_part_c(x, y, x_test, y_test)
+
+    #  list(return_part_c.keys())=['clf', 'cv', 'scores']
+    print(f"\n\n{list(return_part_c.keys())=}")
     answer_part_c = {
         "scores_c": return_part_c["scores"],
         "clf_c": return_part_c["clf"],
         "cv_c": return_part_c["cv"],
     }
+
+    previous_answers["part_c"] = answer_part_c
     # ------
     print("===> repeat part D")
     # Repeat part_1d
-    return_part_d = section1_part_d(x, y)
+    return_part_d = section1_part_d(x, y, x_test, y_test)
+    print(f"\n\n{list(return_part_d.keys())=}")
     answer_part_d = {
         "scores_d": return_part_d["scores"],
         "clf_d": return_part_d["clf"],
         "cv_d": return_part_d["cv"],
     }
+    previous_answers["part_d"] = answer_part_d
 
     # ------
     print("===> repeat part F")
@@ -166,14 +179,16 @@ def part_b_sub(
 
     # Using entire dataset
     answer_part_f = {
-        "scores_train_F": scores_train_f,
-        "scores_test_F": scores_test_f,
+        "accuracy_train_F": scores_train_f,  # float, accuracy
+        "accuracy_test_F": scores_test_f,
         "mean_cv_accuracy_F": mean_cv_accuracy_f,
         "clf": clf,
         "cv": cv,
         "conf_mat_train": conf_mat_train,
         "conf_mat_test": conf_mat_test,
     }
+
+    previous_answers["part_f"] = answer_part_f
 
     # ----------------------------------------------------------------
     # Repeat part G, part_1g, with a LogisticRegressor
@@ -305,7 +320,7 @@ def part_b_sub(
     answers_part_g["default_parameters"] = default_parameters
 
     # The type is a float
-    answers_part_g["mean_accuracy_cv"] = None  # ! FIX!
+    # answers_part_g["mean_accuracy_cv"] = None  # ! FIX!
 
     # The answer type is a numpy.ndarray
     # Return the 2x2 confusion matrix computed from the predictions
@@ -331,6 +346,8 @@ def part_b_sub(
     answers_part_g["precision_orig_full_testing"] = precision_test_pred_orig
     answers_part_g["precision_best_full_testing"] = precision_test_pred_best
 
+    previous_answers["part_g"] = answers_part_g
+
     # End Part 1G with LogisticRegressor
     # ----------------------------------------------------------------
 
@@ -340,15 +357,11 @@ def part_b_sub(
         pickle.dump(clf, f)
 
     # -----------------------------------------------
-    answers = {}
-    answers["partC"] = answer_part_c
-    answers["partD"] = answer_part_d
-    answers["partF"] = answer_part_f
-    answers["ntrain"] = len(y)
-    answers["ntest"] = len(y_test)
-    answers["class_count_train"] = np.unique(y, return_counts=True)[1]
-    answers["class_count_test"] = np.unique(y_test, return_counts=True)[1]
-    return answers
+    previous_answers["ntrain"] = len(x_train)
+    previous_answers["ntest"] = len(x_test)
+    previous_answers["class_count_train"] = np.unique(y_train, return_counts=True)[1]
+    previous_answers["class_count_test"] = np.unique(y_test, return_counts=True)[1]
+    return previous_answers
 
 
 # ----------------------------------------------------------------
@@ -443,22 +456,33 @@ def part_2a() -> dict[str, Any]:
     print(f"{nb_classes_test=}")
 
     answers = {}
-    answers["nb_classes_train"] = (len(np.unique(y_train)),)
-    answers["nb_classes_test"] = (len(np.unique(y_test)),)
-    answers["class_count_train"] = (np.unique(y_train, return_counts=True),)
-    answers["class_count_test"] = (np.unique(y_test, return_counts=True),)
-    answers["length_Xtrain"] = len(x_train)
-    answers["length_Xtest"] = len(x_test)
-    answers["length_ytrain"] = len(y_train)
-    answers["length_ytest"] = len(y_test)
-    answers["max_Xtrain"] = np.max(x_train)
-    answers["max_Xtest"] = np.max(x_test)
-    # answers["Xtrain"] = x_train
-    # answers["ytrain"] = y_train
-    # answers["Xtest"] = x_test
-    # answers["ytest"] = y_test
+    nb_classes_dict: dict[str, int] = {}
+    nb_classes_dict["nb_classes_train"] = len(np.unique(y_train))
+    nb_classes_dict["nb_classes_test"] = len(np.unique(y_test))
+    answers["nb_classes"] = nb_classes_dict
+
+    classes_train, counts_train = np.unique(y_train, return_counts=True)
+    classes_test, counts_test = np.unique(y_test, return_counts=True)
+    class_count_dict: dict[str, int] = {}
+    class_count_dict["class_count_train"] = counts_train
+    class_count_dict["class_count_test"] = counts_test
+    answers["class_count"] = class_count_dict
+
+    class_lengths_dict: dict[str, int] = {}
+    class_lengths_dict["nb_samples_x_train"] = len(x_train)
+    class_lengths_dict["nb_samples_x_test"] = len(x_test)
+    class_lengths_dict["nb_samples_y_train"] = len(y_train)
+    class_lengths_dict["nb_samples_y_test"] = len(y_test)
+    answers["nb_samples_data"] = class_lengths_dict
+
+    class_max_dict: dict[str, int] = {}
+    class_max_dict["max_x_train"] = np.max(x_train)
+    class_max_dict["max_x_test"] = np.max(x_test)
+    answers["max_data"] = class_max_dict
+
     print("\n==>about to exit part_2a")
     pprint(answers)
+    # answers is a dictionary of dictionaries
     return answers
 
 
@@ -500,12 +524,10 @@ def part_2b(
     Task
     ----
     B. Repeat part 1.C, 1.D, and 1.F, for the multiclass problem.
-    Use the Logistic Regression for part F with 300 iterations.
+    Use the Logistic Regression for part F with 500 iterations.
     Explain how multi-class logistic regression works (inherent,  # ! TODO
     one-vs-one, one-vs-the-rest, etc.).
-    Repeat the experiment for N = 1000, 5000, 20000. Choose
-            ntrain = 0.8 * N
-            ntest  = 0.2 * N
+    Use the entire MNIST training set to train the model.
     Comment on the results. Is the accuracy higher for the training or testing set?
 
     Notes
@@ -547,10 +569,11 @@ def part_2b(
     # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
     # ==========================================
 
+    ntrain = len(x_train)
+    ntest = len(x_test)
+
     # Create a test sets that are 20% of each training set
-    ntest_list = [i // 5 for i in ntrain_list]
     print("**** part_2b, ntrain_list: ", ntrain_list)
-    print("**** part_2b, ntest_list: ", ntest_list)
 
     answers = {}
 
@@ -562,17 +585,20 @@ def part_2b(
     print(f"*** {y_test.shape=}")
 
     # For each training size, we will create an optimization using GridSearchCV
-    for ntr, nte in zip(ntrain_list, ntest_list, strict=True):
-        print(f"==> {ntr=}, {nte=}")
-        x_r = x_train[0:ntr, :]
-        y_r = y_train[0:ntr]
-        x_test_r = x_test[0:nte, :]
-        y_test_r = y_test[0:nte]
-        print(f"{ntr=}, {nte=}")
-        print(f"**** {x_r.shape=}, {y_r.shape=}, {x_test_r.shape=}, {y_test_r.shape=}")
-        start = time.time()
-        answers[ntr] = part_b_sub(x_r, y_r, x_test_r, y_test_r)
-        print(f"TIME(part_b_sub), {ntr=}, {nte=}, {time.time() - start=} sec")
+
+    ntr = ntrain
+    nte = ntest
+    answer_dict = {}
+    print(f"==> {ntr=}, {nte=}")
+    x_r = x_train[0:ntr, :]
+    y_r = y_train[0:ntr]
+    x_test_r = x_test[0:nte, :]
+    y_test_r = y_test[0:nte]
+    print(f"{ntr=}, {nte=}")
+    print(f"**** {x_r.shape=}, {y_r.shape=}, {x_test_r.shape=}, {y_test_r.shape=}")
+    start = time.time()
+    previous_answers = part_b_sub(x_r, y_r, x_test_r, y_test_r)
+    print(f"TIME(part_b_sub), {ntr=}, {nte=}, {time.time() - start=} sec")
 
     # Looking at the confusion matrix of the test set, identify the top five pairs of
     # numbers that are most difficult to distinguish. For example, the pair (3,4)
@@ -583,8 +609,71 @@ def part_2b(
     # The smaller digit is always listed first. Thus: (6,3) will be rejected.
     # There should be exactly three pairs of digits. I expect the pairs to be the
     # result of a calculation based on the confusion matrix. Otherwise, the grading
-    # will be incorrect.
+    # will be incorrect. On do the calculation for N=20000.
+
+    answers: dict[str, Any] = {}
+
+    # answers["part_c"] = previous_answers["part_c"]
+    # answers["part_f"] = previous_answers["part_f"]
+    # answers["part_g"] = previous_answers["part_g"]
+
+    print(f"\n\n==> KEYS: {list(previous_answers['part_c'].keys())=}")
+    answers["scores_1c"] = previous_answers["part_c"]["scores_c"]
+    answers["clf_1c"] = previous_answers["part_c"]["clf_c"]
+    answers["cv_1c"] = previous_answers["part_c"]["cv_c"]
+
+    answers["scores_1d"] = previous_answers["part_d"]["scores_d"]
+    answers["clf_1d"] = previous_answers["part_d"]["clf_d"]
+    answers["cv_1d"] = previous_answers["part_d"]["cv_d"]
+
+    answers["accuracy_train_1f"] = previous_answers["part_f"]["accuracy_train_F"]
+    answers["accuracy_test_1f"] = previous_answers["part_f"]["accuracy_test_F"]
+    answers["mean_cv_accuracy_1f"] = previous_answers["part_f"]["mean_cv_accuracy_F"]
+    answers["clf_1f"] = previous_answers["part_f"]["clf"]
+    answers["cv_1f"] = previous_answers["part_f"]["cv"]
+    confusion_1f: dict[str, NDArray] = {}
+    confusion_1f["conf_mat_train_1f"] = previous_answers["part_f"]["conf_mat_train"]
+    confusion_1f["conf_mat_test_1f"] = previous_answers["part_f"]["conf_mat_test"]
+    answers["confusion_matrix_1f"] = confusion_1f
+
+    pag = previous_answers["part_g"]
+    confusion_matrix = {}
+    confusion_matrix["confusion_matrix_train_orig"] = pag["confusion_matrix_train_orig"]
+    confusion_matrix["confusion_matrix_train_best"] = pag["confusion_matrix_train_best"]
+    confusion_matrix["confusion_matrix_test_orig"] = pag["confusion_matrix_test_orig"]
+    confusion_matrix["confusion_matrix_test_best"] = pag["confusion_matrix_test_best"]
+
+    accuracy = {}
+    accuracy["accuracy_orig_full_training"] = pag["accuracy_orig_full_training"]
+    accuracy["accuracy_best_full_training"] = pag["accuracy_best_full_training"]
+    accuracy["accuracy_orig_full_testing"] = pag["accuracy_orig_full_testing"]
+    accuracy["accuracy_best_full_testing"] = pag["accuracy_orig_full_testing"]
+
+    precision = {}
+    precision["precision_orig_full_training"] = pag["precision_orig_full_training"]
+    precision["precision_best_full_training"] = pag["precision_best_full_training"]
+    precision["precision_orig_full_testing"] = pag["precision_orig_full_testing"]
+    precision["precision_best_full_testing"] = pag["precision_orig_full_testing"]
+
+    answers["clf_1g"] = pag["clf"]
+    answers["best_estimator_1g"] = pag["best_estimator"]
+    answers["grid_search_1g"] = pag["grid_search"]
+    answers["default_parameters_1g"] = pag["default_parameters"]
+
+    answers["confusion_matrix_1g"] = confusion_matrix
+    answers["accuracy_1g"] = accuracy
+    answers["precision_1g"] = precision
+
+    class_count: dict[str, NDArray[np.int32]] = {}
+    class_count["class_count_train"] = previous_answers["class_count_train"]
+    class_count["class_count_test"] = previous_answers["class_count_test"]
+    answers["class_count_1g"] = class_count
+
     answers["hard_to_distinguish_pairs"] = [(3, 5), (7, 9), (4, 9), (5, 8), (3, 8)]
+
+    print("\n\nAnswers part_2b")
+    pprint(answers)
+    print("\n\n")
 
     print("\n==>about to exit part_2b")
     pprint(answers)  # noqa: T203
@@ -725,7 +814,7 @@ if __name__ == "__main__":
     # ntrain_list = [1000, 5000]  # max is 60000
 
     # Restrict the size for faster training
-    ntrain_list = [1000, 5000, 10000, 20000, 60000]  # max is 60000
+    ntrain_list = [1000, 5000, 10000, 20000]  # max is 60000
 
     x_train, y_train, x_test, y_test = u.prepare_data()
 
