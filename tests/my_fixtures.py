@@ -231,6 +231,7 @@ def apply_patches(*patches):
                 print(f"Error stopping patch {patch_obj}: {e}")
 
 
+""" ORIG
 def patch_functions(
     directory, module_name: str, function_dict: dict, arg1=None, arg2=None, slice_lg=None, global_patches: dict=None
 ):
@@ -253,6 +254,46 @@ def patch_functions(
         else:
             patcher = patch.object(module, func_name, new=patched_func)
         patches.append(patcher)
+
+    # Add global variable patches
+    if global_patches:
+        for var_name, value in global_patches.items():
+            patcher = patch.object(module, var_name, value)
+            patches.append(patcher)
+
+    return patches
+"""
+
+
+def patch_functions(
+    directory,
+    module_name: str,
+    function_dict: dict,
+    arg1=None,
+    arg2=None,
+    slice_lg=None,
+    global_patches: dict = None,
+):
+    if slice_lg is None:
+        slice_lg = 200
+
+    module = importlib.import_module(directory + "." + module_name)
+    patches = []
+
+    # Only try to patch if there are functions to patch
+    if function_dict and "patched_functions" in function_dict:
+        for func_name, provided_func in function_dict["patched_functions"].items():
+            # Skip if no function provided
+            if provided_func is None:
+                continue
+
+            # Create patch based on function type
+            if provided_func in [plt.scatter, plt.plot]:
+                patched_func = modify_args_decorator(slice_lg=slice_lg)(provided_func)
+                patcher = patch("matplotlib.pyplot." + func_name, new=patched_func)
+            else:
+                patcher = patch.object(module, func_name, new=provided_func)
+            patches.append(patcher)
 
     # Add global variable patches
     if global_patches:
@@ -305,7 +346,13 @@ def run_compute():
 
         # Only work with modification module
         patches = patch_functions(
-            directory, module_name, function_dict, arg1=None, arg2=None, slice_lg=nb_samples, global_patches=global_patches
+            directory,
+            module_name,
+            function_dict,
+            arg1=None,
+            arg2=None,
+            slice_lg=nb_samples,
+            global_patches=global_patches,
         )
         # patches = patch_functions(module_name, function_dict, arg1=data, arg2=labels, slice_lg=nb_samples)
 

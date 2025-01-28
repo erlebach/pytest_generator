@@ -38,6 +38,13 @@ from sklearn.model_selection import (
 from sklearn.tree import DecisionTreeClassifier
 from utils import PrintResults
 
+# These definitions guarantee that the variables are global and exist even if
+# the code is not run interactively.
+x_train = None
+y_train = None
+x_test = None
+y_test = None
+
 # ======================================================================
 seed = 42
 frac_train = 0.2
@@ -210,6 +217,9 @@ def part_1b(
     # The following line makes these variables global.
     global x_train, y_train, x_test, y_test  # noqa: PLW0603
 
+    print(f"\n\nBEFORE START of part_1c, {x_train.shape=}")
+    print(f"\n\nBEFORE START of part_1c, {x_test.shape=}")
+
     if x_train_ is not None:
         x_train = x_train_
     if y_train_ is not None:
@@ -221,12 +231,17 @@ def part_1b(
 
     # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
     # ==========================================
+    print(f"\n\nBEFORE START of part_1b, {x_train.shape=}")
+    print(f"\n\nBEFORE START of part_1b, {x_test.shape=}")
 
     x, y, x_test, y_test = u.prepare_data()
     x_train, y_train = u.filter_out_7_9s(x, y)
     x_test, y_test = u.filter_out_7_9s(x_test, y_test)
     x_train = nu.scale_data(x_train)
     x_test = nu.scale_data(x_test)
+
+    print(f"\n\nAFTER START of part_1b, {x_train.shape=}")
+    print(f"\n\nAFTER START of part_1b, {x_test.shape=}")
 
     answers = {}
 
@@ -311,7 +326,7 @@ def part_1c(
 
     # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
     # ==========================================
-
+    print(f"ENTERED part_1c, {x_train.shape=}, {x_test.shape=}")
     n_splits = 5
     clf = DecisionTreeClassifier(random_state=seed)
     cv = KFold(n_splits=n_splits, shuffle=True, random_state=seed)
@@ -656,14 +671,10 @@ def part_1f(
     variance_rf = answers["scores_RF"]["std_accuracy"] ** 2
 
     # The type is a string, one of "decision-tree" or "random-forest"
-    answers["model_highest_accuracy"] = (
-        "decision-tree" if score_dt > score_rf else "random-forest",
-    )
+    answers["model_highest_accuracy"] = "decision-tree" if score_dt > score_rf else "random-forest"
 
     # The type is a string, one of "decision-tree" or "random-forest"
-    answers["model_lowest_variance"] = (
-        "decision-tree" if variance_dt < variance_rf else "random-forest",
-    )
+    answers["model_lowest_variance"] = "decision-tree" if variance_dt < variance_rf else "random-forest"
 
     # The type is a string, one of "decision-tree" or "random-forest"
     answers["model_fastest"] = "decision-tree" if fit_time_dt < fit_time_rf else "random-forest"
@@ -883,9 +894,6 @@ def part_1g(
     # The type is a dict[str, Any]
     answers["default_parameters"] = default_parameters
 
-    # The type is a float
-    answers["mean_accuracy_cv"] = None
-
     # The answer type is a numpy.ndarray
     # Return the 2x2 confusion matrix computed from the predictions
     confusion_matrix_dict: dict[str, NDArray[np.int32]] = {}
@@ -893,7 +901,7 @@ def part_1g(
     confusion_matrix_dict["confusion_matrix_train_best"] = cm_train_pred_best
     confusion_matrix_dict["confusion_matrix_test_orig"] = cm_test_pred_orig
     confusion_matrix_dict["confusion_matrix_test_best"] = cm_test_pred_best
-    answers["confusion_matrix"] = confusion_matrix
+    answers["confusion_matrix"] = confusion_matrix_dict
 
     # compute: C11 + C22 / |C|_1  (accuracy based on confusion)
     # The answer type is a float

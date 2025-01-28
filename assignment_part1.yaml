@@ -92,11 +92,11 @@ questions:
     - id: scores_RF
       type: dict[str,float]
 
-    - id: clf_dT
+    - id: clf_DT
       type: DecisionTreeClassifier
       answer:
 
-    - id: cv_dT
+    - id: cv_DT
       type: ShuffleSplit
       answer:
 
@@ -112,17 +112,11 @@ questions:
     - id: model_fastest
       type: str
 
-
 - id: part_1g
   parts:
     - id: clf
       type: RandomForestClassifier
       answer:
-
-    - id: best_estimator
-      type: 
-      answer:
-      note: Best model. Can be obtained from GridSearchCV instance.
 
     - id: grid_search
       type: GridSearchCV
@@ -132,10 +126,6 @@ questions:
       type: dict[str,Any]
       answer:
       note: The parameters you started from
-
-    - id: mean_accuracy_cv
-      type: dict[str,float]
-      answer:
 
     - id: confusion_matrix
       type: dict[str,ndarray]
@@ -151,3 +141,4 @@ questions:
 
 
 #----------------------------------------------------------------------
+
