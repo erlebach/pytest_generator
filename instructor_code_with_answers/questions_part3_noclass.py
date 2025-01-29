@@ -29,6 +29,7 @@ from sklearn.metrics import confusion_matrix, top_k_accuracy_score
 
 # Fill in the appropriate import statements from sklearn to solve the homework
 from sklearn.model_selection import StratifiedKFold, cross_validate
+from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC
 from sklearn.utils.class_weight import compute_class_weight
 from utils import Normalization
@@ -180,6 +181,7 @@ def part_3a(
         the top_k_accuracy score for k=1,2,3,4,5.
     Make a plot of k vs. score and comment on the rate of accuracy change.
     Do you think this metric is useful for this dataset?
+    Use all 10 classes for this part of the problem.
 
     """
     global x_train, y_train, x_test, y_test  # noqa: PLW0603
@@ -210,19 +212,43 @@ def part_3a(
 
     train_probs = best_estimator.predict_proba(x_train)
     test_probs = best_estimator.predict_proba(x_test)
+    # le = LabelEncoder()
+    # y_train_encoded = le.fit_transform(y_train)
+    # y_test_encoded = le.fit_transform(y_test)
 
     # Prepare for plotting
     k_list = [1, 2, 3, 4, 5]
     test_accuracy = []
     train_accuracy = []
 
+    class_order = best_estimator.classes_
+    print(f"{class_order=}")
+
+    # y_train, y_test have values 7 and 9
+
     topk_dict = {}
     for k in k_list:
-        train_score = top_k_accuracy_score(y_train, train_probs, k=k)
-        test_score = top_k_accuracy_score(y_test, test_probs, k=k)
+        # print("==>, topk_dict, k= ", k)
+        # print(f"{y_train.shape=}")
+        # print(f"{train_probs.shape=}")
+        # print(f"{y_train=}")
+        # print(f"{y_train_encoded=}")
+        # print(f"{train_probs=}")
+        train_score = top_k_accuracy_score(
+            y_train,
+            train_probs,
+            k=k,
+        )
+        print(f"{train_score=}")
+        test_score = top_k_accuracy_score(
+            y_test,
+            test_probs,
+            k=k,
+        )
+        print(f"{test_score=}")
         train_accuracy.append(train_score)
         test_accuracy.append(test_score)
-        topk_dict[k] = [train_score, test_score]
+        topk_dict[k] = [float(train_score), float(test_score)]
         print(f"{k=}, {train_score=}, {test_score=}")
 
     plt.plot(k_list, train_accuracy, label="Train Accuracy")
@@ -231,7 +257,7 @@ def part_3a(
     plt.ylabel("Accuracy")
     plt.title("Top-k Accuracy for k=1,2,3,4,5")
     plt.legend()
-    plt.savefig("top_k_accuracy.png")
+    plt.savefig("top_k_accuracy_part_3a.png")
 
     # Count the number of classes in the training and test sets
     count_train = np.unique(y_train, return_counts=True)
@@ -240,10 +266,10 @@ def part_3a(
     print(f"{count_test=}")
 
     # Check if the labels are integers
-    is_int = nu.check_labels(y)
+    is_int = nu.check_labels(y_train)
 
     # Analyze the class distribution
-    dist_dict = analyze_class_distribution(y)
+    dist_dict = analyze_class_distribution(y_train)
 
     # top-k accuracy score
     # ! y_pred is not defined
@@ -255,6 +281,9 @@ def part_3a(
     # The two floats are the train and test accuracy for the top-k accuracy score
     # Remember: order of the elements in a list matters
     answers["top_k_accuracy"] = topk_dict
+
+    print("==> part_3a, answers")
+    pprint(answers)
     print("exit part 3a")
 
     return answers  # ! , X, y, Xtest, ytest
@@ -274,6 +303,8 @@ def part_3b(
     This function filters the input dataset to retain only the classes 7 and 9,
     removes a specified fraction of the 9s, and convert the labels accordingly.
     It also prepares the test dataset in the same manner.
+
+    (other using 10 classes)?
 
     Parameters
     ----------
@@ -360,6 +391,8 @@ def part_3b(
     dct1["length_y_train"] = len(y_train)
     dct1["length_y_test"] = len(y_test)
     answers["number_of_samples"] = dct1
+    print("\n==> answers['number_of_samples']")
+    pprint(dct1)
 
     dct2: dict[str, float] = {}
     dct2["max_x_train"] = float(np.max(x_train))
@@ -460,6 +493,10 @@ def part_3c(
     # ==========================================
     # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
     # ==========================================
+    print("INSIDE partD")
+    print(f"{x_train.shape=}, {y_train.shape=}, {x_test.shape=}, {y_test.shape=}")
+    print(f"{y_test=}")
+
     class_weights = compute_class_weight(
         class_weight="balanced",
         classes=np.unique(y_train),
@@ -703,6 +740,7 @@ if __name__ == "__main__":
     y_train = y[0:n_train]
     y_test = y[n_train:]
 
+    # synthetic data with classes 0/1.
     (
         x_train,
         y_train,

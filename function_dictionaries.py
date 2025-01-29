@@ -1,8 +1,8 @@
 from functools import cache
 
+import instructor_code_with_answers.utils as u
 import matplotlib.pyplot as plt
 import numpy as np
-import utils as u
 from numpy.typing import NDArray
 
 # Address each question. Ideally, there should be a default question
@@ -15,11 +15,12 @@ module_name = {
     }
 }
 
+
 def remove_nines_convert_to_01(
     x: NDArray[np.floating],
     y: NDArray[np.int32],
     frac: float,
-    seed: int= 42,
+    seed: int = 42,
 ) -> tuple[
     NDArray[np.floating],
     NDArray[np.int32],
@@ -89,6 +90,7 @@ def initialize_globals_part1(ntrain: int = 1000, ntest: int = 200) -> tuple:
     )
     return x_train, y_train, x_test, y_test
 
+
 @cache
 def initialize_globals_part2(ntrain: int = 1000, ntest: int = 200) -> tuple:
     """Initialize globals with limited MNIST data."""
@@ -107,6 +109,7 @@ def initialize_globals_part2(ntrain: int = 1000, ntest: int = 200) -> tuple:
     )
     return x_train, y_train, x_test, y_test
 
+
 @cache
 def initialize_globals_part3(ntrain: int = 1000, ntest: int = 200) -> tuple:
     """Initialize globals with limited MNIST data."""
@@ -114,14 +117,21 @@ def initialize_globals_part3(ntrain: int = 1000, ntest: int = 200) -> tuple:
     print(
         f"initialize_globals_part3: x.shape={x.shape}, y.shape={y.shape}, x_test.shape={x_test.shape}, y_test.shape={y_test.shape}"
     )
+    # Reduce data size of MNIST data
+    ntrain = 12000
+    ntest = 2000
+    print(f"initialize_globals_part3: {ntrain=}, {ntest=}")
     x_train = x[:ntrain, :]
     y_train = y[:ntrain]
     x_test = x_test[:ntest, :]
     y_test = y_test[:ntest]
-    x_train, y_train = u.filter_out_7_9s(x_train, y_train)
-    x_test, y_test = u.filter_out_7_9s(x_test, y_test)
-    x_train, y_train = remove_nines_convert_to_01(x_train, y_train, frac=0.9)
-    x_test, y_test = remove_nines_convert_to_01(x_test, y_test, frac=0.9)
+    # x_train, y_train = u.filter_out_7_9s(x_train, y_train)
+    # x_test, y_test = u.filter_out_7_9s(x_test, y_test)
+    # x_train, y_train = remove_nines_convert_to_01(x_train, y_train, frac=0.9)
+    # x_test, y_test = remove_nines_convert_to_01(x_test, y_test, frac=0.9)
+    print(f"==> initialize_globals_part3: {len(x_train)=}, {len(y_train)=}")
+    print(f"==> initialize_globals_part3: {len(x_test)=}, {len(y_test)=}")
+    print(y_test)  # 0s and 1s
 
     print(
         f"initialize_globals_part3: x_train.shape={x_train.shape}, y_train.shape={y_train.shape}, x_test.shape={x_test.shape}, y_test.shape={y_test.shape}"
@@ -174,6 +184,9 @@ questions_part2_noclass = {
     "part_2c": {"patched_functions": {}},
 }
 
+ntrain = 60000
+ntest = 10000
+
 questions_part3_noclass = {
     "module_name": "questions_part3_noclass",
     "global_patches": {
@@ -187,7 +200,6 @@ questions_part3_noclass = {
     "part_3c": {"patched_functions": {}},
     "part_3d": {"patched_functions": {}},
 }
-
 
 
 all_questions = {
