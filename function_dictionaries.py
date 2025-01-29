@@ -15,6 +15,60 @@ module_name = {
     }
 }
 
+def remove_nines_convert_to_01(
+    x: NDArray[np.floating],
+    y: NDArray[np.int32],
+    frac: float,
+    seed: int= 42,
+) -> tuple[
+    NDArray[np.floating],
+    NDArray[np.int32],
+]:
+    """Remove a specified fraction of the 9s from the dataset and convert the labels.
+
+    Convert remaining 9s to 1, and all 7s to 0.
+
+    Parameters
+    ----------
+    x : NDArray[np.floating]
+        The feature matrix from which to remove 9s.
+    y : NDArray[np.int32]
+        The labels corresponding to the feature matrix.
+        y contains only 7s and 9s.
+    frac : float
+        The fraction of 9s to remove from the dataset (between 0 and 1).
+
+    Returns
+    -------
+    tuple: A tuple containing the modified feature matrix x and the updated labels y.
+
+    """
+    # Count the number of 9s in the array
+    num_nines = np.sum(y == 9)
+
+    # Calculate the number of 9s to remove (90% of the total number of 9s)
+    num_nines_to_remove = int(frac * num_nines)
+
+    # Identifying indices of 9s in y
+    indices_of_nines = np.where(y == 9)[0]
+
+    # Randomly selecting 30% of these indices
+    num_nines_to_remove = int(np.ceil(len(indices_of_nines) * frac))
+    rng = np.random.default_rng(seed)
+    indices_to_remove = rng.choice(
+        a=indices_of_nines,
+        size=num_nines_to_remove,
+        replace=False,
+    )
+
+    # Removing the selected indices from X and y
+    x = np.delete(x, indices_to_remove, axis=0)
+    y = np.delete(y, indices_to_remove)
+
+    y[y == 7] = 0
+    y[y == 9] = 1
+    return x, y
+
 
 # I NEED utils.py
 @cache
@@ -66,6 +120,9 @@ def initialize_globals_part3(ntrain: int = 1000, ntest: int = 200) -> tuple:
     y_test = y_test[:ntest]
     x_train, y_train = u.filter_out_7_9s(x_train, y_train)
     x_test, y_test = u.filter_out_7_9s(x_test, y_test)
+    x_train, y_train = remove_nines_convert_to_01(x_train, y_train, frac=0.9)
+    x_test, y_test = remove_nines_convert_to_01(x_test, y_test, frac=0.9)
+
     print(
         f"initialize_globals_part3: x_train.shape={x_train.shape}, y_train.shape={y_train.shape}, x_test.shape={x_test.shape}, y_test.shape={y_test.shape}"
     )

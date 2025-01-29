@@ -231,7 +231,6 @@ def part_1b(
     print(f"\n\nBEFORE START of part_1c, {x_train.shape=}")
     print(f"\n\nBEFORE START of part_1c, {x_test.shape=}")
 
-
     # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
     # ==========================================
     print(f"\n\nBEFORE START of part_1b, {x_train.shape=}")
@@ -265,12 +264,6 @@ def part_1b(
     dct2["max_x_test"] = float(np.max(x_test))
     answers["data_bounds"] = dct2
 
-    # The type should be NDArray[np.float32]
-    # These arrays are used for partC
-    # answers["x_train"] = x_train
-    # answers["y_train"] = y_train
-    # answers["x_test"] = x_test
-    # answers["y_test"] = y_test
     print("EXIT part_b")
     return answers
 
@@ -676,7 +669,9 @@ def part_1f(
     answers["model_highest_accuracy"] = "decision-tree" if score_dt > score_rf else "random-forest"
 
     # The type is a string, one of "decision-tree" or "random-forest"
-    answers["model_lowest_variance"] = "decision-tree" if variance_dt < variance_rf else "random-forest"
+    answers["model_lowest_variance"] = (
+        "decision-tree" if variance_dt < variance_rf else "random-forest"
+    )
 
     # The type is a string, one of "decision-tree" or "random-forest"
     answers["model_fastest"] = "decision-tree" if fit_time_dt < fit_time_rf else "random-forest"

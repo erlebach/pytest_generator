@@ -37,39 +37,67 @@ questions:
   parts:
     - id: number_of_samples
       type: dict[str,int]
-      answer:
 
     - id: data_bounds
       type: dict[str,float]
-      answer:
+
+    - id: class_counts
+      type: dct[str,int]
 
 - id: part_3c
   parts:
     - id: clf
-      type: DecisionTreeClassifier
-      answer:
+      type: SVC
 
     - id: cv
-      type: KFold
-      answer:
+      type: StratifiedKFold
 
-    - id: scores
+    - id: mean_metrics
       type: dict[str,float]
+
+    - id: std_metrics
+      type: dict[str,float]
+
+    - id: is_precision_higher_than_recall
+      type: bool
+
+    - id: is_precision_higher_than_recall_explain
+      type: explain_str
+
+    - id: confusion_matrix
+      type: ndarray
+
+    - id: weight_dict
+      type: dict[int,float]
 
 - id: part_3d
   parts:
     - id: clf
-      type: DecisionTreeClassifier
+      type: SVC
       answer:
 
     - id: cv
-      type: ShuffleSplit
+      type: StratifiedKFold
       answer:
 
     - id: scores
       type: dict[str,float]
       answer:
 
-    - id: explain_kfold_vs_shuffle_split
-      type: explain_str
+    - id: mean_metrics
+      type: dict[str,float]
 
+    - id: std_metrics
+      type: dict[str,float]
+
+    - id: confusion_matrix
+      type: ndarray
+
+    - id: weight_dict
+      type: dict[int,float]
+
+
+#537 FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3a_starter_code_int
+#538 FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3c_is_precision_higher_than_recall_bool
+#539 FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3c_is_precision_higher_than_recall_explain_explain_str
+#540 FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3d_scores_dict_lbrack_str_comma_float_rbrack

@@ -41,9 +41,11 @@ types_list = [
     #list[tuples[float]]
     # "dict",
     "DecisionTreeClassifier",
+    "RandomForestClassifier",
+    "StratifiedKFold",
+    "SVC",
     "KFold",
     "ShuffleSplit",
-    "RandomForestClassifier",
     "GridSearchCV",
     "LogisticRegression",
 ]

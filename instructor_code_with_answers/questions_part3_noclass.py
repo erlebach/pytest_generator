@@ -7,6 +7,7 @@
 # GPT on testing functions, mock functions, testing number of calls, and argument values
 # https://chat.openai.com/share/b3fd7739-b691-48f2-bb5e-0d170be4428c
 
+from pprint import pprint
 from typing import Any
 
 import matplotlib.pyplot as plt
@@ -292,7 +293,7 @@ def part_3b(
 
     Task
     ----
-    B. Repeat part 1.B but return an imbalanced dataset consisting of 99% of all 9s
+    B. Repeat part 1.B but return an imbalanced dataset consisting of 90% of all 9s
         removed.  Also convert the 7s to 0s and 9s to 1s.
 
     """
@@ -350,13 +351,36 @@ def part_3b(
     num_1s_train = np.sum(y_train == 1)
     num_0s_test = np.sum(y_test == 0)
     num_1s_test = np.sum(y_test == 1)
+
+    answers: dict[str, Any] = {}
+
+    dct1: dict[str, int] = {}
+    dct1["length_x_train"] = len(x_train)
+    dct1["length_x_test"] = len(x_test)
+    dct1["length_y_train"] = len(y_train)
+    dct1["length_y_test"] = len(y_test)
+    answers["number_of_samples"] = dct1
+
+    dct2: dict[str, float] = {}
+    dct2["max_x_train"] = float(np.max(x_train))
+    dct2["max_x_test"] = float(np.max(x_test))
+    answers["data_bounds"] = dct2
+
     print(f"{num_0s_train=}, {num_1s_train=}, {num_0s_train/num_1s_train=}")
     print(f"{num_0s_test=}, {num_1s_test=}, {num_0s_test/num_1s_test=}")
     print(f"{y.shape=}, {y_train.shape=}, {y_test.shape=}")
 
+    dct3: dict[str, float] = {}
+    dct3["num_0s_train"] = num_0s_train
+    dct3["num_1s_train"] = num_1s_train
+    dct3["num_0s_test"] = num_0s_test
+    dct3["num_1s_test"] = num_1s_test
+    answers["class_counts"] = dct3
+
+    print("return from part_3b")
+
     # Both the test set and the training set are imbalanced.
 
-    answers = {}
     return answers
 
 
@@ -480,14 +504,21 @@ def part_3c(
     answers = {}
     answers["cv"] = cv
     answers["clf"] = clf
-    answers["mean_F1"] = mean_f1
-    answers["mean_recall"] = mean_recall
-    answers["mean_accuracy"] = mean_accuracy
-    answers["mean_precision"] = mean_precision
-    answers["std_F1"] = std_f1
-    answers["std_recall"] = std_recall
-    answers["std_accuracy"] = std_accuracy
-    answers["std_precision"] = std_precision
+
+    # Cross-validation scores
+    mean_scores: dict[str, float] = {}
+    mean_scores["mean_F1"] = mean_f1
+    mean_scores["mean_recall"] = mean_recall
+    mean_scores["mean_accuracy"] = mean_accuracy
+    mean_scores["mean_precision"] = mean_precision
+    answers["mean_metrics"] = mean_scores
+
+    std_scores: dict[str, float] = {}
+    std_scores["std_F1"] = std_f1
+    std_scores["std_recall"] = std_recall
+    std_scores["std_accuracy"] = std_accuracy
+    std_scores["std_precision"] = std_precision
+    answers["std_metrics"] = std_scores
 
     # Type: bool
     answers["is_precision_higher_than_recall"] = mean_precision > mean_recall
@@ -496,6 +527,11 @@ def part_3c(
     # Type: 2x2 NDArray (np.array)
     answers["confusion_matrix"] = conf_mat  # 2 x 2 matrix
     answers["weight_dict"] = weight_dict
+
+    print(f"\n==> 3c: {mean_precision=}, {mean_recall=}")
+
+    print("\n==>return from part_3c")
+    pprint(answers)
 
     ## For testing, I can check the arguments of functions
     return answers
@@ -591,6 +627,15 @@ def part_3d(
         return_train_score=True,  # What does this do?
     )
 
+    mean_accuracy = scores["test_accuracy"].mean()
+    std_accuracy = scores["test_accuracy"].std()
+    mean_precision = scores["test_precision"].mean()
+    std_precision = scores["test_precision"].std()
+    mean_recall = scores["test_recall"].mean()
+    std_recall = scores["test_recall"].std()
+    mean_f1 = scores["test_f1"].mean()
+    std_f1 = scores["test_f1"].std()
+
     print("class_weights = ", class_weights)  # Dimension 2
     print("weight_dict = ", weight_dict)  # Dimension 2
 
@@ -606,22 +651,34 @@ def part_3d(
     answers = {}
     answers["cv"] = cv
     answers["clf"] = clf
-    answers["mean_F1"] = 0
-    answers["mean_recall"] = 0
-    answers["mean_accuracy"] = 0
-    answers["mean_precision"] = 0
-    answers["std_F1"] = 0
-    answers["std_recall"] = 0
-    answers["std_accuracy"] = 0
-    answers["std_precision"] = 0
+
+    # Cross-validation scores
+    mean_scores: dict[str, float] = {}
+    mean_scores["mean_F1"] = mean_f1
+    mean_scores["mean_recall"] = mean_recall
+    mean_scores["mean_accuracy"] = mean_accuracy
+    mean_scores["mean_precision"] = mean_precision
+    answers["mean_metrics"] = mean_scores
+
+    std_scores: dict[str, float] = {}
+    std_scores["std_F1"] = std_f1
+    std_scores["std_recall"] = std_recall
+    std_scores["std_accuracy"] = std_accuracy
+    std_scores["std_precision"] = std_precision
+    answers["std_metrics"] = std_scores
 
     # Type: bool
-    answers["is_precision_higher_than_recall"] = None  # True/False
+    print(f"==> {mean_precision=}, {mean_recall=}")
+    answers["is_precision_higher_than_recall"] = mean_precision > mean_recall
     answers["is_precision_higher_than_recall_explain"] = None  # String
 
     # Type: 2x2 NDArray (np.array)
-    answers["conf_mat"] = conf_mat
+    answers["confusion_matrix"] = conf_mat  # 2 x 2 matrix
     answers["weight_dict"] = weight_dict
+
+    print("\n==>return from part_3d")
+    pprint(answers)
+
     return answers
 
 

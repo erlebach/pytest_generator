@@ -3517,7 +3517,8 @@ def check_structure_bool(student_answer: bool) -> tuple[bool, str]:
             - str: Message explaining the validation result
 
     """
-    if not isinstance(student_answer, bool):
+    print(f"\n==> inside check_structure_bool, {student_answer=}")
+    if not isinstance(student_answer, (bool, np.bool_)):
         status = False
         msg = f"Answer must be of type 'bool'. Your answer is of type {type(student_answer)}."
         msg_list = [msg]
@@ -3804,6 +3805,28 @@ def check_answer_decisiontreeclassifier(
 ) -> tuple[bool, str]:
     pass
 
+# ======================================================================
+
+def check_structure_svc(student_answer) -> tuple[bool, str]:
+    from sklearn.svm import SVC
+    if not isinstance(student_answer, SVC):
+        status = False
+        msg = (
+            f"Answer must be of type 'SVC'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'SVC' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_svc(
+    student_answer, instructor_answer, local_vars_dict
+) -> tuple[bool, str]:
+    pass
 
 # ======================================================================
 def check_structure_kfold(student_answer) -> tuple[bool, str]:
@@ -3900,6 +3923,29 @@ def check_structure_kfold(student_answer) -> tuple[bool, str]:
 def check_answer_kfold(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
     pass
 
+
+# ======================================================================
+
+
+def check_structure_stratifiedkfold(student_answer) -> tuple[bool, str]:
+    from sklearn.model_selection import StratifiedKFold
+
+    if not isinstance(student_answer, StratifiedKFold):
+        status = False
+        msg = (
+            f"Answer must be of type 'StratifiedKFold'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'StratifiedKFold' as expected."]
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_stratifiedkfold(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+    pass
 
 # ======================================================================
 def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
