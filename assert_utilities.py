@@ -773,7 +773,7 @@ def check_structure_dict_str_list_int(
     # Check that all list elements are ints
     for v in student_answer.values():
         for e in v:
-            if not isinstance(e, int):
+            if not isinstance(e, int | np.integer):
                 msg_list.append(f"Element {e} of your list should be of type 'int'")
                 msg_list.append("Check all other list elements")
                 status = False
@@ -1513,7 +1513,7 @@ def check_structure_dict_str_set_int(
 
     if status:
         for k in keys:
-            if isinstance(student_answer[k], int):
+            if isinstance(student_answer[k], int | np.integer):
                 msg_list.append("All set elements must be type 'int'.")
 
     return status, "\n".join(msg_list)
@@ -1834,7 +1834,7 @@ def check_structure_dict_str_int(
         # keys not in the instructor set
         for k in instructor_answer:
             vs = student_answer[k]
-            if not isinstance(vs, int):
+            if not isinstance(vs, int | np.integer):
                 msg_list.append(f"- answer[{k!r}] should be a float.")
                 status = False
 
@@ -2061,7 +2061,7 @@ def check_structure_dict_tuple_int_ndarray(
 
     # Validate that each student answer key is a tuple of integers and value is a numpy array
     for s_key, s_value in student_answer.items():
-        if not isinstance(s_key, tuple) or any(not isinstance(el, int) for el in s_key):
+        if not isinstance(s_key, tuple) or any(not isinstance(el, int | np.integer) for el in s_key):
             status = False
             msg_list.append(f"Key {s_key} must be a tuple of integers")
         if not isinstance(s_value, np.ndarray):
@@ -2192,7 +2192,7 @@ def check_structure_dict_int_ndarray(
         status = False
 
     for key in student_answer:
-        if not isinstance(key, int):
+        if not isinstance(key, int | np.integer):
             status = False
             msg_list += [f"key {key} should be of type 'int', but is type {type(key).__name__}."]
 
@@ -2443,7 +2443,7 @@ def check_structure_dict_int_list_float(
 
     # Check all keys are integers
     for key in student_answer:
-        if not isinstance(key, int):
+        if not isinstance(key, int | np.integer):
             status = False
             msg_list.append(f"Key {key} must be of type 'int', but is type {type(key).__name__}")
 
@@ -2560,7 +2560,7 @@ def check_structure_list_int(
 
     if status:
         for s_arr in instructor_answer:
-            if not isinstance(s_arr, int):
+            if not isinstance(s_arr, int | np.integer):
                 status = False
                 msg_list.append("- Element {i} of your list should be of type 'int'.")
 
@@ -3450,7 +3450,7 @@ def check_structure_int(student_answer: int) -> tuple[bool, str]:
             - str: Message explaining the validation result
 
     """
-    if not isinstance(student_answer, int):
+    if not isinstance(student_answer, int | np.integer): 
         status = False
         msg = (
             f"Answer must be of type 'int'. Your answer is "

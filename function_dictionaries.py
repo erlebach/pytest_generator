@@ -184,6 +184,7 @@ questions_part2_noclass = {
     "part_2c": {"patched_functions": {}},
 }
 
+# Full dataset
 ntrain = 60000
 ntest = 10000
 

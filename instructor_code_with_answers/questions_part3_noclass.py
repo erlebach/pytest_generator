@@ -58,60 +58,6 @@ seed = 42
 frac_train = 0.8
 
 
-def remove_nines_convert_to_01(
-    x: NDArray[np.floating],
-    y: NDArray[np.int32],
-    frac: float,
-) -> tuple[
-    NDArray[np.floating],
-    NDArray[np.int32],
-]:
-    """Remove a specified fraction of the 9s from the dataset and convert the labels.
-
-    Convert remaining 9s to 1, and all 7s to 0.
-
-    Parameters
-    ----------
-    x : NDArray[np.floating]
-        The feature matrix from which to remove 9s.
-    y : NDArray[np.int32]
-        The labels corresponding to the feature matrix.
-        y contains only 7s and 9s.
-    frac : float
-        The fraction of 9s to remove from the dataset (between 0 and 1).
-
-    Returns
-    -------
-    tuple: A tuple containing the modified feature matrix x and the updated labels y.
-
-    """
-    # Count the number of 9s in the array
-    num_nines = np.sum(y == 9)
-
-    # Calculate the number of 9s to remove (90% of the total number of 9s)
-    num_nines_to_remove = int(frac * num_nines)
-
-    # Identifying indices of 9s in y
-    indices_of_nines = np.where(y == 9)[0]
-
-    # Randomly selecting 30% of these indices
-    num_nines_to_remove = int(np.ceil(len(indices_of_nines) * frac))
-    rng = np.random.default_rng(seed)
-    indices_to_remove = rng.choice(
-        a=indices_of_nines,
-        size=num_nines_to_remove,
-        replace=False,
-    )
-
-    # Removing the selected indices from X and y
-    x = np.delete(x, indices_to_remove, axis=0)
-    y = np.delete(y, indices_to_remove)
-
-    y[y == 7] = 0
-    y[y == 9] = 1
-    return x, y
-
-
 def analyze_class_distribution(
     y: NDArray[np.int32],
 ) -> dict[str, Any]:
@@ -342,40 +288,22 @@ def part_3b(
     # ==========================================
     # DO NOT CHANGE THE FUNCTION ABOVE THIS LINE
     # ==========================================
-
-    # Full dataset
-    x = np.concatenate((x_train, x_test), axis=0)
-    y = np.concatenate((y_train, y_test), axis=0)
-
-    print(f"{x.shape=}, {y.shape=}")
-    # Only keep 7s and 9s
-    seven_nine_idx = (y == 7) | (y == 9)  # empty
-    print(f"{seven_nine_idx.shape=}")
-    x = x[seven_nine_idx, :]
-    y = y[seven_nine_idx]
-    print(f"{x.shape=}")
-    print(f"{y.shape=}")
-
-    # Remove 90% of 9s. Convert 7s to 0s and 9s to 1s.
-    frac_to_remove = 0.90
-    x, y = remove_nines_convert_to_01(
-        x,
-        y,
-        frac=frac_to_remove,
+    print("\n\n PART 3B")
+    print(f"{x_train.shape=}, {y_train.shape=}, {x_test.shape=}, {y_test.shape=}")
+    x_train, y_train, x_test, y_test = u.prepare_data()
+    print("ABOUT to call u.prepare_and_filter_data")
+    (
+        x_train,
+        y_train,
+        x_test,
+        y_test,
+    ) = u.prepare_and_filter_data(
+        x_train,
+        y_train,
+        x_test,
+        y_test,
     )
-
-    # Compute number of 0s and 1s in y
-    num_0s = np.sum(y == 0)
-    num_1s = np.sum(y == 1)
-    print(f"{num_0s=}, {num_1s=}")
-    print(f"{x.shape=}, {y.shape=}")
-
-    num_train = int(0.8 * len(x))
-    num_test = len(x) - num_train
-    x_train = x[:num_train, :]
-    y_train = y[:num_train]
-    x_test = x[num_train : num_train + num_test, :]
-    y_test = y[num_train : num_train + num_test]
+    print("EXIT u.prepare_and_filter_data")
 
     # Check the number of 0s and 1s in the training and test sets
     num_0s_train = np.sum(y_train == 0)
@@ -403,7 +331,7 @@ def part_3b(
     print(f"{num_0s_test=}, {num_1s_test=}, {num_0s_test/num_1s_test=}")
     print(f"{y.shape=}, {y_train.shape=}, {y_test.shape=}")
 
-    dct3: dict[str, float] = {}
+    dct3: dict[str, int] = {}
     dct3["num_0s_train"] = num_0s_train
     dct3["num_1s_train"] = num_1s_train
     dct3["num_0s_test"] = num_0s_test
@@ -497,17 +425,28 @@ def part_3c(
     print(f"{x_train.shape=}, {y_train.shape=}, {x_test.shape=}, {y_test.shape=}")
     print(f"{y_test=}")
 
-    class_weights = compute_class_weight(
-        class_weight="balanced",
-        classes=np.unique(y_train),
-        y=y_train,
+    (
+        x_train,
+        y_train,
+        x_test,
+        y_test,
+    ) = u.prepare_and_filter_data(
+        x_train,
+        y_train,
+        x_test,
+        y_test,
     )
-    weight_dict = dict(
-        zip(np.unique(y_train), class_weights, strict=True),
-    )
+    print(f"part_3c: {x_train.shape=}, {y_train.shape=}, {x_test.shape=}, {y_test.shape=}")
+
+    # ----
     print(f"{class_weights=}")
     print(f"{weight_dict=}")
-    n_splits = 5
+    n_splits = 2  # with less splits, less chance of a NaN recall, orig: 5
+
+    # =====================================================================
+
+    # =====================================================================
+
     clf = SVC(random_state=seed)
     cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed)
     scores = cross_validate(
@@ -798,6 +737,7 @@ if __name__ == "__main__":
     print(f"after part_3c, {x_train.shape=}, {y_train.shape=}")
     print(f"after part_3c, {x_test.shape=}, {y_test.shape=}")
     print(f"after part_3c, {x.shape=}, {y.shape=}")
+    quit()
 
     print("============================================")
     all_answers["part_3d"] = part_3d()
