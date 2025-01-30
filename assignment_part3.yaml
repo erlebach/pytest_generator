@@ -95,12 +95,7 @@ questions:
     - id: weight_dict
       type: dict[int,float]
 
-
-#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3a_starter_code_int - ValueError: `y_true` is binary while y_score is 2d with 2 classes. If `y_true` does not contain all the labels, `labels` must be provided.
-
-#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3b_number_of_samples_dict_lbrack_str_comma_int_rbrack - ValueError: zero-size array to reduction operation maximum which has no identity
-#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3b_data_bounds_dict_lbrack_str_comma_float_rbrack - ValueError: zero-size array to reduction operation maximum which has no identity
-#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3b_class_counts_dct_lbrack_str_comma_int_rbrack - ValueError: zero-size array to reduction operation maximum which has no identity
-#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3c_is_precision_higher_than_recall_explain_explain_str - assert False
-#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3d_scores_dict_lbrack_str_comma_float_rbrack - assert False
-
+========================================================================================= short test summary info ==========================================================================================
+FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3c_is_precision_higher_than_recall_explain_explain_str - assert False
+FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3c_weight_dict_dict_lbrack_int_comma_float_rbrack - assert False
+FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3d_scores_dict_lbrack_str_comma_float_rbrack - assert False

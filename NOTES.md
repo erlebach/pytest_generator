@@ -179,3 +179,5 @@ possible. I have applied `chmod 000` to all instances of `assert_utilities.py` t
 inaccurate paths. 
 - IMPORTANT: make sure to import pytest last! This module somehow modifies the order of paths. 
 ----------------------------------------------------------------------
+2025-01-30
+- When the code slows down a lot, it could be because of nan, or because of datasets that are very large. 
