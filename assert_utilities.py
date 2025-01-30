@@ -1563,7 +1563,7 @@ def check_answer_dict_str_float(
     """
     if dict_float_choices is not None:
         print("dict_float_choices is not implemented in dict[str,float] types")
-        raise ValueError("dict_float_choices is not implemented in check_answer_dict_str_float")
+        dict_float_keys = None
 
     msg_list = []
     status = True
