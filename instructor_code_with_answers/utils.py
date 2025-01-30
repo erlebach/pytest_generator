@@ -4,6 +4,7 @@ import pickle
 from enum import Enum
 from pathlib import Path
 
+import new_utils as nu
 import numpy as np
 import utils as u
 from numpy.typing import NDArray
@@ -152,6 +153,7 @@ def prepare_data(
     y = y.astype(np.int32)
     x_train, x_test = x[:num_train], x[num_train : num_train + num_test]
     y_train, y_test = y[:num_train], y[num_train : num_train + num_test]
+    print("prepare_data before return")
     return x_train, y_train, x_test, y_test
 
 
@@ -235,6 +237,157 @@ def filter_out_7_9s(
     x_binary = x[seven_nine_idx, :]
     y_binary = y[seven_nine_idx]
     return x_binary, y_binary
+
+
+# ----------------------------------------------------------------------
+
+
+def remove_nines_convert_to_01(
+    x: NDArray[np.floating],
+    y: NDArray[np.int32],
+    frac: float,
+) -> tuple[
+    NDArray[np.floating],
+    NDArray[np.int32],
+]:
+    """Remove a specified fraction of the 9s from the dataset and convert the labels.
+
+    Convert remaining 9s to 1, and all 7s to 0.
+
+    Parameters
+    ----------
+    x : NDArray[np.floating]
+        The feature matrix from which to remove 9s.
+    y : NDArray[np.int32]
+        The labels corresponding to the feature matrix.
+        y contains only 7s and 9s.
+    frac : float
+        The fraction of 9s to remove from the dataset (between 0 and 1).
+
+    Returns
+    -------
+    tuple: A tuple containing the modified feature matrix x and the updated labels y.
+
+    """
+    # Count the number of 9s in the array
+    num_nines = np.sum(y == 9)
+
+    # Calculate the number of 9s to remove (90% of the total number of 9s)
+    num_nines_to_remove = int(frac * num_nines)
+
+    # Identifying indices of 9s in y
+    indices_of_nines = np.where(y == 9)[0]
+
+    # Randomly selecting 30% of these indices
+    num_nines_to_remove = int(np.ceil(len(indices_of_nines) * frac))
+    seed = 42  # ! for reproducibility. Hardcoded for now.
+    rng = np.random.default_rng(seed)
+    indices_to_remove = rng.choice(
+        a=indices_of_nines,
+        size=num_nines_to_remove,
+        replace=False,
+    )
+
+    # Removing the selected indices from X and y
+    x = np.delete(x, indices_to_remove, axis=0)
+    y = np.delete(y, indices_to_remove)
+
+    y[y == 7] = 0
+    y[y == 9] = 1
+    return x, y
+
+
+# ----------------------------------------------------------------------
+def prepare_and_filter_data(
+    x_train: NDArray[np.floating],
+    y_train: NDArray[np.int32],
+    x_test: NDArray[np.floating],
+    y_test: NDArray[np.int32],
+) -> tuple[
+    NDArray[np.floating],
+    NDArray[np.int32],
+    NDArray[np.floating],
+    NDArray[np.int32],
+]:
+    """Prepare and filter the data.
+
+    Parameters
+    ----------
+    x_train : NDArray[np.floating]
+        Training data matrix
+    y_train : NDArray[np.int32]
+        Training labels array
+    x_test : NDArray[np.floating]
+        Testing data matrix
+    y_test : NDArray[np.int32]
+        Testing labels array
+
+    Returns
+    -------
+    tuple[NDArray[np.floating], NDArray[np.int32], NDArray[np.floating], NDArray[np.int32]]
+        x_train : Training data matrix
+        y_train : Training labels array
+        x_test : Testing data matrix
+        y_test : Testing labels array
+
+    """
+    print("\n\n before u.prepare_and_filter_data", flush=True)
+    # x_train, y_train, x_test, y_test = prepare_data()
+    print("after prepare_data", flush=True)
+    x_train, y_train = filter_out_7_9s(x_train, y_train)
+    x_test, y_test = filter_out_7_9s(x_test, y_test)
+    print("after filter_out_7_9s", flush=True)
+    x_train = nu.scale_data(x_train)
+    x_test = nu.scale_data(x_test)
+    print("after scale_data")
+    num_train = len(x_train)
+    num_test = len(x_test)
+
+    print("\n\n u.prepare_and_filter_data")
+    # Full dataset
+    x = np.concatenate((x_train, x_test), axis=0)
+    y = np.concatenate((y_train, y_test), axis=0)
+
+    # ----
+    print(f"=> utils: {x.shape=}, {y.shape=}", flush=True)
+    # Only keep 7s and 9s
+    seven_nine_idx = (y == 7) | (y == 9)  # empty
+    print(f"=> utils: {seven_nine_idx.shape=}")
+    x = x[seven_nine_idx, :]
+    y = y[seven_nine_idx]
+    print(f"=> utils: {x.shape=}")
+    print(f"=> utils: {y.shape=}")
+
+    # Remove 90% of 9s. Convert 7s to 0s and 9s to 1s.
+    frac_to_remove = 0.90
+    x, y = remove_nines_convert_to_01(
+        x,
+        y,
+        frac=frac_to_remove,
+    )
+
+    print(f"utils after remove_nines_convert_to_01: {x.shape=}")
+    print(f"utils after remove_nines_convert_to_01: {y.shape=}")
+
+    # Compute number of 0s and 1s in y
+    num_0s = np.sum(y == 0)
+    num_1s = np.sum(y == 1)
+    print(f"{num_0s=}, {num_1s=}")
+    print(f"{x.shape=}, {y.shape=}")
+
+    num_train = int(0.8 * len(x))
+    num_test = len(x) - num_train
+    # ----
+
+    x_train = x[:num_train, :]
+    y_train = y[:num_train]
+    x_test = x[num_train : num_train + num_test, :]
+    y_test = y[num_train : num_train + num_test]
+
+    return x_train, y_train, x_test, y_test
+
+
+# ----------------------------------------------------------------------
 
 
 def train_simple_classifier_with_cv(
