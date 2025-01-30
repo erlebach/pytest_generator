@@ -6,11 +6,8 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-# Check if the argument has a .yaml extension
-if [[ $1 == *.yaml ]]; then
-    echo "Error: The argument should not have a .yaml extension."
-    exit 1
-fi
+# Remove .yaml extension if present
+filename=${1%.yaml}
 
 # $1 is the yaml file or yaml files (without the extention)
-./generate_homework_tests.x $1
+./generate_homework_tests.x "$filename"

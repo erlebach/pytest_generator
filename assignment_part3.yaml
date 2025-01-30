@@ -1,0 +1,106 @@
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 20
+module: questions_part3_noclass
+
+# choices: instructor_file, student_file, yaml_file
+
+# Folders are relative to the base project folder
+#student_folder_name: student_github_template
+student_folder_name: student_code_with_answers
+instructor_folder_name: instructor_code_with_answers
+
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixure arguments in a list
+    args: [questions_part3_noclass]
+
+questions:
+- id: part_3a
+  parts:
+    - id: top_k_accuracy
+      type: dict[int,list[float]]
+
+- id: part_3b
+  parts:
+    - id: number_of_samples
+      type: dict[str,int]
+
+    - id: data_bounds
+      type: dict[str,float]
+
+    - id: class_counts
+      type: dct[str,int]
+
+- id: part_3c
+  parts:
+    - id: clf
+      type: SVC
+
+    - id: cv
+      type: StratifiedKFold
+
+    - id: mean_metrics
+      type: dict[str,float]
+
+    - id: std_metrics
+      type: dict[str,float]
+
+    - id: is_precision_higher_than_recall
+      type: bool
+
+    - id: is_precision_higher_than_recall_explain
+      type: explain_str
+
+    - id: confusion_matrix
+      type: ndarray
+
+    - id: weight_dict
+      type: dict[int,float]
+
+- id: part_3d
+  parts:
+    - id: clf
+      type: SVC
+      answer:
+
+    - id: cv
+      type: StratifiedKFold
+      answer:
+
+    - id: scores
+      type: dict[str,float]
+      answer:
+
+    - id: mean_metrics
+      type: dict[str,float]
+
+    - id: std_metrics
+      type: dict[str,float]
+
+    - id: confusion_matrix
+      type: ndarray
+
+    - id: weight_dict
+      type: dict[int,float]
+
+
+#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3a_starter_code_int - ValueError: `y_true` is binary while y_score is 2d with 2 classes. If `y_true` does not contain all the labels, `labels` must be provided.
+
+#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3b_number_of_samples_dict_lbrack_str_comma_int_rbrack - ValueError: zero-size array to reduction operation maximum which has no identity
+#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3b_data_bounds_dict_lbrack_str_comma_float_rbrack - ValueError: zero-size array to reduction operation maximum which has no identity
+#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3b_class_counts_dct_lbrack_str_comma_int_rbrack - ValueError: zero-size array to reduction operation maximum which has no identity
+#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3c_is_precision_higher_than_recall_explain_explain_str - assert False
+#FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3d_scores_dict_lbrack_str_comma_float_rbrack - assert False
+

@@ -1,0 +1,144 @@
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 20
+module: questions_part1_noclass
+
+# choices: instructor_file, student_file, yaml_file
+
+# Folders are relative to the base project folder
+#student_folder_name: student_github_template
+student_folder_name: student_code_with_answers
+instructor_folder_name: instructor_code_with_answers
+
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixure arguments in a list
+    args: [questions_part1_noclass]
+
+questions:
+- id: part_1a
+  parts:
+    - id: starter_code
+      type: int
+      answer: 100
+
+- id: part_1b
+  parts:
+    - id: number_of_samples
+      type: dict[str,int]
+      answer:
+
+    - id: data_bounds
+      type: dict[str,float]
+      answer:
+
+- id: part_1c
+  parts:
+    - id: clf
+      type: DecisionTreeClassifier
+      answer:
+
+    - id: cv
+      type: KFold
+      answer:
+
+    - id: scores
+      type: dict[str,float]
+
+- id: part_1d
+  parts:
+    - id: clf
+      type: DecisionTreeClassifier
+      answer:
+
+    - id: cv
+      type: ShuffleSplit
+      answer:
+
+    - id: scores
+      type: dict[str,float]
+      answer:
+
+    - id: explain_kfold_vs_shuffle_split
+      type: explain_str
+
+- id: part_1e
+  parts:
+    - id: scores
+      type: dict[int,dict[str,Any]]
+      answer:
+
+- id: part_1f
+  parts:
+    - id: clf_RF
+      type: RandomForestClassifier
+      answer:
+
+    - id: cv_RF
+      type: ShuffleSplit
+      answer:
+
+    - id: scores_RF
+      type: dict[str,float]
+
+    - id: clf_DT
+      type: DecisionTreeClassifier
+      answer:
+
+    - id: cv_DT
+      type: ShuffleSplit
+      answer:
+
+    - id: scores_DT
+      type: dict[str,float]
+
+    - id: model_highest_accuracy
+      type: str
+
+    - id: model_lowest_variance
+      type: str
+
+    - id: model_fastest
+      type: str
+
+- id: part_1g
+  parts:
+    - id: clf
+      type: RandomForestClassifier
+      answer:
+
+    - id: grid_search
+      type: GridSearchCV
+      answer:
+
+    - id: default_parameters
+      type: dict[str,Any]
+      answer:
+      note: The parameters you started from
+
+    - id: confusion_matrix
+      type: dict[str,ndarray]
+      answer:
+
+    - id: accuracy_full_training
+      type: dict[str,float]
+      answer:
+
+    - id: precision_full_training
+      type: dict[str,float]
+      answer:
+
+
+#----------------------------------------------------------------------
+
