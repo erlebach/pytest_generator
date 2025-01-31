@@ -2540,8 +2540,43 @@ def check_answer_dict_int_float(
     student_answer: dict[int, float],
     instructor_answer: dict[int, float],
     rel_tol: float,
+    partial_score_frac_l: list[float],
 ) -> tuple[bool, str]:
-    pass
+    """Check if student answer matches instructor answer for dict[int, float] type.
+
+    Compares student and instructor answers that are dictionaries with integer keys and float values.
+    Checks that float values match within the specified relative tolerance.
+
+    Args:
+        student_answer (dict[int, float]): Student's submitted answer
+        instructor_answer (dict[int, float]): Instructor's reference answer
+        rel_tol (float): Relative tolerance for comparing float values
+        partial_score_frac_l (list[float]): List to store partial score fraction
+
+    Returns:
+        tuple[bool, str]: A tuple containing:
+            - bool: True if answers match within tolerance, False otherwise
+            - str: Message explaining any mismatches
+
+    """
+    status = True
+    msg_list = []
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(instructor_answer)
+    for key, i_val in instructor_answer.items():
+        s_val = student_answer.get(key)
+        status_, msg = check_float(i_val, s_val, rel_tol, abs_tol=1.0e-4)
+        msg_list.append(msg)
+        if status_ is False:
+            status = False
+            ps_dict["nb_mismatches"] += 1
+    try:
+        print(f"==> {ps_dict=}")
+        partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        print("ZeroDivisionError in check_answer_dict_int_float. TO FIX.")
+        partial_score_frac_l[0] = 1.0
+    return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # ======================================================================
@@ -2578,7 +2613,7 @@ def check_answer_list_int(
     if not status:
         msg_list.append("Some elements are incorrect")
 
-    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatch"] / ps_dict["nb_total"]
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -2693,7 +2728,7 @@ def check_answer_list_float(
     if monotone_increasing:
         partial_score_frac[0] = 1.0
     else:
-        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatch"] / ps_dict["nb_total"]
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
