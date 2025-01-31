@@ -390,6 +390,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
                 test_code += "    local_namespace.update({'array': np.array, 'assert_utilities': assert_utilities, 'student_answer': student_answer, 'instructor_answer': correct_answer, 'keys':keys})\n"
 
+                print("********")
                 local_vars_dict = part.get("locals", None)
                 test_code += add_attribute("local_vars_dict", local_vars_dict)
 

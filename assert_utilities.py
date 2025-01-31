@@ -107,7 +107,7 @@ def check_float(
         status = True
     else:
         status = False
-        msg = f"Student element {s_el} has rel error > {100*rel_tol}% "
+        msg = f"Student element {s_el} has rel error > {100 * rel_tol}% "
         msg += f"relative to instructor element {i_el}"
     return status, msg
 
@@ -659,6 +659,13 @@ def check_answer_eval_float(
     Returns:
         tuple[bool, str]: The status and message
 
+    Notes:
+        - local_vars_dict is a dictionary that maps variable names to their allowed
+          value ranges (as tuples of lower and upper bounds). These ranges are used
+          to randomly generate test values for variables in both the student's and
+          instructor's expressions, allowing the function to compare their results
+          across multiple random inputs.
+
     """
     msg_list = []
     status = True
@@ -890,7 +897,7 @@ def check_answer_dict_str_dict_str_float(
                     msg_list_.extend(
                         [
                             f"Student answer ({student_answer[k]}) is within rel error ",  # noqa: E501
-                            f"of {rel_tol*100}%% of one of the accepted answers ({val})",  # noqa: E501
+                            f"of {rel_tol * 100}%% of one of the accepted answers ({val})",  # noqa: E501
                         ],
                     )
                     break
@@ -2757,10 +2764,7 @@ def check_structure_list_float(
 
     if not isinstance(student_answer, list):
         status = False
-        msg = (
-            f"- The answer should be of type 'list'; your type is "
-            f"{type(student_answer).__name__}"
-        )
+        msg = f"- The answer should be of type 'list'; your type is {type(student_answer).__name__}"
         msg_list.append(msg)
     else:
         msg = "- The answer is type list. Correct."
@@ -3085,7 +3089,7 @@ def check_answer_list_list_float(
             status = status_
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-    msg_list.append(f"Answer correct if relative error < {rel_tol*100} percent")
+    msg_list.append(f"Answer correct if relative error < {rel_tol * 100} percent")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -3555,8 +3559,7 @@ def check_structure_int(student_answer: int) -> tuple[bool, str]:
     if not isinstance(student_answer, int | np.integer):
         status = False
         msg = (
-            f"Answer must be of type 'int'. Your answer is "
-            f"of type {type(student_answer).__name__}."
+            f"Answer must be of type 'int'. Your answer is of type {type(student_answer).__name__}."
         )
         msg_list = [msg]
     else:
@@ -3908,8 +3911,7 @@ def check_structure_svc(student_answer) -> tuple[bool, str]:
     if not isinstance(student_answer, SVC):
         status = False
         msg = (
-            f"Answer must be of type 'SVC'. Your answer is "
-            f"of type {type(student_answer).__name__}."
+            f"Answer must be of type 'SVC'. Your answer is of type {type(student_answer).__name__}."
         )
         msg_list = [msg]
     else:
@@ -3919,8 +3921,43 @@ def check_structure_svc(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_svc(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
-    pass
+def check_answer_svc(
+    student_answer,
+    instructor_answer,
+) -> tuple[bool, str]:
+    """Check if student's SVC classifier matches instructor's.
+
+    Args:
+        student_answer: Student's SVC classifier
+        instructor_answer: Instructor's SVC classifier
+        local_vars_dict: Optional dictionary of local variables (not used)
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing any mismatches
+    """
+    status = True
+    msg_list = []
+
+    # Check core parameters
+    params_to_check = ["kernel", "C", "random_state"]
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
+
+    # Check kernel-specific parameters if using non-linear kernel
+    # if student_answer.kernel == "rbf":
+    #     if student_answer.gamma != instructor_answer.gamma:
+    #         status = False
+    #         msg_list.append(
+    #             f"Parameter 'gamma' mismatch: expected {instructor_answer.gamma}, got {student_answer.gamma}"
+    #         )
+
+    return status, "\n".join(msg_list) if msg_list else "SVC parameters match expected values"
 
 
 # ======================================================================
@@ -4040,9 +4077,38 @@ def check_structure_stratifiedkfold(student_answer) -> tuple[bool, str]:
 
 
 def check_answer_stratifiedkfold(
-    student_answer, instructor_answer, local_vars_dict
+    student_answer,
+    instructor_answer,
 ) -> tuple[bool, str]:
-    pass
+    """Check if student's StratifiedKFold matches instructor's.
+
+    Args:
+        student_answer: Student's StratifiedKFold object
+        instructor_answer: Instructor's StratifiedKFold object
+        local_vars_dict: Optional dictionary of local variables (not used)
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+
+    """
+    status = True
+    msg_list = []
+
+    # Check core parameters
+    params_to_check = ["n_splits", "shuffle", "random_state"]
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
+
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "StratifiedKFold parameters match expected values"
 
 
 # ======================================================================
