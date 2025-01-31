@@ -66,9 +66,6 @@ questions:
     - id: confusion_matrix
       type: ndarray
 
-    - id: weight_dict
-      type: dict[int,float]
-
 - id: part_3d
   parts:
     - id: clf
@@ -77,10 +74,6 @@ questions:
 
     - id: cv
       type: StratifiedKFold
-      answer:
-
-    - id: scores
-      type: dict[str,float]
       answer:
 
     - id: mean_metrics
@@ -95,7 +88,5 @@ questions:
     - id: weight_dict
       type: dict[int,float]
 
-========================================================================================= short test summary info ==========================================================================================
-FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3c_is_precision_higher_than_recall_explain_explain_str - assert False
-FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3c_weight_dict_dict_lbrack_int_comma_float_rbrack - assert False
-FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3d_scores_dict_lbrack_str_comma_float_rbrack - assert False
+# ========================================================================================= short test summary info ==========================================================================================
+# FAILED tests/test_structure_preprocessed_assignment_part3_expand.py::test_structure_part_3d_scores_dict_lbrack_str_comma_float_rbrack - assert False

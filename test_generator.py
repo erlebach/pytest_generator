@@ -438,6 +438,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
             else:
                 test_code += f"    print('type {part['type']} NOT HANDLED!')\n"
+                test_code +=  "    assert False\n"
 
             if assert_false:
                 test_code += f"    assert False\n"

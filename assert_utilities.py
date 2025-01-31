@@ -1601,9 +1601,7 @@ def check_answer_dict_str_float(
 def check_answer_dict_str_int(
     student_answer: dict[str, int],
     instructor_answer: dict[str, int],
-    keys: list[str] | None = None,
-    dict_int_choices: dict[str, int] | None = None,
-    partial_score_frac: list[int] = [0.0],
+    partial_score_frac: list[float] = [0.0],
 ) -> tuple[bool, str]:
     """Check if a student's dictionary of strings answer matches the instructor's answer.
 
@@ -2061,7 +2059,9 @@ def check_structure_dict_tuple_int_ndarray(
 
     # Validate that each student answer key is a tuple of integers and value is a numpy array
     for s_key, s_value in student_answer.items():
-        if not isinstance(s_key, tuple) or any(not isinstance(el, int | np.integer) for el in s_key):
+        if not isinstance(s_key, tuple) or any(
+            not isinstance(el, int | np.integer) for el in s_key
+        ):
             status = False
             msg_list.append(f"Key {s_key} must be a tuple of integers")
         if not isinstance(s_value, np.ndarray):
@@ -2475,6 +2475,61 @@ def check_structure_dict_int_list_float(
         msg_list.append("Answer has correct structure: dict[int, list[float]]")
 
     return status, "\n".join(msg_list)
+
+
+# ======================================================================
+def check_structure_dict_int_float(
+    student_answer: dict[int, float],
+    instructor_answer: dict[int, float],
+) -> tuple[bool, str]:
+    """Check if student answer matches expected structure of dict[int, float].
+
+    Verifies that:
+    1. Student answer is a dictionary
+    2. All dictionary keys are integers
+    3. All dictionary values are floats
+    4. Student answer contains all required keys from instructor answer
+
+    Args:
+        student_answer (dict[int, float]): The student's submitted answer
+        instructor_answer (dict[int, float]): The instructor's correct answer
+
+    Returns:
+        tuple[bool, str]: A tuple containing:
+            - bool: True if answer has correct structure, False otherwise
+            - str: Message explaining any validation failures
+
+    """
+    status = True
+    msg_list = []
+
+    if not isinstance(student_answer, dict):
+        msg_list.append("Answer must be a dict")
+        return False, "\n".join(msg_list)
+
+    # Check that all instructor keys are present
+    for key in instructor_answer:
+        if key not in student_answer:
+            status = False
+            msg_list.append(f"Key {key} is missing from student answer")
+
+    for key, value in student_answer.items():
+        if not isinstance(key, int | np.integer):
+            msg_list.append(f"Key {key} must be of type 'int', but is type {type(key).__name__}")
+        if not isinstance(value, float | np.floating):
+            msg_list.append(
+                f"Value for key {key} must be a float, but is type {type(value).__name__}"
+            )
+
+    return status, "\n".join(msg_list)
+
+
+def check_answer_dict_int_float(
+    student_answer: dict[int, float],
+    instructor_answer: dict[int, float],
+    rel_tol: float,
+) -> tuple[bool, str]:
+    pass
 
 
 # ======================================================================
@@ -3450,7 +3505,7 @@ def check_structure_int(student_answer: int) -> tuple[bool, str]:
             - str: Message explaining the validation result
 
     """
-    if not isinstance(student_answer, int | np.integer): 
+    if not isinstance(student_answer, int | np.integer):
         status = False
         msg = (
             f"Answer must be of type 'int'. Your answer is "
