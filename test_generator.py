@@ -76,6 +76,9 @@ def create_config_dict():
     config_dict["exclude_indices"] = (
         config.get("types", {}).get("list[string]", {}).get("exclude_indices", [])
     )
+    config_dict["exclude_keys"] = (
+        config.get("types", {}).get("list[string]", {}).get("exclude_keys", [])
+    )
     config_dict["include_indices"] = (
         config.get("types", {}).get("list[string]", {}).get("include_indices", [])
     )
@@ -330,7 +333,15 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 )
                 test_code += f"    exclude_indices = {exclude_indices}\n"
                 test_code += (
-                    f"    local_namespace['exclude_indices'] = exclude_indices\n"
+                    "    local_namespace['exclude_indices'] = exclude_indices\n"
+                )
+
+                exclude_keys = part.get(
+                    "exclude_keys", config_dict["exclude_keys"]
+                )
+                test_code += f"    exclude_keys = {exclude_keys}\n"
+                test_code += (
+                    "    local_namespace['exclude_keys'] = exclude_keys\n"
                 )
 
                 # indices to include from grading for list[float]

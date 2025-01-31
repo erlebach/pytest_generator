@@ -49,4 +49,7 @@ types_list = [
     "ShuffleSplit",
     "GridSearchCV",
     "LogisticRegression",
+    "dict[str,any]",
+    "dict[int,dict[str,any]]",
 ]
+# dict[str,any]: must be able to compare with equality

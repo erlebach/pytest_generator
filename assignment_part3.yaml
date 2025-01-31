@@ -89,9 +89,10 @@ questions:
       type: dict[int,float]
 
 # ========================================================================================= short test summary info ==========================================================================================
-# FAILED tests/test_answers_preprocessed_assignment_part3_expand.py::test_answers_part_3c_clf_SVC - NameError: name 'local_vars_dict' is not defined
-# FAILED tests/test_answers_preprocessed_assignment_part3_expand.py::test_answers_part_3c_cv_StratifiedKFold - NameError: name 'local_vars_dict' is not defined
-# FAILED tests/test_answers_preprocessed_assignment_part3_expand.py::test_answers_part_3d_clf_SVC - NameError: name 'local_vars_dict' is not defined
-# FAILED tests/test_answers_preprocessed_assignment_part3_expand.py::test_answers_part_3d_cv_StratifiedKFold - NameError: name 'local_vars_dict' is not defined
-# FAILED tests/test_answers_preprocessed_assignment_part3_expand.py::test_answers_part_3d_weight_dict_dict_lbrack_int_comma_float_rbrack - TypeError: check_answer_dict_int_float() takes 3 positional arguments but 4 were given
-# ========================= 7 failed, 10 passed in 6.40s =========================
+
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1c_scores_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1d_scores_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1e_scores_dict_lbrack_int_comma_dict_lbrack_str_comma_Any_rbrack_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1f_scores_RF_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1f_scores_DT_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1g_default_parameters_dict_lbrack_str_comma_Any_rbrack - assert False

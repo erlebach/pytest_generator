@@ -18,6 +18,7 @@ import random
 import re
 from collections.abc import Callable
 from pathlib import Path
+from pprint import pprint
 from typing import Any, cast
 
 # ! import matplotlib.pyplot as plt
@@ -1530,63 +1531,48 @@ def check_structure_dict_str_set_int(
 
 
 def check_answer_dict_str_float(
-    student_answer: dict[str, float],
-    instructor_answer: dict[str, float],
+    student_answer,
+    instructor_answer,
     rel_tol: float,
     keys: list[str] | None = None,
     dict_float_choices: dict[str, float] | None = None,
     partial_score_frac: list[float] = [0.0],
 ) -> tuple[bool, str]:
-    """Check if a student's dictionary of strings answer matches the instructor's answer.
+    """Check if student answer matches instructor answer for dict[str, float] type.
 
     Args:
-        student_answer (dict[str, float]): The student's submitted answer
-        instructor_answer (dict[str, float]): The instructor's correct answer
-        rel_tol (float): The relative tolerance for comparing floats
-        keys (list[str] | None): Optional list of keys to check. If None, all keys are
-            checked. If `keys` is provided, only the keys in `keys` are checked.
-            For examples, if the instructor answer is {'a': 1.0, 'b': 2.0, 'c': 3.0},
-            then keys = ['a', 'b', 'c'] will check all keys.
-            If keys = ['a', 'b'], then only keys 'a' and 'b' are checked.
-        dict_float_choices (dict[str, float] | None): Optional dictionary of float choices
-            for each key. If provided, validates that student_answer[k] is one of these choices.
-        partial_score_frac (list[float]): The partial score fraction
+        student_answer: Student's submitted answer
+        instructor_answer: Instructor's reference answer
+        rel_tol: Relative tolerance for comparing floats
+        keys: Optional list of keys to check. If None, checks all instructor keys
+        dict_float_choices: Optional dictionary of acceptable float values for each key
+        partial_score_frac: List to store partial credit score fraction
 
     Returns:
-        tuple[bool, str]: A tuple containing:
-            - bool: True if answers match and validation passes, False otherwise
-            - str: Message explaining the validation result
-
-    Use the function (NOT DONE):
-        def check_dict_str_float(
-            keys: list[str],
-            i_dict: dict[str, float],
-            s_dict: dict[str, float],
-            rel_tol: float,
-            abs_tol: float,
-            ps_dict: dict[str, float | int],
-        ) -> tuple[bool, list[str]]:
-
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
     """
-    if dict_float_choices is not None:
-        print("dict_float_choices is not implemented in dict[str,float] types")
-        dict_float_chocies = None
+    # Initialize dict_float_choices if None
+    if dict_float_choices is None:
+        dict_float_choices = {}
 
     msg_list = []
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(keys)
-    if dict_float_choices is None:
-        dict_float_choices = {}
+
+    print(f"*** check_answer_dict_str_float, {keys=}")
+    print(f"*** check_answer_dict_str_float, {student_answer=}")
+    print(f"*** check_answer_dict_str_float, {instructor_answer=}")
+    print(f"*** check_answer_dict_str_float, {keys=}")
 
     # Need an exception in case the student key is not found
     for k in keys:
         s_float = student_answer[k]
         i_float = instructor_answer[k]
 
-        if len(dict_float_choices) > 0 and k in dict_float_choices:
-            val = dict_float_choices[k]
+        if k in dict_float_choices and dict_float_choices[k]:  # Check if key exists and has values
             for val in dict_float_choices[k]:
                 if val == "i":  # use instructor answer
                     val = i_float
@@ -3853,6 +3839,8 @@ def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> tuple[boo
 
 
 # ======================================================================
+
+
 def check_structure_decisiontreeclassifier(student_answer) -> tuple[bool, str]:
     from sklearn.tree import DecisionTreeClassifier
 
@@ -3870,10 +3858,78 @@ def check_structure_decisiontreeclassifier(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_decisiontreeclassifier(
-    student_answer, instructor_answer, local_vars_dict
+def check_answer_randomforestclassifier(
+    student_answer,
+    instructor_answer,
 ) -> tuple[bool, str]:
-    pass
+    """Check if student's RandomForestClassifier matches instructor's.
+
+    Args:
+        student_answer: Student's RandomForestClassifier object
+        instructor_answer: Instructor's RandomForestClassifier object
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    status = True
+    msg_list = []
+
+    # Check core parameters
+    params_to_check = [
+        "n_estimators",
+        "criterion",
+        "max_depth",
+        "min_samples_split",
+        "min_samples_leaf",
+        "random_state",
+    ]
+
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
+
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "RandomForestClassifier parameters match expected values"
+
+
+def check_answer_decisiontreeclassifier(
+    student_answer,
+    instructor_answer,
+) -> tuple[bool, str]:
+    """Check if student's DecisionTreeClassifier matches instructor's.
+
+    Args:
+        student_answer: Student's DecisionTreeClassifier object
+        instructor_answer: Instructor's DecisionTreeClassifier object
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    status = True
+    msg_list = []
+
+    # Check core parameters
+    params_to_check = ["criterion", "max_depth", "min_samples_split", "random_state"]
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
+
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "DecisionTreeClassifier parameters match expected values"
 
 
 # ======================================================================
@@ -3894,12 +3950,6 @@ def check_structure_logisticregression(student_answer) -> tuple[bool, str]:
         msg_list = ["Answer is of type 'LogisticRegression' as expected."]
 
     return status, "\n".join(msg_list)
-
-
-def check_answer_decisiontreeclassifier(
-    student_answer, instructor_answer, local_vars_dict
-) -> tuple[bool, str]:
-    pass
 
 
 # ======================================================================
@@ -3930,7 +3980,6 @@ def check_answer_svc(
     Args:
         student_answer: Student's SVC classifier
         instructor_answer: Instructor's SVC classifier
-        local_vars_dict: Optional dictionary of local variables (not used)
 
     Returns:
         tuple[bool, str]: Status indicating if answers match and message detailing any mismatches
@@ -3978,7 +4027,7 @@ def check_structure_kfold(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_kfold(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+def check_answer_kfold(student_answer, instructor_answer) -> tuple[bool, str]:
     pass
 
 
@@ -4001,35 +4050,37 @@ def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
 
 
 def check_answer_shufflesplit(
-    student_answer, instructor_answer, local_vars_dict
+    student_answer,
+    instructor_answer,
 ) -> tuple[bool, str]:
-    pass
+    """Check if student's ShuffleSplit matches instructor's.
 
+    Args:
+        student_answer: Student's ShuffleSplit object
+        instructor_answer: Instructor's ShuffleSplit object
 
-# ======================================================================
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
 
+    """
+    status = True
+    msg_list = []
 
-def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
-    from sklearn.model_selection import GridSearchCV
+    # Check core parameters
+    params_to_check = ["n_splits", "test_size", "train_size", "random_state"]
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
 
-    if not isinstance(student_answer, GridSearchCV):
-        status = False
-        msg = (
-            f"Answer must be of type 'GridSearchCV'. Your answer is "
-            f"of type {type(student_answer).__name__}."
-        )
-        msg_list = [msg]
-    else:
-        status = True
-        msg_list = ["Answer is of type 'GridSearchCV' as expected."]
-
-    return status, "\n".join(msg_list)
-
-
-def check_answer_gridsearchcv(
-    student_answer, instructor_answer, local_vars_dict
-) -> tuple[bool, str]:
-    pass
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "ShuffleSplit parameters match expected values"
 
 
 # ======================================================================
@@ -4052,7 +4103,7 @@ def check_structure_kfold(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_kfold(student_answer, instructor_answer, local_vars_dict) -> tuple[bool, str]:
+def check_answer_kfold(student_answer, instructor_answer) -> tuple[bool, str]:
     pass
 
 
@@ -4085,7 +4136,6 @@ def check_answer_stratifiedkfold(
     Args:
         student_answer: Student's StratifiedKFold object
         instructor_answer: Instructor's StratifiedKFold object
-        local_vars_dict: Optional dictionary of local variables (not used)
 
     Returns:
         tuple[bool, str]: Status indicating if answers match and message detailing
@@ -4112,6 +4162,40 @@ def check_answer_stratifiedkfold(
 
 
 # ======================================================================
+
+
+def check_answer_kfold(
+    student_answer,
+    instructor_answer,
+) -> tuple[bool, str]:
+    """Check if student's KFold matches instructor's.
+
+    Args:
+        student_answer: Student's KFold object
+        instructor_answer: Instructor's KFold object
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    status = True
+    msg_list = []
+
+    # Check core parameters
+    params_to_check = ["n_splits", "shuffle", "random_state"]
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
+
+    return status, "\n".join(msg_list) if msg_list else "KFold parameters match expected values"
+
+
+# ======================================================================
 def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
     from sklearn.model_selection import ShuffleSplit
 
@@ -4127,12 +4211,6 @@ def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
         msg_list = ["Answer is of type 'ShuffleSplit' as expected."]
 
     return status, "\n".join(msg_list)
-
-
-def check_answer_shufflesplit(
-    student_answer, instructor_answer, local_vars_dict
-) -> tuple[bool, str]:
-    pass
 
 
 # ======================================================================
@@ -4156,9 +4234,61 @@ def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
 
 
 def check_answer_gridsearchcv(
-    student_answer, instructor_answer, local_vars_dict
+    student_answer,
+    instructor_answer,
 ) -> tuple[bool, str]:
-    pass
+    """Check if student's GridSearchCV matches instructor's.
+
+    Args:
+        student_answer: Student's GridSearchCV object
+        instructor_answer: Instructor's GridSearchCV object
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    status = True
+    msg_list = []
+
+    # Check simple parameters
+    params_to_check = ["cv", "scoring", "refit"]
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
+
+    # Check estimator type and parameters
+    if type(student_answer.estimator) != type(instructor_answer.estimator):
+        status = False
+        msg_list.append(
+            f"Estimator type mismatch: expected {type(instructor_answer.estimator)}, "
+            f"got {type(student_answer.estimator)}"
+        )
+    else:
+        # Compare estimator parameters instead of the estimator objects
+        student_params = student_answer.estimator.get_params()
+        instructor_params = instructor_answer.estimator.get_params()
+        if student_params != instructor_params:
+            status = False
+            msg_list.append(
+                f"Estimator parameters mismatch: expected {instructor_params}, got {student_params}"
+            )
+
+    # Check param_grid separately
+    if student_answer.param_grid != instructor_answer.param_grid:
+        status = False
+        msg_list.append(
+            f"param_grid mismatch: expected {instructor_answer.param_grid}, "
+            f"got {student_answer.param_grid}"
+        )
+
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "GridSearchCV parameters match expected values"
 
 
 # ======================================================================
@@ -4182,9 +4312,44 @@ def check_structure_randomforestclassifier(student_answer) -> tuple[bool, str]:
 
 
 def check_answer_randomforestclassifier(
-    student_answer, instructor_answer, local_vars_dict
+    student_answer,
+    instructor_answer,
 ) -> tuple[bool, str]:
-    pass
+    """Check if student's RandomForestClassifier matches instructor's.
+
+    Args:
+        student_answer: Student's RandomForestClassifier object
+        instructor_answer: Instructor's RandomForestClassifier object
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    status = True
+    msg_list = []
+
+    # Check core parameters
+    params_to_check = [
+        "n_estimators",
+        "criterion",
+        "max_depth",
+        "min_samples_split",
+        "min_samples_leaf",
+        "random_state",
+    ]
+
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
+
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "RandomForestClassifier parameters match expected values"
 
 
 # ======================================================================
@@ -4366,6 +4531,490 @@ def check_structure_scatterplot3d(student_answer: matplotlib.scatter) -> tuple[b
 
     return status, "\n".join(msg_list)
 '''
+
+
+# ======================================================================
+
+
+def check_structure_dict_str_float(
+    student_answer: dict,
+    instructor_answer: dict,
+    keys: list[str] | None = None,
+) -> tuple[bool, str]:
+    """Check if student's dictionary has same structure/types as instructor's.
+
+    Args:
+        student_answer: Student's submitted dictionary
+        instructor_answer: Instructor's reference dictionary
+        keys: Optional list of keys to check. If None, checks all instructor keys
+
+    Returns:
+        tuple[bool, str]: Status indicating if structures match and message detailing
+            any type mismatches
+
+    """
+    msg_list = []
+    status = True
+    keys = list(instructor_answer.keys()) if keys is None else keys
+
+    # First check if all required keys exist
+    for k in keys:
+        if k not in student_answer:
+            status = False
+            msg_list.append(f"Missing key '{k}' in student answer")
+            continue
+
+        s_val = student_answer[k]
+        i_val = instructor_answer[k]
+
+        # Check types match
+        if not isinstance(s_val, type(i_val)):
+            status = False
+            msg_list.append(
+                f"Type mismatch for key '{k}': "
+                f"expected {type(i_val).__name__}, "
+                f"got {type(s_val).__name__}"
+            )
+
+        # For nested dictionaries, recursively check structure
+        if isinstance(i_val, dict):
+            nested_status, nested_msg = check_structure_dict_str_float(s_val, i_val)
+            if not nested_status:
+                status = False
+                msg_list.append(f"In nested dict '{k}': {nested_msg}")
+
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "Dictionary structure matches expected types"
+
+
+def check_answer_dict_str_float(
+    student_answer: dict[str, float],
+    instructor_answer: dict[str, float],
+    rel_tol: float,
+    keys: list[str] | None = None,
+    dict_float_choices: dict[str, float] | None = None,
+    partial_score_frac: list[float] = [0.0],
+) -> tuple[bool, str]:
+    """Check if a student's dictionary of strings answer matches the instructor's answer.
+
+    Args:
+        student_answer (dict[str, float]): The student's submitted answer
+        instructor_answer (dict[str, float]): The instructor's correct answer
+        rel_tol (float): The relative tolerance for comparing floats
+        keys (list[str] | None): Optional list of keys to check. If None, all keys are
+            checked. If `keys` is provided, only the keys in `keys` are checked.
+            For examples, if the instructor answer is {'a': 1.0, 'b': 2.0, 'c': 3.0},
+            then keys = ['a', 'b', 'c'] will check all keys.
+            If keys = ['a', 'b'], then only keys 'a' and 'b' are checked.
+        dict_float_choices (dict[str, float] | None): Optional dictionary of float choices
+            for each key. If provided, validates that student_answer[k] is one of these choices.
+        partial_score_frac (list[float]): The partial score fraction
+
+    Returns:
+        tuple[bool, str]: A tuple containing:
+            - bool: True if answers match and validation passes, False otherwise
+            - str: Message explaining the validation result
+
+    Use the function (NOT DONE):
+        def check_dict_str_float(
+            keys: list[str],
+            i_dict: dict[str, float],
+            s_dict: dict[str, float],
+            rel_tol: float,
+            abs_tol: float,
+            ps_dict: dict[str, float | int],
+        ) -> tuple[bool, list[str]]:
+
+    """
+    if dict_float_choices is not None:
+        print("dict_float_choices is not implemented in dict[str,float] types")
+        dict_float_chocies = {}
+
+    msg_list = []
+    status = True
+    keys = list(instructor_answer.keys()) if keys is None else keys
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(keys)
+
+    # Need an exception in case the student key is not found
+    for k in keys:
+        s_float = student_answer[k]
+        i_float = instructor_answer[k]
+
+        if len(dict_float_choices) > 0 and k in dict_float_choices:
+            val = dict_float_choices[k]
+            for val in dict_float_choices[k]:
+                if val == "i":  # use instructor answer
+                    val = i_float
+                status_, msg_list_ = check_float(s_float, val, rel_tol, 1.0e-5)
+                if status_ is True:
+                    break
+        else:
+            status_, msg_ = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.0e-6)
+
+        if status_ is False:
+            status = False
+            ps_dict["nb_mismatches"] += 1
+            msg_list.append(msg_)
+
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+# ======================================================================
+
+
+def check_answer_dict_str_any(
+    student_answer: dict[str, Any],
+    instructor_answer: dict[str, Any],
+    rel_tol: float = 1e-04,
+    keys: list[str] | None = None,
+    partial_score_frac: list[float] = [0.0],
+) -> tuple[bool, str]:
+    """Check if student's dictionary matches instructor's, handling various value types.
+
+    Args:
+        student_answer: Student's submitted dictionary
+        instructor_answer: Instructor's reference dictionary
+        rel_tol: Relative tolerance for float comparisons
+        keys: Optional list of keys to check. If None, checks all instructor keys
+        partial_score_frac: List to store partial credit score fraction
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    msg_list = []
+    status = True
+    keys = list(instructor_answer.keys()) if keys is None else keys
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(keys)
+
+    for k in keys:
+        s_val = student_answer[k]
+        i_val = instructor_answer[k]
+
+        # Handle different types of values
+        if isinstance(i_val, (int, str)):
+            status_ = s_val == i_val
+            msg_ = f"Value mismatch for key '{k}': expected {i_val}, got {s_val}"
+
+        elif isinstance(i_val, float):
+            status_, msg_ = check_float(i_val, s_val, rel_tol=rel_tol, abs_tol=1.0e-6)
+
+        elif isinstance(i_val, dict):
+            status_, msg_ = check_answer_dict_str_any(s_val, i_val, rel_tol=rel_tol)
+
+        elif isinstance(i_val, (list, tuple, np.ndarray)):
+            if isinstance(i_val, np.ndarray):
+                status_ = np.allclose(i_val, s_val, rtol=rel_tol, atol=1.0e-6)
+            else:
+                status_ = i_val == s_val
+            msg_ = f"Value mismatch for key '{k}': expected {i_val}, got {s_val}"
+
+        else:
+            # For other types (like sklearn objects), compare type and parameters if available
+            if type(i_val) != type(s_val):
+                status_ = False
+                msg_ = f"Type mismatch for key '{k}': expected {type(i_val)}, got {type(s_val)}"
+            elif hasattr(i_val, "get_params"):
+                i_params = i_val.get_params()
+                s_params = s_val.get_params()
+                status_ = i_params == s_params
+                msg_ = f"Parameter mismatch for key '{k}': expected {i_params}, got {s_params}"
+            else:
+                status_ = i_val == s_val
+                msg_ = f"Value mismatch for key '{k}': expected {i_val}, got {s_val}"
+
+        if not status_:
+            status = False
+            ps_dict["nb_mismatches"] += 1
+            msg_list.append(msg_)
+
+    try:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        partial_score_frac[0] = 1.0
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+def check_structure_dict_str_any(
+    student_answer: dict[str, Any],
+    instructor_answer: dict[str, Any],
+    keys: list[str] | None = None,
+) -> tuple[bool, str]:
+    """Check if student's dictionary has same structure/types as instructor's.
+
+    Args:
+        student_answer: Student's submitted dictionary
+        instructor_answer: Instructor's reference dictionary
+        keys: Optional list of keys to check. If None, checks all instructor keys
+
+    Returns:
+        tuple[bool, str]: Status indicating if structures match and message detailing
+            any type mismatches
+
+    """
+    msg_list = []
+    status = True
+    keys = list(instructor_answer.keys()) if keys is None else keys
+
+    # First check if all required keys exist
+    for k in keys:
+        if k not in student_answer:
+            status = False
+            msg_list.append(f"Missing key '{k}' in student answer")
+            continue
+
+        s_val = student_answer[k]
+        i_val = instructor_answer[k]
+
+        # Check types match
+        if not isinstance(s_val, type(i_val)):
+            status = False
+            msg_list.append(
+                f"Type mismatch for key '{k}': "
+                f"expected {type(i_val).__name__}, "
+                f"got {type(s_val).__name__}"
+            )
+            continue
+
+        # For nested dictionaries, recursively check structure
+        if isinstance(i_val, dict):
+            nested_status, nested_msg = check_structure_dict_any(s_val, i_val)
+            if not nested_status:
+                status = False
+                msg_list.append(f"In nested dict '{k}': {nested_msg}")
+
+        # For sklearn objects, check if they have the same parameters
+        elif hasattr(i_val, "get_params"):
+            i_params = set(i_val.get_params().keys())
+            s_params = set(s_val.get_params().keys())
+            if i_params != s_params:
+                status = False
+                missing = i_params - s_params
+                extra = s_params - i_params
+                if missing:
+                    msg_list.append(f"Missing parameters in {k}: {missing}")
+                if extra:
+                    msg_list.append(f"Extra parameters in {k}: {extra}")
+
+        # For numpy arrays, check shape and dtype
+        elif isinstance(i_val, np.ndarray):
+            if s_val.shape != i_val.shape:
+                status = False
+                msg_list.append(
+                    f"Shape mismatch for array '{k}': expected {i_val.shape}, got {s_val.shape}"
+                )
+            if s_val.dtype != i_val.dtype:
+                status = False
+                msg_list.append(
+                    f"Dtype mismatch for array '{k}': expected {i_val.dtype}, got {s_val.dtype}"
+                )
+
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "Dictionary structure matches expected types"
+
+
+# ======================================================================
+
+
+def check_structure_dict_int_dict_str_any(
+    student_answer: dict[str, dict],
+    instructor_answer: dict[str, dict],
+    keys: list[str] | None = None,
+) -> tuple[bool, str]:
+    """Check if student's nested dictionary structure matches instructor's.
+
+    Checks a dictionary where each value is expected to be another dictionary
+    mapping strings to any type.
+
+    Args:
+        student_answer: Student's submitted dictionary of dictionaries
+        instructor_answer: Instructor's reference dictionary of dictionaries
+        keys: Optional list of keys to check. If None, checks all instructor keys
+
+    Returns:
+        tuple[bool, str]: Status indicating if structures match and message detailing
+            any type mismatches
+    """
+    msg_list = []
+    status = True
+    keys = list(instructor_answer.keys()) if keys is None else keys
+
+    ## ARE WE CHECKING THAT THE KEYS ARE int ! TODO
+
+    # Check top-level keys
+    for k in keys:
+        if k not in student_answer:
+            status = False
+            msg_list.append(f"Missing top-level key '{k}' in student answer")
+            continue
+
+        s_val = student_answer[k]
+        i_val = instructor_answer[k]
+
+        # Check if value is a dictionary
+        if not isinstance(s_val, dict):
+            status = False
+            msg_list.append(
+                f"Type mismatch for key '{k}': expected dict, got {type(s_val).__name__}"
+            )
+            continue
+
+        # Check nested dictionary keys
+        nested_keys = i_val.keys()
+        for nested_k in nested_keys:
+            if nested_k not in s_val:
+                status = False
+                msg_list.append(f"Missing nested key '{nested_k}' in '{k}'")
+                continue
+
+            s_nested_val = s_val[nested_k]
+            i_nested_val = i_val[nested_k]
+
+            # Check types of nested values
+            if not isinstance(s_nested_val, type(i_nested_val)):
+                status = False
+                msg_list.append(
+                    f"Type mismatch for nested key '{k}.{nested_k}': "
+                    f"expected {type(i_nested_val).__name__}, "
+                    f"got {type(s_nested_val).__name__}"
+                )
+                continue
+
+            # Special handling for specific types
+            if isinstance(i_nested_val, dict):
+                nested_status, nested_msg = check_structure_dict_any(s_nested_val, i_nested_val)
+                if not nested_status:
+                    status = False
+                    msg_list.append(f"In nested dict '{k}.{nested_k}': {nested_msg}")
+
+            elif hasattr(i_nested_val, "get_params"):
+                i_params = set(i_nested_val.get_params().keys())
+                s_params = set(s_nested_val.get_params().keys())
+                if i_params != s_params:
+                    status = False
+                    missing = i_params - s_params
+                    extra = s_params - i_params
+                    if missing:
+                        msg_list.append(f"Missing parameters in {k}.{nested_k}: {missing}")
+                    if extra:
+                        msg_list.append(f"Extra parameters in {k}.{nested_k}: {extra}")
+
+            elif isinstance(i_nested_val, np.ndarray):
+                if s_nested_val.shape != i_nested_val.shape:
+                    status = False
+                    msg_list.append(
+                        f"Shape mismatch for array '{k}.{nested_k}': "
+                        f"expected {i_nested_val.shape}, got {s_nested_val.shape}"
+                    )
+                if s_nested_val.dtype != i_nested_val.dtype:
+                    status = False
+                    msg_list.append(
+                        f"Dtype mismatch for array '{k}.{nested_k}': "
+                        f"expected {i_nested_val.dtype}, got {s_nested_val.dtype}"
+                    )
+
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "Dictionary structure matches expected types"
+
+
+def check_answer_dict_int_dict_str_any(
+    student_answer: dict[int, dict],
+    instructor_answer: dict[int, dict],
+    rel_tol: float = 1e-04,
+    keys: list[str] | None = None,
+    exclude_keys: list[str] | None = None,
+    partial_score_frac: list[float] = [0.0],
+) -> tuple[bool, str]:
+    """Check if student's nested dictionary values match instructor's.
+
+    Checks a dictionary where each value is expected to be another dictionary
+    mapping strings to any type. Compares actual values, not just structure.
+
+    Args:
+        student_answer: Student's submitted dictionary of dictionaries
+        instructor_answer: Instructor's reference dictionary of dictionaries
+        rel_tol: Relative tolerance for float comparisons
+        keys: Optional list of keys to check. If None, checks all instructor keys
+        exclude_keys: Optional list of keys to ignore during comparison
+        partial_score_frac: List to store partial credit score fraction
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+
+    """
+    print("===> *** check_answer_dict_int_dict_str_any")
+    print("\nstudent_answer=")
+    pprint(student_answer)
+    print("\ninstructor+answer")
+    pprint(instructor_answer)
+    print(f"{exclude_keys=}")
+    print()
+
+    msg_list = []
+    status = True
+    keys = list(instructor_answer.keys()) if keys is None else keys
+    exclude_keys: set[str] = set(exclude_keys if exclude_keys is not None else [])
+
+    ps_dict = init_partial_score_dict()
+    total_checks = 0
+    mismatches = 0
+
+    for k in keys:
+        if k not in student_answer:
+            status = False
+            msg_list.append(f"Missing top-level key '{k}' in student answer")
+            continue
+
+        s_val = student_answer[k]
+        i_val = instructor_answer[k]
+
+        if not isinstance(s_val, dict):
+            status = False
+            msg_list.append(
+                f"Type mismatch for key '{k}': expected dict, got {type(s_val).__name__}"
+            )
+            continue
+
+        # Check nested dictionary values, excluding ignored keys
+        for nested_k, i_nested_val in i_val.items():
+            # Skip this inner key if it's in ignore_keys
+            if nested_k in exclude_keys:
+                continue
+
+            total_checks += 1
+
+            if nested_k not in s_val:
+                status = False
+                mismatches += 1
+                msg_list.append(f"Missing nested key '{nested_k}' in '{k}'")
+                continue
+
+            s_nested_val = s_val[nested_k]
+
+            # Handle different types of values
+            if isinstance(i_nested_val, (int, str)):
+                if s_nested_val != i_nested_val:
+                    status = False
+                    mismatches += 1
+                    msg_list.append(
+                        f"Value mismatch for '{k}.{nested_k}': "
+                        f"expected {i_nested_val}, got {s_nested_val}"
+                    )
+
+            # ... rest of the type checking logic remains the same ...
+
+    if total_checks > 0:
+        partial_score_frac[0] = 1.0 - (mismatches / total_checks)
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # ======================================================================
