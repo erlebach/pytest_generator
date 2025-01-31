@@ -57,10 +57,14 @@ def create_config_dict():
     config_dict["dict_float_choices"] = config.get("types", {}).get(
         "dict_float_choices", {}
     )
+    config_dict["dict_int_choices"] = config.get("types", {}).get(
+        "dict_int_choices", {}
+    )
     config_dict["partial_score_frac"] = config.get("all_tests", {}).get(
         "partial_score_frac", {}
     )
     print(f"{config_dict['partial_score_frac']=}")
+    print(f"{config_dict['dict_int_choices']=}")
 
     config_dict["remove_spaces"] = config_dict.get("option_defaults", {}).get(
         "remove_spaces", False
@@ -126,7 +130,7 @@ with open('type_handlers.yaml', 'r') as f:
 
 def generate_test_answers_code(questions_data, sim_type, output_file="test_answers.py"):
     global rel_tol, abs_tol, exclude_indices, include_indices
-    global str_choices, dict_float_choices
+    global str_choices, dict_float_choices, dict_int_choices
 
     # Fill in data from configuration file from the 'all_tests' section
     """
@@ -305,6 +309,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 rel_tol = part.get("rel_tol", config_dict["rel_tol"])
                 abs_tol = part.get("abs_tol", config_dict["abs_tol"])
                 str_choices = part.get("str_choices", config_dict["str_choices"])
+                dict_int_choices = part.get(
+                    "dict_int_choices", config_dict["dict_int_choices"]
+                )
                 dict_float_choices = part.get(
                     "dict_float_choices", config_dict["dict_float_choices"]
                 )
@@ -343,18 +350,22 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += add_attribute("str_choices", str_choices)
                 test_code += add_attribute("monotone_increasing", monotone_increasing)
 
+                if part_type in ["dict[str,int]"]:
+                    test_code += f"    dict_int_choices = {dict_int_choices}\n"
+                    test_code +=  "    local_namespace['dict_int_choices'] = dict_int_choices\n"
+
                 if part_type in ["dict[str,float]", "dict[str,dict[str,float]]"]:
                     test_code += f"    dict_float_choices = {dict_float_choices}\n"
-                    test_code += f"    local_namespace['dict_float_choices'] = dict_float_choices\n"
+                    test_code +=  "    local_namespace['dict_float_choices'] = dict_float_choices\n"
 
                 if part_type in ["str", "dict[str,float]", "list[str]"]:
                     test_code += f"    remove_spaces = {remove_spaces}\n"
                     test_code += (
-                        f"    local_namespace['remove_spaces'] = remove_spaces\n"
+                         "    local_namespace['remove_spaces'] = remove_spaces\n"
                     )
 
-                test_code += f"    local_namespace['rel_tol'] = rel_tol\n"
-                test_code += f"    local_namespace['abs_tol'] = abs_tol\n"
+                test_code +=  "    local_namespace['rel_tol'] = rel_tol\n"
+                test_code +=  "    local_namespace['abs_tol'] = abs_tol\n"
 
                 strg = f"type_handlers['types']['{part_type}']['assert_answer']"
 

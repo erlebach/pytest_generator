@@ -213,6 +213,7 @@ option_defaults:
   - include_indices: []
   - str_choices: []
   - dict_float_choices: {}
+  - dict_int_choices: {}
   - remove_spaces: False
 
 

@@ -132,7 +132,7 @@ types:
   dict[str,int]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_str_int(student_answer, instructor_answer,
-                      rel_tol, keys, dict_int_choices, partial_score_frac_l)"
+                      keys, dict_int_choices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_int(student_answer, instructor_answer, keys)"
 
   dict[str,ndarray]:

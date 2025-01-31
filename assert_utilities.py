@@ -1563,7 +1563,7 @@ def check_answer_dict_str_float(
     """
     if dict_float_choices is not None:
         print("dict_float_choices is not implemented in dict[str,float] types")
-        dict_float_keys = None
+        dict_float_chocies = None
 
     msg_list = []
     status = True
@@ -1601,6 +1601,8 @@ def check_answer_dict_str_float(
 def check_answer_dict_str_int(
     student_answer: dict[str, int],
     instructor_answer: dict[str, int],
+    keys: list[str] | None = None,
+    dict_int_choices: dict[str, int] | None = None,
     partial_score_frac: list[float] = [0.0],
 ) -> tuple[bool, str]:
     """Check if a student's dictionary of strings answer matches the instructor's answer.
@@ -1629,12 +1631,17 @@ def check_answer_dict_str_int(
 
     """
     if dict_int_choices is not None:
-        print("dict_float_choices is not implemented in dict[str,float] types")
-        raise ValueError("dict_float_choices is not implemented in check_answer_dict_str_float")
+        dict_int_choices = {}
+        print("dict_int_choices is not implemented in dict[str,int] types")
+
+    # keys not implement
+    if keys is not None or keys is None:
+        keys = []
+        print("keys is not yet implemented for dict[str,int] types")
 
     msg_list = []
     status = True
-    keys = list(instructor_answer.keys()) if keys is None else keys
+    keys = list(instructor_answer.keys()) if keys is [] else keys
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(keys)
     if dict_int_choices is None:
@@ -1660,7 +1667,12 @@ def check_answer_dict_str_int(
             ps_dict["nb_mismatches"] += 1
             msg_list.append(msg_)
 
-    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    print(f"==> {ps_dict=}")
+    try:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        print("ZeroDivisionError: check_answer_dict_str_int. TO FIX.")
+        partial_score_frac[0] = 1.0
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
