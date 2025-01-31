@@ -41,7 +41,7 @@ questions:
       type: dict[str,float]
 
     - id: class_counts
-      type: dct[str,int]
+      type: dict[str,int]
 
 - id: part_3c
   parts:
