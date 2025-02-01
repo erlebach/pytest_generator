@@ -4635,7 +4635,7 @@ def check_answer_dict_str_float(
     """
     if dict_float_choices is not None:
         print("dict_float_choices is not implemented in dict[str,float] types")
-        dict_float_chocies = {}
+        dict_float_choices = {}
 
     msg_list = []
     status = True
@@ -4645,7 +4645,9 @@ def check_answer_dict_str_float(
 
     # Need an exception in case the student key is not found
     for k in keys:
+        print(f"{exclude_keys=}, key={k}")
         if k in exclude_keys:
+            print(f"==> Exclude {k=}")
             continue
         s_float = student_answer[k]
         i_float = instructor_answer[k]
@@ -5124,4 +5126,38 @@ def check_answer_set_tuple_int(
         partial_score_frac_l[0] = correct / total
 
     print(f"{msg_list=}")
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+def check_answer_logisticregression(
+    student_answer,
+    instructor_answer,
+) -> tuple[bool, str]:
+    """Check if student's LogisticRegression matches instructor's.
+
+    Args:
+        student_answer: Student's LogisticRegression object
+        instructor_answer: Instructor's LogisticRegression object
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    status = True
+    msg_list = []
+
+    # Check core parameters
+    params_to_check = ["penalty", "C", "random_state", "solver", "max_iter"]
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
+
+    if not msg_list:
+        msg_list = ["LogisticRegression parameters match expected values"]
+
     return return_value(status, msg_list, student_answer, instructor_answer)
