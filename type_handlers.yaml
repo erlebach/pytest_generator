@@ -131,7 +131,7 @@ types:
   dict[str,float]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer,
-                      rel_tol, keys, dict_float_choices, partial_score_frac_l)"
+                      rel_tol, keys, exclude_keys, dict_float_choices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, instructor_answer, keys)"
 
   dict[str,any]:

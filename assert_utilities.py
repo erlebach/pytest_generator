@@ -558,6 +558,8 @@ def return_value(
         msg_list.append("Answer is incorrect.")
     msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
     msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
+    print(f"return_value: {s_answ=}")
+    print(f"return_value: {i_answ=}")
 
     return status, "\n".join(msg_list)
 
@@ -4596,6 +4598,7 @@ def check_answer_dict_str_float(
     instructor_answer: dict[str, float],
     rel_tol: float,
     keys: list[str] | None = None,
+    exclude_keys: list[str] | None = None,
     dict_float_choices: dict[str, float] | None = None,
     partial_score_frac: list[float] = [0.0],
 ) -> tuple[bool, str]:
@@ -4642,6 +4645,8 @@ def check_answer_dict_str_float(
 
     # Need an exception in case the student key is not found
     for k in keys:
+        if k in exclude_keys:
+            continue
         s_float = student_answer[k]
         i_float = instructor_answer[k]
 

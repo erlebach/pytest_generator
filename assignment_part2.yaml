@@ -62,6 +62,7 @@ questions:
 
     - id: scores_1c
       type: dict[str,float]
+      exclude_keys: ['mean_fit_time', 'std_fit_time']  # TO IMPLEMENT
 
     - id: clf_1d
       type: DecisionTreeClassifier
@@ -122,8 +123,6 @@ questions:
       note: Type not implemented.
 
 # class_count: dict[str, list[int]]
-
-# LED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_scores_1c_dict_lbrack_str_comma_float_rbrack - assert False
 # FAILED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_scores_1d_dict_lbrack_str_comma_float_rbrack - assert False
 # FAILED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_clf_1f_LogisticRegression - AttributeError: module 'assert_utilities' has no attribute 'check_answer_logisticregression'. Did you mean: 'check_structure_logisticregression'?
 # FAILED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_clf_1g_LogisticRegression - AttributeError: module 'assert_utilities' has no attribute 'check_answer_logisticregression'. Did you mean: 'check_structure_logisticregression'?
