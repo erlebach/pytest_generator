@@ -423,7 +423,6 @@ def check_dict_str_float(
 # ----------------------------------------------------------------------
 
 
-
 # ......................................................................
 
 
@@ -580,8 +579,8 @@ def check_answer_float(
         abs_tol=abs_tol,
     )
 
-    if not msg_list:
-        msg_list = ["Float value is as expected."]
+    if not msg:
+        msg = "Float value is as expected."
 
     return return_value(status, [msg], student_answer, instructor_answer)
 
@@ -926,7 +925,6 @@ def check_structure_dict_str_dict_str_float(
 # ======================================================================
 
 
-
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 def check_key_structure(
     s_dict: dict[Any, Any],
@@ -1000,8 +998,8 @@ def check_answer_str(
         remove_spaces=remove_spaces,
     )
 
-    if not msg_list:
-        msg_list = ["Answer matches expected values."]
+    if not msg:
+        msg = "Answer matches expected values."
 
     return return_value(status, [msg], student_answer, instructor_answer)
 
@@ -1231,7 +1229,6 @@ def check_structure_set_str(student_answer: set[str] | list[str]) -> tuple[bool,
 # ======================================================================
 
 
-
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
@@ -1331,73 +1328,7 @@ def check_answer_dict_str_set_int(
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-
 # ======================================================================
-
-
-def check_answer_dict_str_float(
-    student_answer,
-    instructor_answer,
-    rel_tol: float,
-    keys: list[str] | None = None,
-    dict_float_choices: dict[str, float] | None = None,
-    partial_score_frac: list[float] = [0.0],
-) -> tuple[bool, str]:
-    """Check if student answer matches instructor answer for dict[str, float] type.
-
-    Args:
-        student_answer: Student's submitted answer
-        instructor_answer: Instructor's reference answer
-        rel_tol: Relative tolerance for comparing floats
-        keys: Optional list of keys to check. If None, checks all instructor keys
-        dict_float_choices: Optional dictionary of acceptable float values for each key
-        partial_score_frac: List to store partial credit score fraction
-
-    Returns:
-        tuple[bool, str]: Status indicating if answers match and message detailing
-            any mismatches
-    """
-    # Initialize dict_float_choices if None
-    if dict_float_choices is None:
-        dict_float_choices = {}
-
-    msg_list = []
-    status = True
-    keys = list(instructor_answer.keys()) if keys is None else keys
-    ps_dict = init_partial_score_dict()
-    ps_dict["nb_total"] = len(keys)
-
-    print(f"*** check_answer_dict_str_float, {keys=}")
-    print(f"*** check_answer_dict_str_float, {student_answer=}")
-    print(f"*** check_answer_dict_str_float, {instructor_answer=}")
-    print(f"*** check_answer_dict_str_float, {keys=}")
-
-    # Need an exception in case the student key is not found
-    for k in keys:
-        s_float = student_answer[k]
-        i_float = instructor_answer[k]
-
-        if k in dict_float_choices and dict_float_choices[k]:  # Check if key exists and has values
-            for val in dict_float_choices[k]:
-                if val == "i":  # use instructor answer
-                    val = i_float
-                status_, msg_list_ = check_float(s_float, val, rel_tol, 1.0e-5)
-                if status_ is True:
-                    break
-        else:
-            status_, msg_ = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.0e-6)
-
-        if status_ is False:
-            status = False
-            ps_dict["nb_mismatches"] += 1
-            msg_list.append(msg_)
-
-    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-
-    if not msg_list:
-        msg_list = ["Answer matches expected values. "]
-
-    return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 def check_answer_dict_str_int(
@@ -1457,6 +1388,7 @@ def check_answer_dict_str_int(
         s_int = student_answer[k]
         i_int = instructor_answer[k]
 
+        # if clause not exeucted if dict_int_choices is None or {}
         if len(dict_int_choices) > 0 and k in dict_int_choices:
             for val in dict_int_choices[k]:
                 if val == "i":  # use instructor answer
@@ -1488,63 +1420,6 @@ def check_answer_dict_str_int(
 # ======================================================================
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-
-def check_structure_dict_str_float(
-    student_answer: dict[str, float],
-    instructor_answer: dict[str, float],
-    keys: list[str] | None = None,
-) -> tuple[bool, str]:
-    """Check if a student's dictionary of strings answer matches the instructor's answer.
-
-    Args:
-        student_answer (dict[str, float]): The student's submitted answer
-        instructor_answer (dict[str, float]): The instructor's correct answer
-        keys (list[str] | None): Optional list of keys to check. If None, all keys are
-            checked. If `keys` is provided, only the keys in `keys` are checked.
-
-    Returns:
-        tuple[bool, str]: A tuple containing:
-            - bool: True if answers match and validation passes, False otherwise
-            - str: Message explaining the validation result
-
-    """
-    status = True
-    msg_list = []
-
-    if status and not isinstance(student_answer, dict):
-        msg_list += ["Student answer should be a dict"]
-        status = False
-
-    if status:
-        keys = keys if keys else list(instructor_answer.keys())
-        instructor_keys = set(keys)
-        instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
-        student_keys = set(student_answer.keys())
-        missing_keys = list(instructor_keys - student_keys)
-
-        if len(missing_keys) > 0:
-            msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
-            status = False
-        else:
-            msg_list.append("- No missing keys.")
-
-    if status:
-        # some keys are filtered. Student is allowed to have
-        # keys not in the instructor set
-        for k in instructor_answer:
-            vs = student_answer[k]
-            if not isinstance(vs, float | np.floating):
-                msg_list.append(f"- answer[{k!r}] should be a float.")
-                status = False
-
-        if status:
-            msg_list.append("- All elements are of type float as expected.")
-
-    if status:
-        msg_list.append("Type 'dict[str, float]' is correct")
-
-    return status, "\n".join(msg_list)
 
 
 # ======================================================================
@@ -2332,6 +2207,10 @@ def check_answer_dict_int_float(
     ps_dict["nb_total"] = len(instructor_answer)
     for key, i_val in instructor_answer.items():
         s_val = student_answer.get(key)
+        if s_val is None:
+            status = False
+            msg_list.append(f"Key {key} is missing from student answer")
+            continue
         status_, msg = check_float(i_val, s_val, rel_tol, abs_tol=1.0e-4)
         msg_list.append(msg)
         if status_ is False:
@@ -2683,8 +2562,6 @@ def check_structure_list_ndarray(
 # ======================================================================
 
 
-
-
 def check_answer_ndarray(
     student_answer: np.ndarray,
     instructor_answer: np.ndarray,
@@ -2775,7 +2652,7 @@ def check_answer_function(
     status = True
 
     if not msg_list:
-        msg_list = ["Answer matches expected values." ]
+        msg_list = ["Answer matches expected values."]
 
     return return_value(status, msg_list, s_source, i_source)
 
@@ -2837,7 +2714,7 @@ def check_answer_list_list_float(
     msg_list.append(f"Answer correct if relative error < {rel_tol * 100} percent")
 
     if not msg_list:
-        msg_list = ["Answer matches expected values." ]
+        msg_list = ["Answer matches expected values."]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -2923,6 +2800,7 @@ def check_structure_list_set(
 
 
 # ======================================================================
+
 
 def check_answer_list_set(
     student_answer: list[set],
@@ -3013,7 +2891,7 @@ def check_answer_set_set_int(
     status = set_of_sets_s == set_of_sets_i
 
     if not msg_list:
-        msg_list = ["Answer matches expected values. " ]
+        msg_list = ["Answer matches expected values. "]
 
     return return_value(status, msg_list, set_of_sets_s, set_of_sets_i)
 
@@ -3308,8 +3186,8 @@ def check_answer_int(
     """
     status, msg = check_int(instructor_answer, student_answer)
 
-    if not msg_list:
-        msg_list = ["Answer matches expected value. "]
+    if not msg:
+        msg = "Answer matches expected value. "
 
     return return_value(status, [msg], student_answer, instructor_answer)
 
@@ -3654,47 +3532,6 @@ def check_structure_decisiontreeclassifier(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_answer_randomforestclassifier(
-    student_answer,
-    instructor_answer,
-) -> tuple[bool, str]:
-    """Check if student's RandomForestClassifier matches instructor's.
-
-    Args:
-        student_answer: Student's RandomForestClassifier object
-        instructor_answer: Instructor's RandomForestClassifier object
-
-    Returns:
-        tuple[bool, str]: Status indicating if answers match and message detailing
-            any mismatches
-    """
-    status = True
-    msg_list = []
-
-    # Check core parameters
-    params_to_check = [
-        "n_estimators",
-        "criterion",
-        "max_depth",
-        "min_samples_split",
-        "min_samples_leaf",
-        "random_state",
-    ]
-
-    for param in params_to_check:
-        student_val = getattr(student_answer, param)
-        instructor_val = getattr(instructor_answer, param)
-        if student_val != instructor_val:
-            status = False
-            msg_list.append(
-                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
-            )
-
-    return status, "\n".join(
-        msg_list
-    ) if msg_list else "RandomForestClassifier parameters match expected values"
-
-
 def check_answer_decisiontreeclassifier(
     student_answer,
     instructor_answer,
@@ -3724,10 +3561,9 @@ def check_answer_decisiontreeclassifier(
             )
 
     if not msg_list:
-        msg_list = ["DecisionTreeClassifier parameters match expected values" ]
+        msg_list = ["DecisionTreeClassifier parameters match expected values"]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
-
 
 
 # ======================================================================
@@ -3810,45 +3646,10 @@ def check_answer_svc(
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
-
 # ======================================================================
-def check_structure_kfold(student_answer) -> tuple[bool, str]:
-    from sklearn.model_selection import KFold
-
-    if not isinstance(student_answer, KFold):
-        status = False
-        msg = (
-            f"Answer must be of type 'KFold'. Your answer is "
-            f"of type {type(student_answer).__name__}."
-        )
-        msg_list = [msg]
-    else:
-        status = True
-        msg_list = ["Answer is of type 'KFold' as expected."]
-
-    return status, "\n".join(msg_list)
-
-
-def check_answer_kfold(student_answer, instructor_answer) -> tuple[bool, str]:
-    pass
 
 
 # ======================================================================
-def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
-    from sklearn.model_selection import ShuffleSplit
-
-    if not isinstance(student_answer, ShuffleSplit):
-        status = False
-        msg = (
-            f"Answer must be of type 'ShuffleSplit'. Your answer is "
-            f"of type {type(student_answer).__name__}."
-        )
-        msg_list = [msg]
-    else:
-        status = True
-        msg_list = ["Answer is of type 'ShuffleSplit' as expected."]
-
-    return status, "\n".join(msg_list)
 
 
 def check_answer_shufflesplit(
@@ -3886,6 +3687,23 @@ def check_answer_shufflesplit(
 
 
 # ======================================================================
+"""
+def check_structure_kfold(student_answer) -> tuple[bool, str]:
+    from sklearn.model_selection import KFold
+
+    if not isinstance(student_answer, KFold):
+        status = False
+        msg = (
+            f"Answer must be of type 'KFold'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'KFold' as expected."]
+
+    return status, "\n".join(msg_list)
+"""
 
 
 def check_structure_kfold(student_answer) -> tuple[bool, str]:
@@ -3903,10 +3721,6 @@ def check_structure_kfold(student_answer) -> tuple[bool, str]:
         msg_list = ["Answer is of type 'KFold' as expected."]
 
     return status, "\n".join(msg_list)
-
-
-def check_answer_kfold(student_answer, instructor_answer) -> tuple[bool, str]:
-    pass
 
 
 # ======================================================================
@@ -4002,6 +3816,25 @@ def check_answer_kfold(
 
 
 # ======================================================================
+"""
+def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
+    from sklearn.model_selection import ShuffleSplit
+
+    if not isinstance(student_answer, ShuffleSplit):
+        status = False
+        msg = (
+            f"Answer must be of type 'ShuffleSplit'. Your answer is "
+            f"of type {type(student_answer).__name__}."
+        )
+        msg_list = [msg]
+    else:
+        status = True
+        msg_list = ["Answer is of type 'ShuffleSplit' as expected."]
+
+    return status, "\n".join(msg_list)
+    """
+
+
 def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
     from sklearn.model_selection import ShuffleSplit
 
@@ -4117,6 +3950,49 @@ def check_structure_randomforestclassifier(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
+'''
+def check_answer_randomforestclassifier(
+    student_answer,
+    instructor_answer,
+) -> tuple[bool, str]:
+    """Check if student's RandomForestClassifier matches instructor's.
+
+    Args:
+        student_answer: Student's RandomForestClassifier object
+        instructor_answer: Instructor's RandomForestClassifier object
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    status = True
+    msg_list = []
+
+    # Check core parameters
+    params_to_check = [
+        "n_estimators",
+        "criterion",
+        "max_depth",
+        "min_samples_split",
+        "min_samples_leaf",
+        "random_state",
+    ]
+
+    for param in params_to_check:
+        student_val = getattr(student_answer, param)
+        instructor_val = getattr(instructor_answer, param)
+        if student_val != instructor_val:
+            status = False
+            msg_list.append(
+                f"Parameter '{param}' mismatch: expected {instructor_val}, got {student_val}"
+            )
+
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "RandomForestClassifier parameters match expected values"
+'''
+
+
 def check_answer_randomforestclassifier(
     student_answer,
     instructor_answer,
@@ -4162,12 +4038,67 @@ def check_answer_randomforestclassifier(
 # ======================================================================
 
 
-
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-
 # ======================================================================
+'''
+def check_structure_dict_str_float(
+    student_answer: dict[str, float],
+    instructor_answer: dict[str, float],
+    keys: list[str] | None = None,
+) -> tuple[bool, str]:
+    """Check if a student's dictionary of strings answer matches the instructor's answer.
+
+    Args:
+        student_answer (dict[str, float]): The student's submitted answer
+        instructor_answer (dict[str, float]): The instructor's correct answer
+        keys (list[str] | None): Optional list of keys to check. If None, all keys are
+            checked. If `keys` is provided, only the keys in `keys` are checked.
+
+    Returns:
+        tuple[bool, str]: A tuple containing:
+            - bool: True if answers match and validation passes, False otherwise
+            - str: Message explaining the validation result
+
+    """
+    status = True
+    msg_list = []
+
+    if status and not isinstance(student_answer, dict):
+        msg_list += ["Student answer should be a dict"]
+        status = False
+
+    if status:
+        keys = keys if keys else list(instructor_answer.keys())
+        instructor_keys = set(keys)
+        instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
+        student_keys = set(student_answer.keys())
+        missing_keys = list(instructor_keys - student_keys)
+
+        if len(missing_keys) > 0:
+            msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
+            status = False
+        else:
+            msg_list.append("- No missing keys.")
+
+    if status:
+        # some keys are filtered. Student is allowed to have
+        # keys not in the instructor set
+        for k in instructor_answer:
+            vs = student_answer[k]
+            if not isinstance(vs, float | np.floating):
+                msg_list.append(f"- answer[{k!r}] should be a float.")
+                status = False
+
+        if status:
+            msg_list.append("- All elements are of type float as expected.")
+
+    if status:
+        msg_list.append("Type 'dict[str, float]' is correct")
+
+    return status, "\n".join(msg_list)
+'''
 
 
 def check_structure_dict_str_float(
@@ -4222,6 +4153,68 @@ def check_structure_dict_str_float(
     ) if msg_list else "Dictionary structure matches expected types"
 
 
+'''
+def check_answer_dict_str_float(
+    student_answer,
+    instructor_answer,
+    rel_tol: float,
+    keys: list[str] | None = None,
+    dict_float_choices: dict[str, float] | None = None,
+    partial_score_frac: list[float] = [0.0],
+) -> tuple[bool, str]:
+    """Check if student answer matches instructor answer for dict[str, float] type.
+
+    Args:
+        student_answer: Student's submitted answer
+        instructor_answer: Instructor's reference answer
+        rel_tol: Relative tolerance for comparing floats
+        keys: Optional list of keys to check. If None, checks all instructor keys
+        dict_float_choices: Optional dictionary of acceptable float values for each key
+        partial_score_frac: List to store partial credit score fraction
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    # Initialize dict_float_choices if None
+    if dict_float_choices is None:
+        dict_float_choices = {}
+
+    msg_list = []
+    status = True
+    keys = list(instructor_answer.keys()) if keys is None else keys
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(keys)
+
+    # Need an exception in case the student key is not found
+    for k in keys:
+        s_float = student_answer[k]
+        i_float = instructor_answer[k]
+
+        if k in dict_float_choices and dict_float_choices[k]:  # Check if key exists and has values
+            for val in dict_float_choices[k]:
+                if val == "i":  # use instructor answer
+                    val = i_float
+                status_, msg_list_ = check_float(s_float, val, rel_tol, 1.0e-5)
+                if status_ is True:
+                    break
+        else:
+            status_, msg_ = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.0e-6)
+
+        if status_ is False:
+            status = False
+            ps_dict["nb_mismatches"] += 1
+            msg_list.append(msg_)
+
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+
+    if not msg_list:
+        msg_list = ["Answer matches expected values. "]
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+'''
+
+
 def check_answer_dict_str_float(
     student_answer: dict[str, float],
     instructor_answer: dict[str, float],
@@ -4271,6 +4264,11 @@ def check_answer_dict_str_float(
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(keys)
+    if exclude_keys is None:
+        exclude_keys = []
+
+    if dict_float_choices is None:
+        dict_float_choices = {}
 
     # Need an exception in case the student key is not found
     for k in keys:
@@ -4283,12 +4281,11 @@ def check_answer_dict_str_float(
 
         if len(dict_float_choices) > 0 and k in dict_float_choices:
             val = dict_float_choices[k]
-            for val in dict_float_choices[k]:
-                if val == "i":  # use instructor answer
-                    val = i_float
-                status_, msg_list_ = check_float(s_float, val, rel_tol, 1.0e-5)
-                if status_ is True:
-                    break
+            if val == "i":  # use instructor answer
+                val = i_float
+            status_, msg_list_ = check_float(s_float, val, rel_tol, 1.0e-5)
+            if status_ is True:
+                break
         else:
             status_, msg_ = check_float(i_float, s_float, rel_tol=rel_tol, abs_tol=1.0e-6)
 
@@ -4384,6 +4381,49 @@ def check_answer_dict_str_any(
         msg_list = ["Answre parameters match expected values. "]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+def check_structure_dict_any(
+    student_dict: dict[Any, Any],
+    instructor_dict: dict[Any, Any],
+) -> tuple[bool, str]:
+    """Check if student's dictionary has same structure/types as instructor's.
+
+    Args:
+        student_dict: Student's submitted dictionary
+        instructor_dict: Instructor's reference dictionary
+
+    Returns:
+        tuple[bool, str]: A tuple containing:
+            - bool: True if structures match, False otherwise
+            - str: Message explaining any type mismatches
+
+    """
+    msg_list = []
+    status = True
+
+    # Check if all instructor keys exist in student dict
+    for k, i_val in instructor_dict.items():
+        if k not in student_dict:
+            status = False
+            msg_list.append(f"Missing key '{k}' in student answer")
+            continue
+
+        s_val = student_dict[k]
+
+        # Check if types match
+        if not isinstance(s_val, type(i_val)):
+            status = False
+            msg_list.append(
+                f"Type mismatch for key '{k}': "
+                f"expected {type(i_val).__name__}, "
+                f"got {type(s_val).__name__}"
+            )
+
+    if not msg_list:
+        msg_list = ["Dictionary structure matches expected types"]
+
+    return status, "\n".join(msg_list)
 
 
 def check_structure_dict_str_any(
@@ -4606,14 +4646,14 @@ def check_answer_dict_int_dict_str_any(
 
     msg_list = []
     status = True
-    keys = list(instructor_answer.keys()) if keys is None else keys
+    keys_list = list(instructor_answer.keys()) if keys is None else keys
     exclude_keys: set[str] = set(exclude_keys if exclude_keys is not None else [])
 
     ps_dict = init_partial_score_dict()
     total_checks = 0
     mismatches = 0
 
-    for k in keys:
+    for k in keys_list:
         if k not in student_answer:
             status = False
             msg_list.append(f"Missing top-level key '{k}' in student answer")
@@ -4799,4 +4839,3 @@ def check_answer_logisticregression(
         msg_list = ["LogisticRegression parameters match expected values"]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
-
