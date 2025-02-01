@@ -31,18 +31,17 @@ questions:
   parts:
     - id: nb_classes
       type: dict[str,int]
-      answer: 
 
     - id: class_count
       type: dict[str,ndarray]
       note: specifying type of ndarray is not implemented
 
     - id: nb_samples_data
-      type: dic[str,int]
+      type: dict[str,int]
       answer: 
 
     - id: max_data
-      type: dct[str,float]
+      type: dict[str,float]
       answer: 
 
 - id: part_2b
@@ -119,9 +118,14 @@ questions:
       note: ndarray[int]
 
     - id: hard_to_distinguish_pairs
-      type: list[tuple[int]]
+      type: set[tuple[int]]
       note: Type not implemented.
 
 # class_count: dict[str, list[int]]
 
-# FAILED tests/test_structure_preprocessed_assignment_part2_expand.py::test_structure_part_2b_class_count_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack - assert False
+# LED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_scores_1c_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_scores_1d_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_clf_1f_LogisticRegression - AttributeError: module 'assert_utilities' has no attribute 'check_answer_logisticregression'. Did you mean: 'check_structure_logisticregression'?
+# FAILED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_clf_1g_LogisticRegression - AttributeError: module 'assert_utilities' has no attribute 'check_answer_logisticregression'. Did you mean: 'check_structure_logisticregression'?
+# FAILED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_best_estimator_1g_LogisticRegression - AttributeError: module 'assert_utilities' has no attribute 'check_answer_logisticregression'. Did you mean: 'check_structure_logisticregression'?
+# FAILED tests/test_answers_preprocessed_assignment_part2_expand.py::test_answers_part_2b_default_parameters_1g_dict_lbrack_str_comma_Any_rbrack - assert False

@@ -425,7 +425,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += f"    question_id = {repr(part_question_id)}\n"
                 test_code += f"    subquestion_id = {repr(part_id)}\n"
 
-                test_code += f"    partial_score_frac_l = [0.]\n"
+                test_code += "    partial_score_frac_l = [0.]\n"
                 test_code += "    local_namespace['partial_score_frac_l'] = partial_score_frac_l\n"
 
                 test_code += "    function_name.answer_type = answer_type\n"

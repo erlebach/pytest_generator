@@ -1640,6 +1640,9 @@ def check_answer_dict_str_int(
     if dict_int_choices is None:
         dict_int_choices = {}
 
+    print(f"==> {student_answer=}")
+    print(f"==> {instructor_answer=}")
+
     # Need an exception in case the student key is not found
     for k in keys:
         s_int = student_answer[k]
@@ -1664,7 +1667,7 @@ def check_answer_dict_str_int(
     try:
         partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     except ZeroDivisionError:
-        print("ZeroDivisionError: check_answer_dict_str_int. TO FIX.")
+        print("ZeroDivisionError: check_answer_dict_str_int. FIX.")
         partial_score_frac[0] = 1.0
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -4930,7 +4933,7 @@ def check_answer_dict_int_dict_str_any(
     rel_tol: float = 1e-04,
     keys: list[str] | None = None,
     exclude_keys: list[str] | None = None,
-    partial_score_frac: list[float] = [0.0],
+    partial_score_frac_l: list[float] = [0.0],
 ) -> tuple[bool, str]:
     """Check if student's nested dictionary values match instructor's.
 
@@ -4943,7 +4946,7 @@ def check_answer_dict_int_dict_str_any(
         rel_tol: Relative tolerance for float comparisons
         keys: Optional list of keys to check. If None, checks all instructor keys
         exclude_keys: Optional list of keys to ignore during comparison
-        partial_score_frac: List to store partial credit score fraction
+        partial_score_frac_l: List to store partial credit score fraction
 
     Returns:
         tuple[bool, str]: Status indicating if answers match and message detailing
@@ -5012,9 +5015,108 @@ def check_answer_dict_int_dict_str_any(
             # ... rest of the type checking logic remains the same ...
 
     if total_checks > 0:
-        partial_score_frac[0] = 1.0 - (mismatches / total_checks)
+        partial_score_frac_l[0] = 1.0 - (mismatches / total_checks)
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # ======================================================================
+
+
+def check_structure_set_tuple_int(
+    student_answer: set[tuple[int, ...]],
+) -> tuple[bool, str]:
+    """Check if student's answer is a set of tuples containing integers.
+
+    Args:
+        student_answer: Student's submitted answer
+        instructor_answer: Instructor's reference answer (used for type hint only)
+
+    Returns:
+        tuple[bool, str]: Status indicating if structure matches and message detailing
+            any type mismatches
+    """
+    msg_list = []
+    status = True
+
+    # Check if it's a set
+    if not isinstance(student_answer, set):
+        print("1. false", flush=True)
+        return False, f"Expected type set, got {type(student_answer).__name__}"
+
+    # Check each element
+    for i, item in enumerate(student_answer):
+        print(f"for, {i=}", flush=True)
+        # Check if element is a tuple
+        if not isinstance(item, tuple):
+            status = False
+            msg_list.append(f"Element {i} is not a tuple: got {type(item).__name__}")
+            print("if not")
+            continue
+
+        # Check if all elements in tuple are integers
+        if not all(isinstance(x, int) for x in item):
+            print("if not all")
+            status = False
+            msg_list.append(f"Tuple {i} {item} contains non-integer values")
+
+    print("msg_list= ", msg_list, flush=True)
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "Structure matches expected set[tuple[int, ...]]"
+
+
+# ======================================================================
+
+
+def check_answer_set_tuple_int(
+    student_answer: set[tuple[int, ...]],
+    instructor_answer: set[tuple[int, ...]],
+    partial_score_frac_l: list[float] = [0.0],
+) -> tuple[bool, str]:
+    """Check if student's set of integer tuples matches instructor's.
+
+    Args:
+        student_answer: Student's submitted set of integer tuples
+        instructor_answer: Instructor's reference set of integer tuples
+        partial_score_frac_l: List to store partial credit score fraction.
+            The list permist its return via the argument.
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    msg_list = []
+    status = True
+
+    print("===> *** check_answer_set_tuple_int")
+    print(f"{student_answer=}")
+    print(f"{instructor_answer=}")
+
+    # First check structure
+    structure_status, structure_msg = check_structure_set_tuple_int(student_answer)
+
+    if not structure_status:
+        print("Return due to bad structure check")
+        return False, structure_msg
+
+    # Check for missing tuples
+    missing = instructor_answer - student_answer
+    if missing:
+        status = False
+        msg_list.append(f"Missing tuples: {missing}")
+
+    # Check for extra tuples
+    extra = student_answer - instructor_answer
+    if extra:
+        status = False
+        msg_list.append(f"Extra tuples: {extra}")
+
+    # Calculate partial score based on correct tuples
+    total = len(instructor_answer)
+    if total > 0:
+        correct = len(instructor_answer & student_answer)  # intersection
+        partial_score_frac_l[0] = correct / total
+
+    print(f"{msg_list=}")
+    return return_value(status, msg_list, student_answer, instructor_answer)
