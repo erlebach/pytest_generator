@@ -91,11 +91,6 @@ types:
     struct_msg: Answer should be a float in a specified range (WHAT IS THE RANGE?). 
     note: What is the range? 
 
-  dict:
-    import: ""
-    assert_answer: "assert_utilities.check_answer_dict(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_dict(student_answer, instructor_answer)"
-
   dict[int,float]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_int_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
