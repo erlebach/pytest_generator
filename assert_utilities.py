@@ -695,6 +695,7 @@ def check_structure_eval_float(student_answer: str) -> tuple[bool, str]:
 
 def check_structure_dict_str_list_int(
     student_answer: dict[str, list[int]],
+    instructor_answer: dict[str, list[int]],
 ) -> tuple[bool, str]:
     """Check the structure of the student's answer.
 
@@ -781,7 +782,129 @@ def check_answer_dict_str_list_int(
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
-# --------------------------------------------------------------------
+# ----------
+
+
+def check_structure_dict_str_list_str(
+    student_answer: dict[str, list[str]],
+    instructor_answer: dict[str, list[str]],
+) -> tuple[bool, str]:
+    """Check if student answer matches expected structure of dict[str, list[str]].
+
+    Verifies that:
+    1. Student answer is a dictionary
+    2. All dictionary keys are strings
+    3. All dictionary values are lists of strings
+    4. Student answer contains all required keys from instructor answer
+
+    Args:
+        student_answer (dict[str, list[str]]): Student's submitted answer to check
+        instructor_answer (dict[str, list[str]]): Instructor's reference answer
+            defining expected structure
+
+    Returns:
+        tuple[bool, str]: Status indicating if structure is valid and message detailing
+            any validation errors
+    """
+    status = True
+    msg_list = []
+
+    # Check if answer is a dictionary
+    if not isinstance(student_answer, dict):
+        return False, "Answer must be a dict"
+
+    # Check for missing keys
+    instructor_keys = set(instructor_answer.keys())
+    student_keys = set(student_answer.keys())
+    missing_keys = instructor_keys - student_keys
+
+    if missing_keys:
+        msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
+        status = False
+    else:
+        msg_list.append("- No missing keys")
+
+    # Check that all keys are strings and all values are lists of strings
+    for key, value in student_answer.items():
+        if not isinstance(key, str):
+            msg_list.append(
+                f"- Key {key!r} must be of type 'str', but is type {type(key).__name__}"
+            )
+            status = False
+            continue
+
+        if not isinstance(value, list):
+            msg_list.append(
+                f"- Value for key {key!r} must be a list, but is type {type(value).__name__}"
+            )
+            status = False
+            continue
+
+        # Check that all elements in the list are strings
+        for i, elem in enumerate(value):
+            if not isinstance(elem, str):
+                msg_list.append(
+                    f"- Element {i} for key {key!r} must be a string, but is type {type(elem).__name__}"
+                )
+                status = False
+
+    if status:
+        msg_list.append("Type 'dict[str, list[str]]' is correct")
+
+    return status, "\n".join(msg_list)
+
+
+# ----------------------------------------------------------------------
+
+
+def check_answer_dict_str_list_str(
+    student_answer: dict[str, list[str]],
+    instructor_answer: dict[str, list[str]],
+    partial_score_frac: list[float],
+) -> tuple[bool, str]:
+    """Check if student answer matches instructor answer for dict[str, list[str]] type.
+
+    Compares student and instructor answers that are dictionaries with string keys and
+    lists of strings as values. Checks that list elements match exactly.
+
+    Args:
+        student_answer (dict[str, list[str]]): Student's submitted answer
+        instructor_answer (dict[str, list[str]]): Instructor's reference answer
+        partial_score_frac (list[float]): List to store partial credit score fraction
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+    """
+    print("\n===> INSIDE check_answer_dict_str_list_str")
+    msg_list = []
+    status = True
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(instructor_answer)
+
+    # Check each key in instructor answer
+    for key, i_list in instructor_answer.items():
+        if key not in student_answer:
+            status = False
+            msg_list.append(f"Missing key: {key!r}")
+            ps_dict["nb_mismatches"] += 1
+            continue
+
+        s_list = student_answer[key]
+        status_, msg_ = check_list_str(i_list, s_list, ps_dict)
+        if not status_:
+            status = False
+            msg_list.extend([f"For key {key!r}:"] + [msg_])
+
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+
+    if not msg_list:
+        msg_list = ["Answer matches expected values."]
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+# ----------------------------------------------------------------------
 
 
 def check_structure_dict_str_dict_str_list(

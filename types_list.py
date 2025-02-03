@@ -5,6 +5,7 @@ types_list = [
     "dict[str,dict[str,list]]",
     "dict[str,list]",
     "dict[str,list[int]]",
+    "dict[str,list[str]]",
     "dict[str,float]", 
     "dict[str,int]", 
     "dict[int,float]", 
