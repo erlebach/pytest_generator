@@ -13,7 +13,7 @@ types:
 
   float:
     import: ""
-    assert_answer: "assert_utilities.check_answer_float(student_answer, instructor_answer, options)"
+    assert_answer: "assert_utilities.check_answer_float(student_answer, instructor_answer, rel_tol, abs_tol)"
     assert_structure: "assert_utilities.check_structure_float(student_answer)"
 
   int:
@@ -28,25 +28,17 @@ types:
     assert_structure: "assert_utilities.check_structure_set_set_int(student_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
-  list[float]:
-    import: "" 
-    # monotone 
-    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, options, rel_tol, exclude_indices, monotone_increasing, partial_score_frac_l)"
-    assert_structure: "assert_utilities.check_structure_list_float(student_answer, instructor_answer)"
-
   list[list[float]]:
     import: ""
     # Fix for structure
-    assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, rel_tol, exclude_indices, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_list_list_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_list_float(student_answer, instructor_answer)"
  
   list[ndarray]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, exclude_indices, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_list_ndarray(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_ndarray(student_answer, instructor_answer)"
 
-<<<<<<< HEAD
-=======
   list[float]:
     import: "" 
     # monotone 
@@ -58,7 +50,6 @@ types:
     assert_answer: "assert_utilities.check_answer_set_tuple_int(student_answer, instructor_answer, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_set_tuple_int(student_answer)"
 
->>>>>>> 5fe5f6c6f157a4124b65b5c0f9736abf1192fde1
   list[int]:
     import: "" 
     assert_answer: "assert_utilities.check_answer_list_int(student_answer, instructor_answer)"
@@ -112,7 +103,7 @@ types:
 
   dict[str,dict[str,float]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, options, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_dict_str_dict_str_float(student_answer, instructor_answer, rel_tol, dict_str_float, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_dict_str_float(student_answer, instructor_answer)"
 
   explain_str:
@@ -135,12 +126,7 @@ types:
   dict[str,float]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer,
-<<<<<<< HEAD
-                      rel_tol, keys, dict_float_choices, partial_score_frac_l)"
-                      #rel_tol, keys, dict_float_choices, partial_score_frac_l)"
-=======
                       rel_tol, keys, exclude_keys, dict_float_choices, partial_score_frac_l)"
->>>>>>> 5fe5f6c6f157a4124b65b5c0f9736abf1192fde1
     assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, instructor_answer, keys)"
 
   dict[str,any]:
@@ -269,12 +255,12 @@ types:
 
   lineplot:
     import: ""
-    assert_answer: "assert_utilities.check_answer_lineplot(student_answer, instructor_answer, options)"
+    assert_answer: "assert_utilities.check_answer_lineplot(student_answer, instructor_answer, rel_tol)"
     assert_structure: "assert_utilities.check_structure_lineplot(student_answer)"
 
   scatterplot2d:
     import: ""
-    assert_answer: "assert_utilities.check_answer_scatterplot2d(student_answer, instructor_answer, options)"
+    assert_answer: "assert_utilities.check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol)"
     assert_structure: "assert_utilities.check_structure_scatterplot2d(student_answer)"
 
   scatterplot3d:

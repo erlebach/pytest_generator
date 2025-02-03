@@ -64,6 +64,7 @@ def create_config_dict():
         "partial_score_frac", {}
     )
     print(f"{config_dict['partial_score_frac']=}")
+    print(f"{config_dict['dict_int_choices']=}")
 
     config_dict["remove_spaces"] = config_dict.get("option_defaults", {}).get(
         "remove_spaces", False
@@ -133,53 +134,6 @@ with open('type_handlers.yaml', 'r') as f:
 def generate_test_answers_code(questions_data, sim_type, output_file="test_answers.py"):
     global rel_tol, abs_tol, exclude_indices, include_indices
     global str_choices, dict_float_choices, dict_int_choices
-
-    # Fill in data from configuration file from the 'all_tests' section
-    """
-    questions_data["student_folder_name"] = config_dict.get(
-        "student_folder_name", "student_code_with_answers"
-    )
-    questions_data["instructor_folder_name"] = config_dict.get(
-        "instructor_folder_name", "instructor_code_with_answers"
-    )
-    questions_data["i_answer_source"] = config_dict.get(
-        "i_answer_source", "instructor_file"
-    )
-    questions_data["s_answer_source"] = config_dict.get(
-        "s_answer_source", "student_file"
-    )
-    """
-    # Update the questions_data with the keys of config_dict that are not present in questions_data
-    for k, v in config['all_tests'].items():
-        if k not in questions_data:
-            questions_data[k] = v
-
-    if sim_type == "answers":
-        # Fill in data from configuration file from the 'test_answers' section of the config dict
-        for k, v in config["test_answers"].items():
-            if k not in questions_data:
-                questions_data[k] = v
-    elif sim_type == "structure":
-        # Fill in data from configuration file from the 'test_structure' section of the config dict
-        for k, v in config["test_structure"].items():
-            if k not in questions_data:
-                questions_data[k] = v
-
-    """
-    config_dict["student_folder_name"] = config.get(
-        "student_folder_name", "student_code_with_answers"
-    )
-    config_dict["instructor_folder_name"] = config.get(
-        "instructor_folder_name", "instructor_code_with_answers"
-    )
-    config_dict["i_answer_source"] = config.get(
-        "instructor_answer", "instructor_code_with_answers"
-    )
-    config_dict["s_answer_source"] = config.get(
-        "student_answer", "student_code_with_answers"
-    )
-    """
-    print(f"==> {questions_data=}")
 
     # Fill in data from configuration file from the 'all_tests' section
     """
@@ -423,8 +377,6 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
                 test_code +=  "    local_namespace['rel_tol'] = rel_tol\n"
                 test_code +=  "    local_namespace['abs_tol'] = abs_tol\n"
-
-                strg = f"type_handlers['types']['{part_type}']['assert_answer']"
 
                 strg = f"type_handlers['types']['{part_type}']['assert_answer']"
 
