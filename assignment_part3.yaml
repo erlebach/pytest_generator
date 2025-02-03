@@ -1,0 +1,98 @@
+# Default for entire file. Each question can override
+# max_score: per assert
+visibility: visible
+max_score: 20
+module: questions_part3_noclass
+
+# choices: instructor_file, student_file, yaml_file
+
+# Folders are relative to the base project folder
+#student_folder_name: student_github_template
+student_folder_name: student_code_with_answers
+instructor_folder_name: instructor_code_with_answers
+
+i_answer_source: instructor_file
+s_answer_source: student_file
+
+# default fixtures for all my tests
+# set to None for any questions that does not require fixtures
+# All fixtures should be in a single file
+fixtures: 
+  # file that contains all the fixtures
+  # Perhaps this should be part of the configuration file
+  # Necessary for fixtures to work
+  fixture:
+    name: run_compute
+    # Fixure arguments in a list
+    args: [questions_part3_noclass]
+
+questions:
+- id: part_3a
+  parts:
+    - id: top_k_accuracy
+      type: dict[int,list[float]]
+
+- id: part_3b
+  parts:
+    - id: number_of_samples
+      type: dict[str,int]
+
+    - id: data_bounds
+      type: dict[str,float]
+
+    - id: class_counts
+      type: dict[str,int]
+
+- id: part_3c
+  parts:
+    - id: clf
+      type: SVC
+
+    - id: cv
+      type: StratifiedKFold
+
+    - id: mean_metrics
+      type: dict[str,float]
+
+    - id: std_metrics
+      type: dict[str,float]
+
+    - id: is_precision_higher_than_recall
+      type: bool
+
+    - id: is_precision_higher_than_recall_explain
+      type: explain_str
+
+    - id: confusion_matrix
+      type: ndarray
+
+- id: part_3d
+  parts:
+    - id: clf
+      type: SVC
+      answer:
+
+    - id: cv
+      type: StratifiedKFold
+      answer:
+
+    - id: mean_metrics
+      type: dict[str,float]
+
+    - id: std_metrics
+      type: dict[str,float]
+
+    - id: confusion_matrix
+      type: ndarray
+
+    - id: weight_dict
+      type: dict[int,float]
+
+# ========================================================================================= short test summary info ==========================================================================================
+
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1c_scores_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1d_scores_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1e_scores_dict_lbrack_int_comma_dict_lbrack_str_comma_Any_rbrack_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1f_scores_RF_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1f_scores_DT_dict_lbrack_str_comma_float_rbrack - assert False
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1g_default_parameters_dict_lbrack_str_comma_Any_rbrack - assert False

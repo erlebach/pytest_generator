@@ -179,6 +179,7 @@ possible. I have applied `chmod 000` to all instances of `assert_utilities.py` t
 inaccurate paths. 
 - IMPORTANT: make sure to import pytest last! This module somehow modifies the order of paths. 
 ----------------------------------------------------------------------
+<<<<<<< HEAD
 2024-04-19_23:10
 - When I have a list, where I am comparing mean and std, I should remove the std because it is not realistic 
 to compare std. 
@@ -212,3 +213,10 @@ How to break out of a look in a pytest, and continue student code after loop.?
 ----------------------------------------------------------------------
 2024-05-06_12:56
 - I could've asked the students to return their ARI and SSE functions. I could have tested the results. MY ERROR.
+=======
+2025-01-30
+- When the code slows down a lot, it could be because of nan, or because of datasets that are very large. 
+----------------------------------------------------------------------
+2025-02-03
+Last commit bbc00da6f7306f7fff13e12f85c88cda7bd30e54
+>>>>>>> 5fe5f6c6f157a4124b65b5c0f9736abf1192fde1
