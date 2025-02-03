@@ -55,6 +55,9 @@ questions:
 
     - id: scores
       type: dict[str,float]
+      note: Do not check mean_fit_time, std_fit_time accuracy, but check presence
+      keys: ["mean_accuracy", "std_accuracy"]
+      
 
 - id: part_1d
   parts:
@@ -68,7 +71,8 @@ questions:
 
     - id: scores
       type: dict[str,float]
-      answer:
+      note: Do not check mean_fit_time, std_fit_time accuracy, but check presence
+      keys: ["mean_accuracy", "std_accuracy"]
 
     - id: explain_kfold_vs_shuffle_split
       type: explain_str
@@ -76,8 +80,9 @@ questions:
 - id: part_1e
   parts:
     - id: scores
-      type: dict[int,dict[str,Any]]
-      answer:
+      type: dict[int,dict[str,any]]
+      exclude_keys: ["mean_fit_time", "std_fit_time", "cv", "clf"]
+      note: inner keys to consider
 
 - id: part_1f
   parts:
@@ -91,6 +96,8 @@ questions:
 
     - id: scores_RF
       type: dict[str,float]
+      note: Do not check mean_fit_time, std_fit_time accuracy, but check presence
+      keys: ["mean_accuracy", "std_accuracy"]
 
     - id: clf_DT
       type: DecisionTreeClassifier
@@ -102,6 +109,8 @@ questions:
 
     - id: scores_DT
       type: dict[str,float]
+      note: Do not check mean_fit_time, std_fit_time accuracy, but check presence
+      keys: ["mean_accuracy", "std_accuracy"]
 
     - id: model_highest_accuracy
       type: str
@@ -123,7 +132,7 @@ questions:
       answer:
 
     - id: default_parameters
-      type: dict[str,Any]
+      type: dict[str,any]
       answer:
       note: The parameters you started from
 
@@ -142,3 +151,8 @@ questions:
 
 #----------------------------------------------------------------------
 
+# TODO: 
+#   ShuffleSplit
+#   GridSearchCV
+
+# FAILED tests/test_answers_preprocessed_assignment_part1_expand.py::test_answers_part_1e_scores_dict_lbrack_int_comma_dict_lbrack_str_comma_Any_rbrack_rbrack - assert False

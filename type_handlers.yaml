@@ -42,8 +42,13 @@ types:
   list[float]:
     import: "" 
     # monotone 
-    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, rel_tol, monotone_increasing, partial_score_frac)"
+    assert_answer: "assert_utilities.check_answer_list_float(student_answer, instructor_answer, rel_tol, monotone_increasing, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_float(student_answer, instructor_answer)"
+
+  set[tuple[int]]:
+    import: "" 
+    assert_answer: "assert_utilities.check_answer_set_tuple_int(student_answer, instructor_answer, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_set_tuple_int(student_answer)"
 
   list[int]:
     import: "" 
@@ -86,10 +91,10 @@ types:
     struct_msg: Answer should be a float in a specified range (WHAT IS THE RANGE?). 
     note: What is the range? 
 
-  dict:
+  dict[int,float]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict(student_answer, instructor_answer)"
-    assert_structure: "assert_utilities.check_structure_dict(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_dict_int_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_int_float(student_answer, instructor_answer)"
 
   dict[int,list[float]]:
     import: ""
@@ -121,13 +126,25 @@ types:
   dict[str,float]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_str_float(student_answer, instructor_answer,
-                      rel_tol, keys, dict_float_choices, partial_score_frac_l)"
+                      rel_tol, keys, exclude_keys, dict_float_choices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_float(student_answer, instructor_answer, keys)"
+
+  dict[str,any]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_str_any(student_answer, instructor_answer,
+                      rel_tol, keys, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_str_any(student_answer, instructor_answer, keys)"
+
+  dict[int,dict[str,any]]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_dict_int_dict_str_any(student_answer, instructor_answer,
+                      rel_tol, keys, exclude_keys, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_int_dict_str_any(student_answer, instructor_answer, keys)"
 
   dict[str,int]:
     import: ""
     assert_answer: "assert_utilities.check_answer_dict_str_int(student_answer, instructor_answer,
-                      rel_tol, keys, dict_int_choices, partial_score_frac_l)"
+                      keys, dict_int_choices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_int(student_answer, instructor_answer, keys)"
 
   dict[str,ndarray]:
@@ -181,58 +198,58 @@ types:
     # The next statement gets sent to eval and the result included in the pytest code.
     import: "from sklearn.tree import DecisionTreeClassifier"
     assert: "isinstance({answer_var}, DecisionTreeClassifier)"
-    assert_answer: "assert_utilities.check_answer_decisiontreeclassifier(student_answer, instructor_answer, local_vars_dict)"
+    assert_answer: "assert_utilities.check_answer_decisiontreeclassifier(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_decisiontreeclassifier(student_answer)"
     struct_msg: Answer should be an instance of DecisionTreeClassifier.
 
-  SVC:
-    # The next statement gets sent to eval and the result included in the pytest code.
-    import: "from sklearn.svm import SVC"
-    assert: "isinstance({answer_var}, SVC)"
-    assert_answer: "assert_utilities.check_answer_svc(student_answer, instructor_answer, local_vars_dict)"
-    assert_structure: "assert_utilities.check_structure_svc(student_answer)"
-    struct_msg: Answer should be an instance of DecisionTreeClassifier.
+  RandomForestClassifier:
+    import: "from sklearn.ensemble import RandomForestClassifier"
+    assert: "isinstance({answer_var}, RandomForestClassifier)"
+    assert_answer: "assert_utilities.check_answer_randomforestclassifier(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_randomforestclassifier(student_answer)"
+    struct_msg: Answer should be an instance of RandomForestClassifier.
 
   LogisticRegression:
     # The next statement gets sent to eval and the result included in the pytest code.
     import: "from sklearn.linear_model import LogisticRegression"
     assert: "isinstance({answer_var}, LogisticRegression)"
-    assert_answer: "assert_utilities.check_answer_logisticregression(student_answer, instructor_answer, local_vars_dict)"
+    assert_answer: "assert_utilities.check_answer_logisticregression(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_logisticregression(student_answer)"
     struct_msg: Answer should be an instance of LogisticRegression.
 
   GridSearchCV:
     import: "from sklearn.model_selection import GridSearchCV"
     assert: "isinstance({answer_var}, GridSearchCV)"
-    assert_answer: "assert_utilities.check_answer_gridsearchcv(student_answer, instructor_answer, local_vars_dict)"
+    assert_answer: "assert_utilities.check_answer_gridsearchcv(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_gridsearchcv(student_answer)"
     struct_msg: Answer should be an instance of GridSearchCV.
 
-  RandomForestClassifier:
-    import: "from sklearn.ensemble import RandomForestClassifier"
-    assert: "isinstance({answer_var}, RandomForestClassifier)"
-    assert_answer: "assert_utilities.check_answer_randomforestclassifier(student_answer, instructor_answer, local_vars_dict)"
-    assert_structure: "assert_utilities.check_structure_randomforestclassifier(student_answer)"
-    struct_msg: Answer should be an instance of RandomForestClassifier.
+  SVC:
+    # The next statement gets sent to eval and the result included in the pytest code.
+    import: "from sklearn.svm import SVC"
+    assert: "isinstance({answer_var}, SVC)"
+    assert_answer: "assert_utilities.check_answer_svc(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_svc(student_answer)"
+    struct_msg: Answer should be an instance of SVC"
 
   KFold:
     import: "from sklearn.model_selection import KFold"
-    assert: "isinstance({answer_var}, DecisionTreeClassifier)"
-    assert_answer: "assert_utilities.check_answer_kfold(student_answer, instructor_answer, local_vars_dict)"
+    assert: "isinstance({answer_var}, KFold)"
+    assert_answer: "assert_utilities.check_answer_kfold(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_kfold(student_answer)"
     struct_msg: Answer should be an instance of KFold. 
 
   StratifiedKFold:
     import: "from sklearn.model_selection import StratifiedKFold"
     assert: "isinstance({answer_var}, StratifiedKFold)"
-    assert_answer: "assert_utilities.check_answer_stratifiedkfold(student_answer, instructor_answer, local_vars_dict)"
+    assert_answer: "assert_utilities.check_answer_stratifiedkfold(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_stratifiedkfold(student_answer)"
-    struct_msg: Answer should be an instance of StratifiedKFold. 
+    # struct_msg: Answer should be an instance of StratifiedKFold. 
 
   ShuffleSplit:
     import: "from sklearn.model_selection import ShuffleSplit"
     assert: "isinstance({answer_var}, ShuffleSplit)"
-    assert_answer: "assert_utilities.check_answer_shufflesplit(student_answer, instructor_answer, local_vars_dict)"
+    assert_answer: "assert_utilities.check_answer_shufflesplit(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_shufflesplit(student_answer)"
     struct_msg: Answer should be an instance of ShuffleSplit. 
 
@@ -295,9 +312,10 @@ types:
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
     struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
 
-  dict_str_list:
+  dict[str,list]:
     import: ""
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
     truct_msg: "Answer should be dictionary, specifically: dict[str, str]."
+
 
 
