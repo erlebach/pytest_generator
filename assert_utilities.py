@@ -826,6 +826,7 @@ def check_structure_dict_str_list_str(
 
     # Check that all keys are strings and all values are lists of strings
     for key, value in student_answer.items():
+        # int can be easily converted to string
         if not isinstance(key, str):
             msg_list.append(
                 f"- Key {key!r} must be of type 'str', but is type {type(key).__name__}"
@@ -842,7 +843,7 @@ def check_structure_dict_str_list_str(
 
         # Check that all elements in the list are strings
         for i, elem in enumerate(value):
-            if not isinstance(elem, str):
+            if not isinstance(elem, str | int | float):  # choice of int is a hack (student can use string or int or float
                 msg_list.append(
                     f"- Element {i} for key {key!r} must be a string, but is type {type(elem).__name__}"
                 )
