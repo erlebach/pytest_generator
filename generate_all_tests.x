@@ -10,4 +10,4 @@ fi
 filename=${1%.yaml}
 
 # $1 is the yaml file or yaml files (without the extension)
-./generate_homework_tests.x $1
+./generate_homework_tests.x $filename
