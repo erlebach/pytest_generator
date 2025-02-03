@@ -312,10 +312,12 @@ types:
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
     struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
 
-  dict[str,list]:
+  dict[str,list[int]]:
     import: ""
+    assert_answer: "assert_utilities.check_answer_dict_str_list_int(student_answer, instructor_answer, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_dict_str_list_int(student_answer)"
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
-    truct_msg: "Answer should be dictionary, specifically: dict[str, str]."
+    struct_msg: "Answer should be dictionary, specifically: dict[str, str]."
 
 
 

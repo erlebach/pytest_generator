@@ -159,7 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# File to not track in the future
+# Files to not track in the future
 function_dictionaries.py
 tests/
 instructor_code_with_answers/

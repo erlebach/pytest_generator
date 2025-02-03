@@ -12,7 +12,7 @@ Use Python 3.10 or above
 """
 
 import ast
-import inspect  
+import inspect
 import math
 import random
 import re
@@ -729,6 +729,59 @@ def check_structure_dict_str_list_int(
                 break
 
     return status, "\n".join(msg_list)
+
+
+# ----------------------------------------------------------------------
+
+
+def check_answer_dict_str_list_int(
+    student_answer: dict[str, list[int]],
+    instructor_answer: dict[str, list[int]],
+    partial_score_frac: list[float],
+) -> tuple[bool, str]:
+    """Check if student answer matches instructor answer for dict[str, list[int]] type.
+
+    Compares student and instructor answers that are dictionaries with string keys and
+    lists of integers as values. Checks that list elements match exactly.
+
+    Args:
+        student_answer (dict[str, list[int]]): Student's submitted answer
+        instructor_answer (dict[str, list[int]]): Instructor's reference answer
+        partial_score_frac (list[float]): List to store partial credit score fraction
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+
+    """
+    msg_list = []
+    status = True
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(instructor_answer)
+
+    # Check each key in instructor answer
+    for key, i_list in instructor_answer.items():
+        if key not in student_answer:
+            status = False
+            msg_list.append(f"Missing key: {key!r}")
+            ps_dict["nb_mismatches"] += 1
+            continue
+
+        s_list = student_answer[key]
+        status_, msg_ = check_list_int(i_list, s_list, ps_dict)
+        if not status_:
+            status = False
+            msg_list.extend([f"For key {key!r}:"] + [msg_])
+
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+
+    if not msg_list:
+        msg_list = ["Answer matches expected values."]
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+# --------------------------------------------------------------------
 
 
 def check_structure_dict_str_dict_str_list(
