@@ -10,6 +10,7 @@
 export PYTHONPATH=student_code_with_answers:/autograder/MAKE-STUDENT-OUTPUT/CODE:.:pytest_utils:instructor_code_with_answers:tests
 
 due_date="2025-01-24"
+due_date="2025-02-24" # DEBUGGING
 
 # Current date in YYYY-MM-DD format
 current_date=$(date '+%Y-%m-%d')

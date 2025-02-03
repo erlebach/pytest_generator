@@ -823,10 +823,6 @@ def check_answer_dict_str_dict_str_float(
     msg_list = []
     ps_dict = init_partial_score_dict()
 
-    # msg_list.append(f"DEBUG: {dict_float_choices=}")
-    # msg_list.append(f"DEBUG: {instructor_answer=}")
-    # msg_list.append(f"DEBUG: {student_answer=}")
-
     # Should go in structure check
     if not isinstance(student_answer, dict):
         return False, ""
@@ -837,6 +833,10 @@ def check_answer_dict_str_dict_str_float(
         # Initialize variables before use
         status_ = True  # Default to True
         msg_list_ = []  # Empty list to start
+
+        msg_list.append(f"DEBUG: {dict_float_choices=}")
+        msg_list.append("fDEBUG: {instructor_answer=}")
+        msg_list.append("fDEBUG: {student_answer==}")
 
         if len(dict_float_choices) > 0 and k in dict_float_choices:
             for val in dict_float_choices[k]:
@@ -1484,6 +1484,7 @@ def check_structure_dict_str_set_int(
 # ======================================================================
 
 
+''' NOT USED
 def check_answer_dict_str_float(
     student_answer: dict[str, float],
     instructor_answer: dict[str, float],
@@ -1511,11 +1512,6 @@ def check_answer_dict_str_float(
 
     """
     msg_list = []
-
-    # msg_list.append(f"DEBUG: {dict_float_choices=}")
-    # msg_list.append(f"DEBUG: {instructor_answer=}")
-    # msg_list.append(f"DEBUG: {student_answer=}")
-
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
@@ -1545,6 +1541,7 @@ def check_answer_dict_str_float(
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     return return_value(status, msg_list, student_answer, instructor_answer)
+'''
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
