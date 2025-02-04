@@ -83,6 +83,8 @@ def create_config_dict():
         config.get("types", {}).get("list[string]", {}).get("include_indices", [])
     )
     config_dict["outer_key_choices"] = []  # default
+    config_dict["inner_key_choices"] = []  # default
+    config_dict["key_choices"] = {}  # default
 
     config_dict["student_folder_name"] = config.get("all_tests").get(
         "student_folder_name", "student_code_with_answers"
@@ -312,6 +314,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 rel_tol = part.get("rel_tol", config_dict["rel_tol"])
                 abs_tol = part.get("abs_tol", config_dict["abs_tol"])
                 str_choices = part.get("str_choices", config_dict["str_choices"])
+                dict_key_choices = part.get("key_choices", config_dict["key_choices"])
                 dict_int_choices = part.get(
                     "dict_int_choices", config_dict["dict_int_choices"]
                 )
@@ -374,6 +377,13 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                     test_code += (
                          "    local_namespace['remove_spaces'] = remove_spaces\n"
                     )
+
+                if part_type in ["dict[str,list[str]]"]:
+                    test_code += f"    dict_key_choices = {dict_key_choices}\n"
+                    test_code += (
+                         "    local_namespace['key_choices'] = dict_key_choices\n"
+                    )
+
 
                 test_code +=  "    local_namespace['rel_tol'] = rel_tol\n"
                 test_code +=  "    local_namespace['abs_tol'] = abs_tol\n"

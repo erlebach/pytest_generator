@@ -873,7 +873,8 @@ def check_structure_dict_str_list_str(
 def check_answer_dict_str_list_str(
     student_answer: dict[str, list[str]],
     instructor_answer: dict[str, list[str]],
-    partial_score_frac: list[float],
+    key_choices: dict[str, list[str]] | None = None,
+    partial_score_frac: list[float] = [0.0],
 ) -> tuple[bool, str]:
     """Check if student answer matches instructor answer for dict[str, list[str]] type.
 
@@ -883,35 +884,64 @@ def check_answer_dict_str_list_str(
     Args:
         student_answer (dict[str, list[str]]): Student's submitted answer
         instructor_answer (dict[str, list[str]]): Instructor's reference answer
+        key_choices (dict[str, list[str]] | None): Dictionary mapping instructor keys
+            to lists of acceptable alternative key spellings
         partial_score_frac (list[float]): List to store partial credit score fraction
 
     Returns:
         tuple[bool, str]: Status indicating if answers match and message detailing
             any mismatches
     """
-    print("\n===> INSIDE check_answer_dict_str_list_str")
     msg_list = []
-    status = True
+    status = False
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(instructor_answer)
 
+    if key_choices is None:
+        key_choices = {}
+
+    print(f".... key_choices: {key_choices}")
+    # Create mapping from alternative keys to instructor keys
+    key_mapping = {}
+    for i_key, alternatives in key_choices.items():
+        for alt_key in alternatives:
+            key_mapping[clean_str_answer(alt_key)] = i_key
+
     # Check each key in instructor answer
-    for key, i_list in instructor_answer.items():
-        if key not in student_answer:
+    for i_key, i_list in instructor_answer.items():
+        # Try to find matching student key
+        s_key = None
+        if i_key in student_answer:
+            s_key = i_key
+        else:
+            # Look for alternative spellings
+            clean_student_keys = {clean_str_answer(k): k for k in student_answer.keys()}
+            for clean_key, original_key in clean_student_keys.items():
+                if clean_key in key_mapping and key_mapping[clean_key] == i_key:
+                    s_key = original_key
+                    msg_list.append(f"Accepted alternative key {s_key!r} for {i_key!r}")
+                    break
+
+        if s_key is None:
             status = False
-            msg_list.append(f"Missing key: {key!r}")
+            msg_list.append(f"Missing key: {i_key!r}")
             ps_dict["nb_mismatches"] += 1
             continue
 
-        s_list = student_answer[key]
+        # Check list values
+        s_list = student_answer[s_key]
         status_, msg_ = check_list_str(i_list, s_list, ps_dict)
         if not status_:
             status = False
-            msg_list.extend([f"For key {key!r}:"] + [msg_])
+            msg_list.extend([f"For key {i_key!r}:"] + [msg_])
+
+    # Set status to True if no errors were found
+    if ps_dict["nb_mismatches"] == 0:
+        status = True
 
     partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
-    if not msg_list:
+    if status and not msg_list:
         msg_list = ["Answer matches expected values."]
 
     return return_value(status, msg_list, student_answer, instructor_answer)

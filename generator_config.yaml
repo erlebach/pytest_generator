@@ -75,8 +75,12 @@ test_answers:
   # Alternative choices for inner dictionary keys
   # ???
   inner_key_choices: {}
+
+  # Alternative choices dictionary keys
+  key_choices: {}
  
-  # Alternative choices for string values associated with dictionary keys
+  # Alternative choices for string values associated with dictionary values
+  # in a list. 
   # Assume a dictionary with keys: 'a', 'b'
   # str_value_choices: {'a': ['word1', 'word2'], 'b': ['word3', 'word4']}
   str_value_choices: {}

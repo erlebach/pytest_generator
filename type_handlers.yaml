@@ -323,7 +323,7 @@ types:
 
   dict[str,list[str]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_list_str(student_answer, instructor_answer, partial_score_frac_l)"
+    assert_answer: "assert_utilities.check_answer_dict_str_list_str(student_answer, instructor_answer, key_choices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_dict_str_list_str(student_answer, instructor_answer)"
     assert: "isinstance({answer_var}, dict) and all(isinstance(k, str) and isinstance(v, list) for k, v in {answer_var}.items())"
     struct_msg: "Answer should be dictionary, specifically: dict[str, list[str]]."
