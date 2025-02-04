@@ -101,8 +101,12 @@ def check_float(
     status = True
     msg = ""
 
+    print("===> check_float <====")
+    print(f"{i_el=}, {s_el=}")
+    print(f"{rel_tol=}, {abs_tol=}")
     if math.fabs(i_el) <= abs_tol:
         abs_err = math.fabs(i_el - s_el)
+        print(f"{abs_err=}")
         status = abs_err < FLOAT_TOL
     elif math.fabs((i_el - s_el) / i_el) < rel_tol:
         status = True
@@ -282,6 +286,12 @@ def check_str(
     """
     status = True
     msg = ""
+    # Allow argument to be int (maybe temporary)
+    if isinstance(s_str, int):
+        s_str = str(s_str)
+    # Allow argument to be int (maybe temporary)
+    if isinstance(i_str, int):
+        i_str = str(i_str)
     if str_choices is None:
         str_choices = []
     str_choices = [clean_str_answer(s) for s in str_choices]
@@ -843,7 +853,9 @@ def check_structure_dict_str_list_str(
 
         # Check that all elements in the list are strings
         for i, elem in enumerate(value):
-            if not isinstance(elem, str | int | float):  # choice of int is a hack (student can use string or int or float
+            if not isinstance(
+                elem, str | int | float
+            ):  # choice of int is a hack (student can use string or int or float
                 msg_list.append(
                     f"- Element {i} for key {key!r} must be a string, but is type {type(elem).__name__}"
                 )
@@ -5016,3 +5028,127 @@ def check_answer_logisticregression(
         msg_list = ["LogisticRegression parameters match expected values"]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+# ----------------------------------------------------------------------
+
+
+def check_structure_list_tuple_float(
+    student_answer: list[tuple[float, ...]],
+) -> tuple[bool, str]:
+    """Check if student's answer is a list of tuples containing floats.
+
+    Args:
+        student_answer: Student's submitted answer
+
+    Returns:
+        tuple[bool, str]: A tuple containing:
+            - bool: True if structure matches, False otherwise
+            - str: Message explaining any type mismatches
+    """
+    msg_list = []
+    status = True
+
+    print("INSIDE structure")
+    print(f"{student_answer=}")
+
+    # Check if it's a list
+    if not isinstance(student_answer, list):
+        print("not a list")
+        return False, f"Expected type list, got {type(student_answer).__name__}"
+
+    # Check each element
+    for i, item in enumerate(student_answer):
+        print(f"{i=}, {item=}")
+        # Check if element is a tuple
+        if not isinstance(item, tuple):
+            status = False
+            msg_list.append(f"Element {i} is not a tuple: got {type(item).__name__}")
+            continue
+
+        # Check if all elements in tuple are floats or can be cast to float
+        if not all(isinstance(x, (float, int, np.floating)) for x in item):
+            status = False
+            msg_list.append(f"Tuple {i} {item} contains non-float values")
+
+    print("status= ", status)
+    return status, "\n".join(
+        msg_list
+    ) if msg_list else "Structure matches expected list[tuple[float, ...]]"
+
+
+def check_answer_list_tuple_float(
+    student_answer: list[tuple[float, ...]],
+    instructor_answer: list[tuple[float, ...]],
+    rel_tol: float,
+    partial_score_frac_l: list[float] = [0.0],
+) -> tuple[bool, str]:
+    """Check if student's list of float tuples matches instructor's.
+
+    Args:
+        student_answer: Student's submitted list of float tuples
+        instructor_answer: Instructor's reference list of float tuples
+        rel_tol: Relative tolerance for float comparisons
+        partial_score_frac: List to store partial credit score fraction.
+            The list permits its return via the argument.
+
+    Returns:
+        tuple[bool, str]: Status indicating if answers match and message detailing
+            any mismatches
+
+    """
+    print(f"...{rel_tol=}")
+    print(f"{partial_score_frac_l=}")
+    print(f"==> {student_answer=}")
+    print(f"==> {instructor_answer=}")
+    msg_list = []
+    status = True
+    ps_dict = init_partial_score_dict()
+
+    # First check structure
+    structure_status, structure_msg = check_structure_list_tuple_float(student_answer)
+    print("===> EXIT check_structure_list_tuple_float")
+    if not structure_status:
+        return False, structure_msg
+
+    # Check if lists have same length
+    if len(student_answer) != len(instructor_answer):
+        status = False
+        msg_list.append(
+            f"Length mismatch: expected {len(instructor_answer)}, got {len(student_answer)}"
+        )
+        return return_value(status, msg_list, student_answer, instructor_answer)
+
+    ps_dict["nb_total"] = len(instructor_answer) * len(instructor_answer[0])
+
+    # Check each tuple
+    for i, (s_tuple, i_tuple) in enumerate(zip(student_answer, instructor_answer, strict=True)):
+        # Check if tuples have same length
+        if len(s_tuple) != len(i_tuple):
+            status = False
+            msg_list.append(
+                f"Tuple {i} length mismatch: expected {len(i_tuple)}, got {len(s_tuple)}"
+            )
+            continue
+
+        # Compare each float in the tuples
+        print(f"==> {s_tuple=}, {i_tuple=}")
+        for j, (s_val, i_val) in enumerate(zip(s_tuple, i_tuple, strict=True)):
+            print(f"==> {j=}, {s_val=}, {i_val=}")
+            print(f"{type(s_val)=}, {type(i_val)=}")
+            status_, msg = check_float(i_val, s_val, rel_tol=rel_tol, abs_tol=1.0e-6)
+            print(f"==> {status_=}, {msg=}")
+            if not status_:
+                status = False
+                ps_dict["nb_mismatches"] += 1
+                msg_list.append(f"Tuple {i}, element {j}: {msg}")
+
+    partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+
+    if not msg_list:
+        msg_list = ["Answer matches expected values."]
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+
+# ----------------------------------------------------------------------

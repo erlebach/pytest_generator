@@ -54,5 +54,6 @@ types_list = [
     "GridSearchCV",
     "LogisticRegression",
     "set[tuple[int]]",
+    "list[tuple[float]]",
 ]
 # dict[str,any]: must be able to compare with equality

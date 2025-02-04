@@ -50,6 +50,11 @@ types:
     assert_answer: "assert_utilities.check_answer_set_tuple_int(student_answer, instructor_answer, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_set_tuple_int(student_answer)"
 
+  list[tuple[float]]:
+    import: ""
+    assert_answer: "assert_utilities.check_answer_list_tuple_float(student_answer, instructor_answer, rel_tol, partial_score_frac_l)"
+    assert_structure: "assert_utilities.check_structure_list_tuple_float(student_answer)"
+
   list[int]:
     import: "" 
     assert_answer: "assert_utilities.check_answer_list_int(student_answer, instructor_answer)"
@@ -65,7 +70,6 @@ types:
   set:
     import: ""
     assert: "isinstance({answer_var}, set)"
-    struct_msg: Answer should be of type set. 
     note: a set of objects (any type, mostly strings), TBD
 
   set[str]:
@@ -78,12 +82,10 @@ types:
     import: ""
     assert_answer: "assert_utilities.check_answer_bool(student_answer, instructor_answer)"
     assert_structure: "assert_utilities.check_structure_bool(student_answer)"
-    #struct_msg: Answer should be a bool. 
 
   choice:
     import: ""
     assert: "{answer_var} in {valid_choices}"
-    #struct_msg: Answer should one of {valid_choices}. 
 
   float_range:
     import: ""
