@@ -1333,43 +1333,41 @@ def check_answer_set_str(
             - bool: True if answers match and validation passes, False otherwise
             - str: Message explaining the validation result
 
+    Notes:
+        Set equality is order-independent. Sets {a,b} and {b,a} are equal.
+        All strings are cleaned using clean_str_answer before comparison.
     """
     msg_list = []
-    status = True
+    status = False
     ps_dict = init_partial_score_dict()
 
     if choices is None:
         choices = []
 
-    s_answ = {i.lower().strip() for i in student_answer}
-    i_answ = {i.lower().strip() for i in instructor_answer}
+    # Clean all strings using clean_str_answer
+    s_answ = {clean_str_answer(i) for i in student_answer}
+    i_answ = {clean_str_answer(i) for i in instructor_answer}
 
-    # ! TODO: How to compare two sets with strings for equality?
-
-    # Only consider elements in choices
-    # Each choice[i] is a list (of alternatives?)
+    # Clean choices if provided
     if choices and isinstance(choices[0], list):
-        choices = [set(c) for c in choices]
+        choices = [set(clean_str_answer(el) for el in c) for c in choices]
+    elif choices and isinstance(choices[0], set):
+        choices = [set(clean_str_answer(el) for el in c) for c in choices]
 
-    # ! TODO: do not consider elements in `exclude_list`
-    # ! TODO: only consider elements in `include_list`
-    # ! TODO: I should use **kwargs to simplify code
-
-    if choices != [] and isinstance(choices[0], set):
-        for i, a_set in enumerate(choices):
-            choices[i] = {clean_str_answer(el) for el in a_set}
-
+    # Check answer against choices or instructor answer
     if choices and isinstance(choices[0], set):
-        status = s_answ in choices
+        if s_answ in choices:
+            status = True
     else:
-        status = s_answ == i_answ
+        if s_answ == i_answ:
+            status = True
 
-    msg_list.append("Strings are lower-cased and stripped")
+    msg_list.append("All strings are cleaned (lowercased, stripped, spaces normalized)")
     if choices and isinstance(choices[0], set):
         msg_list.append(f"Student answer is one of {choices}")
 
-    if not msg_list:
-        msg_list = ["Your set[str] answer matches expected values. "]
+    if status and not msg_list:
+        msg_list = ["Your set[str] answer matches expected values."]
 
     return return_value(status, msg_list, s_answ, i_answ)
 
