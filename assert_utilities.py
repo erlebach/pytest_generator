@@ -917,7 +917,9 @@ def check_answer_dict_str_list_str(
     msg_list = []
     status = True  # Start with True since structure is valid
     ps_dict = init_partial_score_dict()
-    ps_dict["nb_total"] = len(instructor_answer)
+    # ps_dict["nb_total"] = len(instructor_answer)
+    # gets updated in check_list
+    ps_dict["nb_total"] = 0
 
     if key_choices is None:
         key_choices = {}
@@ -951,11 +953,14 @@ def check_answer_dict_str_list_str(
 
         # Check list values
         s_list = student_answer[s_key]
+        print(f"\nsend to check_list_str, {i_list=}")
+        print(f"send to check_list_str, {s_list=}")
         status_, msg_ = check_list_str(i_list, s_list, ps_dict)
+        print("return from check_list_str, ps_dict= ", ps_dict, "\n")
         if not status_:
             # Update status and increment mismatch counter
             status = False
-            ps_dict["nb_mismatches"] += 1
+            # ps_dict["nb_mismatches"] += 1
 
             # Create message prefix for this key
             key_msg = f"For key {i_key!r}:"
@@ -973,12 +978,16 @@ def check_answer_dict_str_list_str(
             msg_list.append(message_lines)
 
     # Calculate partial credit
-    partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    try:
+        partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        partial_score_frac_l[0] = 1.0
 
     if status and not msg_list:
         msg_list = ["Answer matches expected values."]
     print(f"{msg_list=}")
     print(f"{status=}")
+    print(f"{partial_score_frac_l=}")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
