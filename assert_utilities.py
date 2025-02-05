@@ -524,16 +524,28 @@ def return_value(
         tuple[bool, str]: The status and message list
 
     """
-    if status:
-        msg_list.append("Answer is correct")
-    else:
-        msg_list.append("Answer is incorrect.")
-    msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
-    msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
-    print(f"return_value: {s_answ=}")
-    print(f"return_value: {i_answ=}")
+    # if status:
+    #     msg_list.append("Answer is correct")
+    # else:
+    #     msg_list.append("Answer is incorrect.")
+    # msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
+    # msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
+    # print(f"*** return_value: {s_answ=}")
+    # print(f"*** return_value: {i_answ=}")
 
-    return status, "\n".join(msg_list)
+    # return status, "\n".join(msg_list)
+
+    # For debug messages, just convert everything to strings directly
+    # since we're only using them for display purposes
+    debug_s = str(s_answ)
+    debug_i = str(i_answ)
+
+    # Ensure all elements in msg_list are strings
+    msg_list = [str(msg) for msg in msg_list]
+
+    return status, "\n".join(
+        [*msg_list, f"return_value: s_answ={debug_s}", f"return_value: i_answ={debug_i}"]
+    )
 
 
 # ----------------------------------------------------------------------
@@ -798,6 +810,7 @@ def check_answer_dict_str_list_int(
 def check_structure_dict_str_list_str(
     student_answer: dict[str, list[str]],
     instructor_answer: dict[str, list[str]],
+    key_choices: dict[str, list[str]] | None = None,
 ) -> tuple[bool, str]:
     """Check if student answer matches expected structure of dict[str, list[str]].
 
@@ -805,63 +818,80 @@ def check_structure_dict_str_list_str(
     1. Student answer is a dictionary
     2. All dictionary keys are strings
     3. All dictionary values are lists of strings
-    4. Student answer contains all required keys from instructor answer
+    4. Student answer contains all required keys from instructor answer or their
+       acceptable alternatives
 
     Args:
         student_answer (dict[str, list[str]]): Student's submitted answer to check
         instructor_answer (dict[str, list[str]]): Instructor's reference answer
             defining expected structure
+        key_choices (dict[str, list[str]] | None): Dictionary mapping instructor keys
+            to lists of acceptable alternative key spellings
 
     Returns:
         tuple[bool, str]: Status indicating if structure is valid and message detailing
             any validation errors
     """
-    status = True
+    status = False
     msg_list = []
 
     # Check if answer is a dictionary
     if not isinstance(student_answer, dict):
         return False, "Answer must be a dict"
 
-    # Check for missing keys
-    instructor_keys = set(instructor_answer.keys())
-    student_keys = set(student_answer.keys())
-    missing_keys = instructor_keys - student_keys
+    if key_choices is None:
+        key_choices = {}
+
+    # Create mapping from alternative keys to instructor keys
+    key_mapping = {}
+    for i_key, alternatives in key_choices.items():
+        for alt_key in alternatives:
+            key_mapping[clean_str_answer(alt_key)] = i_key
+
+    # Check for missing keys, accounting for alternatives
+    missing_keys = set()
+    for i_key in instructor_answer.keys():
+        found = False
+        if i_key in student_answer:
+            found = True
+        else:
+            # Look for alternative spellings
+            clean_student_keys = {clean_str_answer(k): k for k in student_answer.keys()}
+            for clean_key in clean_student_keys:
+                if clean_key in key_mapping and key_mapping[clean_key] == i_key:
+                    found = True
+                    msg_list.append(
+                        f"Accepted alternative key {clean_student_keys[clean_key]!r} for {i_key!r}"
+                    )
+                    break
+        if not found:
+            missing_keys.add(i_key)
 
     if missing_keys:
         msg_list.append(f"- Missing keys: {[repr(k) for k in missing_keys]}.")
-        status = False
     else:
         msg_list.append("- No missing keys")
 
-    # Check that all keys are strings and all values are lists of strings
-    for key, value in student_answer.items():
-        # int can be easily converted to string
-        if not isinstance(key, str):
-            msg_list.append(
-                f"- Key {key!r} must be of type 'str', but is type {type(key).__name__}"
-            )
-            status = False
-            continue
-
+    # Check that all values are lists of strings
+    for s_key, value in student_answer.items():
         if not isinstance(value, list):
             msg_list.append(
-                f"- Value for key {key!r} must be a list, but is type {type(value).__name__}"
+                f"- Value for key {s_key!r} must be a list, but is type {type(value).__name__}"
             )
-            status = False
             continue
 
         # Check that all elements in the list are strings
         for i, elem in enumerate(value):
-            if not isinstance(
-                elem, str | int | float
-            ):  # choice of int is a hack (student can use string or int or float
+            if not isinstance(elem, str | int | float):  # student can use string or int or float
                 msg_list.append(
-                    f"- Element {i} for key {key!r} must be a string, but is type {type(elem).__name__}"
+                    f"- Element {i} for key {s_key!r} must be a string, but is type {type(elem).__name__}"
                 )
-                status = False
 
-    if status:
+    # Set status to True if no errors found (or only alternative key messages exist)
+    if not any(msg.startswith("- ") for msg in msg_list) or (
+        all(not msg.startswith("- ") or "No missing keys" in msg for msg in msg_list)
+    ):
+        status = True
         msg_list.append("Type 'dict[str, list[str]]' is correct")
 
     return status, "\n".join(msg_list)
@@ -874,55 +904,41 @@ def check_answer_dict_str_list_str(
     student_answer: dict[str, list[str]],
     instructor_answer: dict[str, list[str]],
     key_choices: dict[str, list[str]] | None = None,
-    partial_score_frac: list[float] = [0.0],
+    partial_score_frac_l: list[float] = [0.0],
 ) -> tuple[bool, str]:
     """Check if student answer matches instructor answer for dict[str, list[str]] type.
-
-    Compares student and instructor answers that are dictionaries with string keys and
-    lists of strings as values. Checks that list elements match exactly.
-
-    Args:
-        student_answer (dict[str, list[str]]): Student's submitted answer
-        instructor_answer (dict[str, list[str]]): Instructor's reference answer
-        key_choices (dict[str, list[str]] | None): Dictionary mapping instructor keys
-            to lists of acceptable alternative key spellings
-        partial_score_frac (list[float]): List to store partial credit score fraction
-
-    Returns:
-        tuple[bool, str]: Status indicating if answers match and message detailing
-            any mismatches
+    Assumes structure validation has already passed.
     """
     msg_list = []
-    status = False
+    status = True  # Start with True since structure is valid
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(instructor_answer)
 
     if key_choices is None:
         key_choices = {}
 
-    print(f".... key_choices: {key_choices}")
-    # Create mapping from alternative keys to instructor keys
-    key_mapping = {}
-    for i_key, alternatives in key_choices.items():
-        for alt_key in alternatives:
-            key_mapping[clean_str_answer(alt_key)] = i_key
+    # Create sets of acceptable keys for each instructor key
+    i_keys = {
+        i_key: set([i_key] + key_choices.get(i_key, [])) for i_key in instructor_answer.keys()
+    }
 
-    # Check each key in instructor answer
-    for i_key, i_list in instructor_answer.items():
-        # Try to find matching student key
-        s_key = None
-        if i_key in student_answer:
-            s_key = i_key
-        else:
-            # Look for alternative spellings
-            clean_student_keys = {clean_str_answer(k): k for k in student_answer.keys()}
-            for clean_key, original_key in clean_student_keys.items():
-                if clean_key in key_mapping and key_mapping[clean_key] == i_key:
-                    s_key = original_key
+    # Map student keys to instructor keys
+    student_to_instructor = {}
+    for s_key in student_answer:
+        for i_key, acceptable_keys in i_keys.items():
+            if s_key in acceptable_keys:
+                student_to_instructor[s_key] = i_key
+                if s_key != i_key:
                     msg_list.append(f"Accepted alternative key {s_key!r} for {i_key!r}")
-                    break
+                break
+
+    # Check values for each instructor key
+    for i_key, i_list in instructor_answer.items():
+        # Find the corresponding student key
+        s_key = next((k for k, v in student_to_instructor.items() if v == i_key), None)
 
         if s_key is None:
+            # This shouldn't happen if structure check passed
             status = False
             msg_list.append(f"Missing key: {i_key!r}")
             ps_dict["nb_mismatches"] += 1
@@ -932,68 +948,115 @@ def check_answer_dict_str_list_str(
         s_list = student_answer[s_key]
         status_, msg_ = check_list_str(i_list, s_list, ps_dict)
         if not status_:
+            # Update status and increment mismatch counter
             status = False
-            msg_list.extend([f"For key {i_key!r}:"] + [msg_])
+            ps_dict["nb_mismatches"] += 1
 
-    # Set status to True if no errors were found
-    if ps_dict["nb_mismatches"] == 0:
-        status = True
+            # Create message prefix for this key
+            key_msg = f"For key {i_key!r}:"
 
-    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+            # Format message based on whether msg_ is string or list
+            if isinstance(msg_, str):
+                message_lines = [key_msg, msg_]
+                print(f"if instance, {message_lines=}", flush=True)
+            else:
+                message_lines = [key_msg] + msg_
+                print(f"else, {message_lines=}", flush=True)
+
+            # Add formatted message to msg_list
+            msg_list.extend(message_lines)
+            msg_list.append(message_lines)
+
+    # Calculate partial credit
+    partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     if status and not msg_list:
         msg_list = ["Answer matches expected values."]
-
+    print(f"{msg_list=}")
+    print(f"{status=}")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # ----------------------------------------------------------------------
 
 
-def check_structure_dict_str_dict_str_list(
-    student_answer: dict[str, dict[str, list]],
-    instructor_answer: dict[str, dict[str, list]],
+def check_structure_dict_str_list_str(
+    student_answer: dict[str, list[str]],
+    instructor_answer: dict[str, list[str]],
+    key_choices: dict[str, list[str]] | None = None,
 ) -> tuple[bool, str]:
-    """Check the structure of the student answer.
+    """Check if student answer matches expected structure of dict[str, list[str]].
 
     Args:
-        student_answer (dict[str, dict[str, list]]): The student answer
-        instructor_answer (dict[str, dict[str, list]]): The instructor answer
+        student_answer: Student's submitted answer
+        instructor_answer: Instructor's reference answer
+        key_choices: Dictionary mapping instructor keys to lists of acceptable alternatives
 
     Returns:
-        tuple[bool, str]: The status and message
-
+        tuple[bool, str]: Status indicating if structure is valid and message
     """
-    msg_list: list[str] = []
-    status: bool = True
-    i_ans = instructor_answer
-    s_ans = student_answer
+    status = True
+    msg_list = []
 
-    if not isinstance(s_ans, dict):
+    if not isinstance(student_answer, dict):
         return False, "Answer must be a dict"
 
-    missing_keys = set(i_ans.keys()) - set(s_ans.keys())
-    if len(missing_keys) > 0:
-        return False, f"- Missing keys: {[repr(k) for k in missing_keys]}."
-    for k, v in instructor_answer.items():
-        if not isinstance(v, dict):
-            msg_list.append(f"- answer[{k!r}] must be of type 'dict'")
+    if key_choices is None:
+        key_choices = {}
+
+    # Create dictionary of sets of acceptable keys for each instructor key
+    i_keys = {
+        i_key: set([i_key] + key_choices.get(i_key, [])) for i_key in instructor_answer.keys()
+    }
+
+    # Track which instructor keys have been matched
+    matched_i_keys = set()
+
+    # Check each student key against acceptable keys
+    for s_key in student_answer:
+        found_match = False
+        for i_key, acceptable_keys in i_keys.items():
+            if i_key in matched_i_keys:
+                continue
+            if s_key in acceptable_keys:
+                matched_i_keys.add(i_key)
+                found_match = True
+                if s_key != i_key:
+                    msg_list.append(f"Accepted alternative key {s_key!r} for {i_key!r}")
+                break
+
+        if not found_match:
             status = False
-            continue
-        # v is a dict
-        for kk, vv in v.items():
-            if not (isinstance(kk, str) and isinstance(vv, list)):
-                # `repr` is used so that quotes are seen when printing the message
-                msg_list.extend(
-                    [
-                        f"- answer[{k!r}] must have keys of type 'str' and ",
-                        "values of type 'list'",
-                    ],
+            msg_list.append(f"Invalid key {s_key!r} - no matching instructor key")
+
+    # Check for unmatched instructor keys
+    unmatched_keys = set(i_keys.keys()) - matched_i_keys
+    if unmatched_keys:
+        status = False
+        msg_list.append(f"Missing keys: {[repr(k) for k in unmatched_keys]}")
+    else:
+        msg_list.append("All required keys present")
+
+    # Check that values are lists of strings
+    if status:
+        for s_key, value in student_answer.items():
+            if not isinstance(value, list):
+                msg_list.append(
+                    f"Value for key {s_key!r} must be a list, but is type {type(value).__name__}"
                 )
                 status = False
+                continue
 
-    if status is True:
-        msg_list.append("Type 'dict[str, dict[str, list]' is correct.")
+            # Check that all elements in the list are strings
+            for i, elem in enumerate(value):
+                if not isinstance(elem, (str, int, float)):  # Allow string, int or float
+                    msg_list.append(
+                        f"Element {i} for key {s_key!r} must be a string, int, or float, but is type {type(elem).__name__}"
+                    )
+                    status = False
+
+    if status:
+        msg_list.append("Type 'dict[str, list[str]]' is correct")
 
     return status, "\n".join(msg_list)
 
@@ -2090,57 +2153,90 @@ def check_structure_dict_int_ndarray(
 
 
 # ======================================================================
-def check_answer_dict_int_list(
-    student_answer: dict[int, list[float]],
-    instructor_answer: dict[int, list[float]],
-    keys: list[int] | None,
+def check_answer_dict_str_int(
+    student_answer: dict[str, int],
+    instructor_answer: dict[str, int],
+    keys: list[str] | None = None,
+    dict_int_choices: dict[str, int] | None = None,
+    partial_score_frac: list[float] = [0.0],
 ) -> tuple[bool, str]:
-    """Check if student answer matches instructor answer for dict[int, list[float]].
-
-    Compares student and instructor answers that are dictionaries with integer keys and
-    lists of floats as values.
+    """Check if a student's dictionary of strings answer matches the instructor's answer.
 
     Args:
-        student_answer (dict[int, list[float]]): Student's submitted answer
-        instructor_answer (dict[int, list[float]]): Instructor's reference answer
-        keys (list[int] | None): List of keys to check. If None, checks all keys in
-            instructor_answer
+        student_answer (dict[str, int]): The student's submitted answer
+        instructor_answer (dict[str, int]): The instructor's correct answer
+        keys (list[str] | None): Optional list of keys to check. If None, all keys are
+            checked. If `keys` is provided, only the keys in `keys` are checked.
+        dict_int_choices (dict[str, int] | None): Optional dictionary of float choices
+            for each key. If provided, validates that student_answer[k] is one of these choices.
+        partial_score_frac (list[float]): The partial score fraction
 
     Returns:
-        tuple[bool, str]: Status indicating if answers match and message detailing any
-            mismatches
+        tuple[bool, str]: A tuple containing:
+            - bool: True if answers match and validation passes, False otherwise
+            - str: Message explaining the validation result
+
+    Use the function (NOT DONE):
+        def check_dict_str_float(
+            keys: list[str],
+            i_dict: dict[str, int],
+            s_dict: dict[str, int],
+            ps_dict: dict[str, int],
+        ) -> tuple[bool, list[str]]:
 
     """
-    msg_list = []
-    status = True
-    keys = list(instructor_answer.keys()) if keys is None else keys
+    if dict_int_choices is not None:
+        dict_int_choices = {}
+        print("dict_int_choices is not implemented in dict[str,int] types")
 
-    return False, ""
+    # keys not implement
+    if keys is not None or keys is None:
+        keys = []
+        print("keys is not yet implemented for dict[str,int] types")
+
+    msg_list = []
+
+    # msg_list.append(f"DEBUG: {dict_float_choices=}")
+    # msg_list.append(f"DEBUG: {instructor_answer=}")
+    # msg_list.append(f"DEBUG: {student_answer=}")
+
+    status = True
+    keys = list(instructor_answer.keys()) if keys is [] else keys
+    ps_dict = init_partial_score_dict()
+    ps_dict["nb_total"] = len(keys)
+    if dict_int_choices is None:
+        dict_int_choices = {}
+
+    print(f"==> {student_answer=}")
+    print(f"==> {instructor_answer=}")
 
     # Need an exception in case the student key is not found
     for k in keys:
-        s_arr = student_answer[k]
-        i_arr = instructor_answer[k]
-        if s_arr.shape != i_arr.shape:
+        s_int = student_answer[k]
+        i_int = instructor_answer[k]
+
+        # if clause not exeucted if dict_int_choices is None or {}
+        if len(dict_int_choices) > 0 and k in dict_int_choices:
+            for val in dict_int_choices[k]:
+                if val == "i":  # use instructor answer
+                    val = i_int
+                status_, msg_list_ = check_int(s_int, val)
+                if status_ is True:
+                    break
+        else:
+            status_, msg_ = check_int(i_int, s_int)
+
+        if status_ is False:
             status = False
-            msg_list.append(f"key: {k}, incorrect shape {s_arr.shape}, should be {i_arr.shape}.")
-        for i_el, s_el in zip(i_arr, s_arr, strict=True):
-            if i_el == s_el:
-                status = True
-            else:
-                status = False
-                msg_list.append(f"Elements not equal (instructor/student): {i_el}/{s_el}")
-        """
-        # s_norm = np.linalg.norm(s_arr)
-        # i_norm = np.linalg.norm(i_arr)
-        # i_dict_norm[k] = i_norm
-        # s_dict_norm[k] = s_norm
-        # rel_err = math.fabs(s_norm - i_norm) / math.fabs(i_norm)
-        # if rel_err > rel_tol:
-        # status = False
-        # msg_list.append(f"key: {key}, L2 norm is not within {int(100*rel_tol)}%\n\
-        # relative error of the correct norm of {i_norm}.")
-        """
+            ps_dict["nb_mismatches"] += 1
+            msg_list.append(msg_)
+
+    print(f"==> {ps_dict=}")
+    try:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        print("ZeroDivisionError: check_answer_dict_str_int. FIX.")
+        partial_score_frac[0] = 1.0
 
     if not msg_list:
         msg_list = ["Answer matches expected values. "]
@@ -2148,7 +2244,9 @@ def check_answer_dict_int_list(
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+# ======================================================================
+
+
 def check_structure_dict_int_list(
     student_answer: dict[int, list[float]],
     instructor_answer: dict[int, list[float]],
