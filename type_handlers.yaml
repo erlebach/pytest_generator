@@ -74,7 +74,7 @@ types:
 
   set[str]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_set_str(student_answer, instructor_answer, partial_score_frac_l, choices)"
+    assert_answer: "assert_utilities.check_answer_set_str(student_answer, instructor_answer, choices, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_set_str(student_answer)"
     #answer_msg: "Correct answer: {instructor_answer}"
 
