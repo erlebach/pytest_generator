@@ -530,8 +530,9 @@ def return_value(
     #     msg_list.append("Answer is incorrect.")
     # msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
     # msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
-    # print(f"*** return_value: {s_answ=}")
-    # print(f"*** return_value: {i_answ=}")
+
+    print(f"*** Instructor answer: {i_answ}")
+    print(f"*** Student answer: {s_answ}")
 
     # return status, "\n".join(msg_list)
 
@@ -544,7 +545,11 @@ def return_value(
     msg_list = [str(msg) for msg in msg_list]
 
     return status, "\n".join(
-        [*msg_list, f"return_value: s_answ={debug_s}", f"return_value: i_answ={debug_i}"]
+        [
+            *msg_list,
+            f"return_value: student_answer={debug_s}",
+            f"return_value: instructor_answer={debug_i}",
+        ],
     )
 
 
