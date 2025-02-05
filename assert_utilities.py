@@ -786,7 +786,7 @@ def check_answer_dict_str_list_int(
             any mismatches
 
     """
-    print(f"==> inside check_answer_dict_str_list_int, {partial_score_frac_l=}")
+    print(f"==> inside check_answer_dict_str_list_int, {partial_score_frac_l=}", flush=True)
     msg_list = []
     status = True
     ps_dict = init_partial_score_dict()
@@ -3758,7 +3758,12 @@ def check_answer_list_str(
             ps_dict["nb_mismatches"] += 1
             mismatched_strings.append(s_a)
 
-    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    try:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+        print(f"==> inside check_answer_list_str, {partial_score_frac=}")
+    except ZeroDivisionError:
+        partial_score_frac[0] = 1.0
+
     # ! TODO: Explicitly state the indices considered for grading.
     """
     # msg_list += [f"List elements in position()s {exclude_indices} is/are not graded.\n"]
@@ -5386,7 +5391,11 @@ def check_answer_list_tuple_float(
                 ps_dict["nb_mismatches"] += 1
                 msg_list.append(f"Tuple {i}, element {j}: {msg}")
 
-    partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    try:
+        partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+        print(f"==> **** inside check_answer_list_tuple_float, {partial_score_frac_l=}")
+    except ZeroDivisionError:
+        partial_score_frac_l[0] = 1.0
 
     if not msg_list:
         msg_list = ["Answer matches expected values."]

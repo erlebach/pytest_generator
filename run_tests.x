@@ -29,29 +29,7 @@ else
     #pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py::test_answers_question5_q5_4_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack
 
     #pytest -s --import-mode='append' tests/test_structure_preprocessed_hw1_expand.py
-    #pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py
-     pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py::test_answers_question4_q4_1_list_lbrack_str_rbrack
+    pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py
 
 fi
 
-
-# Fix all partial scoring
-#OK FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question2_q2_4_set_lbrack_str_rbrack - assert False
-#OK FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question3_q3_1_set_lbrack_str_rbrack - assert False
-#OKFAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question3_q3_2_set_lbrack_str_rbrack - assert False
-#OK FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question3_q3_3_set_lbrack_str_rbrack - assert False
-# OK FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question3_q3_6_set_lbrack_str_rbrack - assert False
-# OK FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question3_q3_7_set_lbrack_str_rbrack - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question4_q4_1_list_lbrack_str_rbrack - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question5_q5_1_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack - ValueError: zip() argument 2 is shorter than argument 1
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question5_q5_3_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack - ValueError: zip() argument 2 is longer than argument 1
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question5_q5_4_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question6_q6_1_dict_lbrack_str_comma_list_lbrack_str_rbrack_rbrack - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question6_q6_2_dict_lbrack_str_comma_list_lbrack_str_rbrack_rbrack - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question6_q6_3_dict_lbrack_str_comma_list_lbrack_str_rbrack_rbrack - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question7_q7_2_str - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question7_q7_3_list_lbrack_tuple_lbrack_float_rbrack_rbrack - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question9_q9_1_str - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question9_q9_3_str - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question10_q10_2_bool - assert False
-#FAILED tests/test_answers_preprocessed_hw1_expand.py::test_answers_question10_q10_7_bool - assert False]
