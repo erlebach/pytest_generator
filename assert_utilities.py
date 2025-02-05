@@ -738,6 +738,9 @@ def check_structure_dict_str_list_int(
     status: bool = True
     msg_list: list[str] = []
 
+    print(f"structure, {student_answer=}")
+    print(f"structure, {instructor_answer=}")
+
     if not isinstance(student_answer, dict):
         return False, "Answer must be a dict"
 
@@ -765,7 +768,7 @@ def check_structure_dict_str_list_int(
 def check_answer_dict_str_list_int(
     student_answer: dict[str, list[int]],
     instructor_answer: dict[str, list[int]],
-    partial_score_frac: list[float],
+    partial_score_frac_l: list[float],
 ) -> tuple[bool, str]:
     """Check if student answer matches instructor answer for dict[str, list[int]] type.
 
@@ -801,7 +804,10 @@ def check_answer_dict_str_list_int(
             status = False
             msg_list.extend([f"For key {key!r}:"] + [msg_])
 
-    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    try:
+        partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        partial_score_frac_l[0] = 1.0
 
     if not msg_list:
         msg_list = ["Answer matches expected values."]
