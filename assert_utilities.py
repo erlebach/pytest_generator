@@ -203,6 +203,7 @@ def check_list_int(
     msg_list = []
     status = True
     ps_dict["nb_total"] += len(i_arr)
+    print(f"==> inside check_list_int, {ps_dict=}")
 
     for i_el, s_el in zip(i_arr, s_arr, strict=True):
         status_, msg_ = check_int(i_el, s_el)
@@ -785,6 +786,7 @@ def check_answer_dict_str_list_int(
             any mismatches
 
     """
+    print(f"==> inside check_answer_dict_str_list_int, {partial_score_frac_l=}")
     msg_list = []
     status = True
     ps_dict = init_partial_score_dict()
@@ -795,11 +797,12 @@ def check_answer_dict_str_list_int(
         if key not in student_answer:
             status = False
             msg_list.append(f"Missing key: {key!r}")
-            ps_dict["nb_mismatches"] += 1
+            # ps_dict["nb_mismatches"] += 1
             continue
 
         s_list = student_answer[key]
         status_, msg_ = check_list_int(i_list, s_list, ps_dict)
+        print("check_list return, ps_dict= ", ps_dict, "\n", flush=True)
         if not status_:
             status = False
             msg_list.extend([f"For key {key!r}:"] + [msg_])
@@ -808,7 +811,7 @@ def check_answer_dict_str_list_int(
         partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     except ZeroDivisionError:
         partial_score_frac_l[0] = 1.0
-
+    print(f"===check_answer_dict_str_list_int, {partial_score_frac_l=}")
     if not msg_list:
         msg_list = ["Answer matches expected values."]
 
@@ -988,6 +991,7 @@ def check_answer_dict_str_list_str(
         partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     except ZeroDivisionError:
         partial_score_frac_l[0] = 1.0
+    print(f"==> inside check_answer_dict_str_list_str, {partial_score_frac_l=}")
 
     if status and not msg_list:
         msg_list = ["Answer matches expected values."]

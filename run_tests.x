@@ -24,10 +24,12 @@ if [[ "$current_date" < "$due_date" ]] || [[ "$current_date" == "$due_date" ]]; 
 else 
     echo "Current date is later than the due date."
 
-    # pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py
-    # pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py::test_answers_question6_q6_3_dict_lbrack_str_comma_list_lbrack_str_rbrack_rbrack
+    # # pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py
+    #pytest -s --import-mode='append' tests/test_structure_preprocessed_hw1_expand.py::test_structure_question5_q5_4_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack
+    #pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py::test_answers_question5_q5_4_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack
 
-    # pytest -s --import-mode='append' tests/test_structure_preprocessed_hw1_expand.py
-    pytest -s --import-mode='append' tests/test_structure_preprocessed_hw1_expand.py::test_structure_question5_q5_4_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack
+    #pytest -s --import-mode='append' tests/test_structure_preprocessed_hw1_expand.py
+    # pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py
+    pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py::test_answers_question6_q6_1_dict_lbrack_str_comma_list_lbrack_str_rbrack_rbrack
 
 fi
