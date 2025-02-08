@@ -305,7 +305,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 function_name,
             )
 
-            print(f"{part_type=}")
+            #print(f"{part_type=}")
+            #print("types_list= ", types_list)
             if part_type in types_list:
                 print("part_type is in types_list")
                 test_code += "    local_namespace = {}\n"
