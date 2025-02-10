@@ -1524,55 +1524,36 @@ def check_answer_set_str(
         All strings are cleaned using clean_str_answer before comparison.
 
     """
-    print("enter check_answer_set_str")
-
     msg_list = []
     status = False
     ps_dict = init_partial_score_dict()
-    print(f"enter: {partial_score_frac_l=}")
+    ps_dict["nb_total"] = len(instructor_answer)
 
     if choices is None:
-        choices = []
+        choices = set()
 
     # Clean all strings using clean_str_answer
     s_answ = {clean_str_answer(i) for i in student_answer}
     i_answ = {clean_str_answer(i) for i in instructor_answer}
 
-    # Clean choices if provided
-    if choices and isinstance(choices[0], list):
-        choices = [set(clean_str_answer(el) for el in c) for c in choices]
-    elif choices and isinstance(choices[0], set):
-        choices = [set(clean_str_answer(el) for el in c) for c in choices]
+    all_choices = set()
+    # if choices is a list of sets, add all the elements into a single set
+    if choices and isinstance(choices, list):
+        for s in choices:
+            all_choices.update(s)
+    all_choices.update(i_answ)
 
-    # First check if answer matches any of the choices
-    if choices:
-        if s_answ in choices:
-            status = True
-            msg_list.append(f"Student answer matches one of the valid choices: {choices}")
-            msg_list.append(f"Score: 0")
-            partial_score_frac_l[0] = 0.0
-            return return_value(status, msg_list, s_answ, i_answ)
+    # clean all the choices
+    all_choices = {clean_str_answer(i) for i in all_choices}
 
-    # If no choices provided or answer didn't match choices, compare with instructor answer
-    if not choices or not status:
-        if s_answ == i_answ:
-            status = True
-        else:
-            # Calculate partial credit
-            if len(i_answ) != len(s_answ):
-                msg_list.append(
-                    f"Student answer has {len(s_answ)} elements, expected {len(i_answ)} elements",
-                )
-            ps_dict["nb_total"] = len(i_answ)
-            ps_dict["nb_mismatches"] = len(i_answ) - len(i_answ.intersection(s_answ))
-
-    msg_list.append("All strings are cleaned (lowercased, stripped, spaces normalized)")
-
-    if status and not msg_list:
-        msg_list = ["Your set[str] answer matches expected values."]
+    # Loop over the student answer and check if it is in the all_choices
+    for s in s_answ:
+        if s not in all_choices:
+            status = False
+            ps_dict["nb_mismatches"] += 1
+            msg_list.append(f"Student answer contains {s}, which is not in the valid choices")
 
     try:
-        print(f"{partial_score_frac_l=}")
         partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     except ZeroDivisionError:
         partial_score_frac_l[0] = 1.0

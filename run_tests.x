@@ -29,7 +29,8 @@ else
     #pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py::test_answers_question5_q5_4_dict_lbrack_str_comma_list_lbrack_int_rbrack_rbrack
 
     #pytest -s --import-mode='append' tests/test_structure_preprocessed_hw1_expand.py
-    pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py
+    3 pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py
+    pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py::test_answers_question2_q2_3_set_lbrack_str_rbrack
 
 fi
 
