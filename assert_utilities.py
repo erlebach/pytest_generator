@@ -1528,9 +1528,10 @@ def check_answer_set_str(
     status = False
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(instructor_answer)
-
-    if choices is None:
+    print("top ==> choices: ", choices)
+    if not choices:
         choices = set()
+        print("choices is None -> set()")
 
     # Clean all strings using clean_str_answer
     s_answ = {clean_str_answer(i) for i in student_answer}
@@ -1552,6 +1553,9 @@ def check_answer_set_str(
             status = False
             ps_dict["nb_mismatches"] += 1
             msg_list.append(f"Student answer contains {s}, which is not in the valid choices")
+
+    if ps_dict["nb_mismatches"] == 0:
+        status = True
 
     try:
         partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
