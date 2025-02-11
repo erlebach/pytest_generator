@@ -1599,24 +1599,26 @@ def check_structure_set_str(student_answer: set[str] | list[str]) -> tuple[bool,
     """
     msg_list = []
     status = True
-    are_all_str = True  # Initialize are_all_str to avoid unbound error
+    are_all_str = None
 
     if isinstance(student_answer, set | list):
         status = True
         msg_list.append("- Type is either 'list' or 'set' (correct).")
     else:
         status = False
+        are_all_str = False
         msg_list.append("- Answer must be of type 'set' or 'list'.")
 
     if status:
         for s in student_answer:
+            print("s= ", s, flush=True)
             if not isinstance(s, str):
                 msg = f"- Set element {s!r} must be of type 'str'"
                 msg_list.append(msg)
                 status = False
                 are_all_str = False
 
-    if are_all_str:
+    if are_all_str is None:
         msg_list.append("- All elements are 'str', as required")
         status = True
 

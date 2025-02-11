@@ -19,8 +19,9 @@ echo "due_date" : $due_date
 if [[ "$current_date" < "$due_date" ]] || [[ "$current_date" == "$due_date" ]]; then
     echo "Current date is earlier than the due date."
 
-    # pytest -s --import-mode='append' tests/test_structure_preprocessed_hw3_expand.py
-    pytest -s --import-mode='append' tests/test_answers_preprocessed_hw3_expand.py
+    pytest -s --import-mode='append' tests/test_structure_preprocessed_hw3_expand.py
+    # pytest -s --import-mode='append' tests/test_structure_preprocessed_hw3_expand.py::test_structure_question5_a_set_lbrack_str_rbrack
+    # pytest -s --import-mode='append' tests/test_answers_preprocessed_hw3_expand.py
     #pytest -s --import-mode='append' tests/test_structure_preprocessed_all_questions_hw3_expand.py::test_structure_question5_a_set_lbrack_string_rbrack
 
 else 

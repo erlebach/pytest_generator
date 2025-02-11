@@ -43,14 +43,14 @@ def load_data_labels(nb_slices: int) -> tuple[Any, Any] | None:
     data_file_path = base_path / "question1_cluster_data.npy"  # Adjust the file name as needed
     labels_file_path = base_path / "question1_cluster_labels.npy"  # Adjust the file name as needed
 
-    try:
-        data = np.load(data_file_path)[:nb_slices]
-        labels = np.load(labels_file_path)[:nb_slices]
-    except (FileNotFoundError, OSError, ValueError) as e:
-        print(f"Error loading data_labels: {e}")
-        return None, None
-    else:
-        return data, labels
+    #try:
+        #data = np.load(data_file_path)[:nb_slices]
+        #labels = np.load(labels_file_path)[:nb_slices]
+    #except (FileNotFoundError, OSError, ValueError) as e:
+        #print(f"Error loading data_labels: {e}")
+        #return None, None
+    #else:
+        #return data, labels
 
 
 # ----------------------------------------------------------------------
