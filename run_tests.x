@@ -9,7 +9,7 @@
 # student_code_with_answers is on my local system
 export PYTHONPATH=student_code_with_answers:/autograder/MAKE-STUDENT-OUTPUT/CODE:.:pytest_utils:instructor_code_with_answers:tests
 
-due_date="2025-03-04"
+due_date="2025-01-24"
 
 # Current date in YYYY-MM-DD format
 current_date=$(date '+%Y-%m-%d')
@@ -33,6 +33,7 @@ else
 
     #pytest -s --import-mode='append' tests/test_structure_preprocessed_hw1_expand.py
     pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py
+    # pytest -s --import-mode='append' tests/test_answers_preprocessed_hw1_expand.py::test_answers_question2_q2_1_set_lbrack_str_rbrack
 
 fi
 
