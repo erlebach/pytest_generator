@@ -9,7 +9,7 @@
 # student_code_with_answers is on my local system
 export PYTHONPATH=student_code_with_answers:/autograder/MAKE-STUDENT-OUTPUT/CODE:.:pytest_utils:instructor_code_with_answers:tests
 
-due_date="2025-01-24"
+due_date="2025-02-20"
 
 # Current date in YYYY-MM-DD format
 current_date=$(date '+%Y-%m-%d')
@@ -20,9 +20,7 @@ if [[ "$current_date" < "$due_date" ]] || [[ "$current_date" == "$due_date" ]]; 
     echo "Current date is earlier than the due date."
 
     pytest -s --import-mode='append' tests/test_structure_preprocessed_hw3_expand.py
-    # pytest -s --import-mode='append' tests/test_structure_preprocessed_hw3_expand.py::test_structure_question5_a_set_lbrack_str_rbrack
-    # pytest -s --import-mode='append' tests/test_answers_preprocessed_hw3_expand.py
-    #pytest -s --import-mode='append' tests/test_structure_preprocessed_all_questions_hw3_expand.py::test_structure_question5_a_set_lbrack_string_rbrack
+    #pytest -s --import-mode='append' tests/test_structure_preprocessed_hw3_expand.py::test_structure_question1_a_bool
 
 else 
     echo "Current date is later than the due date."

@@ -290,10 +290,10 @@ def run_compute():
         ### My patches are not applied. WHY?
 
         ## load_data_labels is not normally required.
-        try:
-            data, labels = load_data_labels(nb_slices=nb_samples)
-        except (FileNotFoundError, OSError, ValueError) as e:
-            print(f"Error loading data_labels: {e}")
+        #try:
+            #data, labels = load_data_labels(nb_slices=nb_samples)
+        #except (FileNotFoundError, OSError, ValueError) as e:
+            #print(f"Error loading data_labels: {e}")
         # Replace the first two args of spectral by my own data. This avoids some randomness.
 
         # Only work with modification module
