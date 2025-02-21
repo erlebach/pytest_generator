@@ -213,10 +213,7 @@ How to break out of a look in a pytest, and continue student code after loop.?
 ----------------------------------------------------------------------
 2024-05-06_12:56
 - I could've asked the students to return their ARI and SSE functions. I could have tested the results. MY ERROR.
-=======
+----------------------------------------------------------------------
 2025-01-30
 - When the code slows down a lot, it could be because of nan, or because of datasets that are very large. 
 ----------------------------------------------------------------------
-2025-02-03
-Last commit bbc00da6f7306f7fff13e12f85c88cda7bd30e54
->>>>>>> 5fe5f6c6f157a4124b65b5c0f9736abf1192fde1
