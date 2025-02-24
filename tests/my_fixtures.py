@@ -220,7 +220,7 @@ def apply_patches(*patches):
                 patched_obj = patch_obj.start()
                 patched_objects.append(patched_obj)
             except AttributeError as e:
-                print(f"Failed to patch {patch_obj}: {e}")
+                # print(f"Failed to patch {patch_obj}: {e}")
                 continue  # Skip failed patches
         yield patched_objects
     finally:
