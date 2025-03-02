@@ -86,7 +86,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus):
                 # print additional explanation
                 output += f"Explanation: {s.explanation!s}\n"
 
-            if s.answer_note is not None and s.answer_note is not "":
+            if s.answer_note is not None and s.answer_note != "":
                 output += f"Additional note: {s.answer_note!s}\n"
 
             if hasattr(s, 'hide_errors') and s.hide_errors is not None:

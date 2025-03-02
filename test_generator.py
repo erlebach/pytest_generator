@@ -114,7 +114,16 @@ assert_false = gen_config.get("assert_false", False)
 fixture_import_file = gen_config.get("fixture_import_file", None)
 
 function_header_str = f"""
-from pytest_utils.decorators import max_score, visibility, hide_errors
+# pytest_utils.pytest_utils necessary if I have pytest_utils as a local package
+# defined in pyproject.toml (might not work on Gradescope)
+try:
+    from pytest_utils.pytest_utils.decorators import max_score, visibility, hide_errors
+except:
+    pass
+try:
+    from pytest_utils.decorators import max_score, visibility, hide_errors
+except:
+    pass
 import assert_utilities  # <<< SHOULD be specified in config
 from {fixture_import_file} import *   
 # meant to handle fixtures (ideally auto-generated, but not yet)

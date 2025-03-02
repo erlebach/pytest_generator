@@ -19,23 +19,27 @@ echo "due_date" : $due_date
 if [[ "$current_date" < "$due_date" ]] || [[ "$current_date" == "$due_date" ]]; then
     echo "Current date is earlier than the due date."
 
-    pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part1_expand.py
-    # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part1_expand.py
+    pytest -s --import-mode='append' \
+       tests/test_structure_preprocessed_assignment_part1_expand.py \
+       tests/test_structure_preprocessed_assignment_part2_expand.py \
+       tests/test_structure_preprocessed_assignment_part3_expand.py
 
-    pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part2_expand.py
-    # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part2_expand.py
-
-    pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part3_expand.py
-    # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part3_expand.py
+    # pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part1_expand.py
+    # pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part2_expand.py
+    # pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part3_expand.py
 
 
 else 
     echo "Current date is later than the due date."
 
 #   >>>> CHANGE MANUALLY
-    pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part1_expand.py
+    pytest -s --import-mode='append' \
+       tests/test_answers_preprocessed_assignment_part1_expand.py \
+       tests/test_answers_preprocessed_assignment_part2_expand.py \
+       tests/test_answers_preprocessed_assignment_part3_expand.py
+
+    # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part1_expand.py
+    # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part2_expand.py
+    # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part3_expand.py
 fi
 
-#
-# test_answers_preprocessed_assignment_part1_expand.py	
-# test_structure_preprocessed_hw1_expand.py
