@@ -3,7 +3,10 @@
 # Runs on Gradescope server
 export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./student_code_with_answers:./instructor_code_with_answers:.:./tests
 
+<<<<<<< HEAD
 due_date="2025-05-01"
+=======
+>>>>>>> b6afed15545ba57dce1ba59049f0abd8666b1266
 due_date="2025-03-20"
 
 # Current date in YYYY-MM-DD format
