@@ -57,3 +57,5 @@ types_list = [
     "list[tuple[float]]",
 ]
 # dict[str,any]: must be able to compare with equality
+
+# dict[dict[str,float]] 3 NOT HANDLED

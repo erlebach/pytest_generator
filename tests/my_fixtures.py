@@ -266,10 +266,22 @@ def run_compute():
         # function_name = patch_dict["function_name"]
         # print("++==> run_compute")
         # print(f"  {module_dict=}")
-        # print(f"  {function_name=}")
+
+
+
+        ### tests/test_answers_preprocessed_jarvis_patrick_expand.py
+        ### ==> function_name='jarvis_patrick_clustering'
+        ### ==> patch_dict={'module': 'jarvis_patrick_clustering', 'function_name': 'jarvis_patrick_clustering', 'patched_functions': {'jarvis_patrick_clustering': None, 'scatter': <function scatter at 0x1086671c0>, 'plot': <function plot at 0x108666cb0>}}
+        ### ==> list(patch_dict.keys())=['module', 'function_name', 'patched_functions']
+
+
+
+        # print(f"\n==> {function_name=}")
         # print(f"  {module_dict[function_name]=}")
+        # print(f"\n==> {patch_dict=}")
+        # print(f"\n==> {list(patch_dict.keys())=}")
         function_dict = patch_dict[function_name]
-        module_name = patch_dict["module_name"]
+        module_name = patch_dict['module_name']
         # print(f"{module_name=}")
         # print("after patch_dict")
 

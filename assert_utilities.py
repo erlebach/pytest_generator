@@ -102,8 +102,8 @@ def check_float(
     msg = ""
 
     print("===> check_float <====")
-    print(f"{i_el=}, {s_el=}")
-    print(f"{rel_tol=}, {abs_tol=}")
+    # print(f"{i_el=}, {s_el=}")
+    # print(f"{rel_tol=}, {abs_tol=}")
     if math.fabs(i_el) <= abs_tol:
         abs_err = math.fabs(i_el - s_el)
         print(f"{abs_err=}")
@@ -1217,8 +1217,10 @@ def check_structure_dict_str_dict_str_float(
             continue
         # v is a dict
         for kk, vv in v.items():
-            if not (isinstance(kk, str) and isinstance(vv, float | np.floating)):
+            if not (isinstance(kk, str) and isinstance(vv, float | np.floating | np.integer | int)):
                 msg = f"- answer[{k!r}] must have keys of type 'str' and values of type 'float'"
+                msg_list.append(msg)
+                msg = f"-    Instead, key has type {type(kk)} and value has type {type(vv)}" 
                 msg_list.append(msg)
                 status = False
 
@@ -2854,7 +2856,7 @@ def check_structure_list_float(
 
     if status:
         for s_arr in instructor_answer:
-            if not isinstance(s_arr, float | np.floating):
+            if not isinstance(s_arr, float | np.floating | int | np.integer):
                 status = False
                 msg_list.append("- Element {i} of your list should be of type 'float'.")
 
@@ -4511,7 +4513,7 @@ def check_structure_dict_str_float(
         # keys not in the instructor set
         for k in instructor_answer:
             vs = student_answer[k]
-            if not isinstance(vs, float | np.floating):
+            if not isinstance(vs, float | np.floating | int):
                 msg_list.append(f"- answer[{k!r}] should be a float.")
                 status = False
 
@@ -4933,8 +4935,8 @@ def check_structure_dict_str_any(
 
 
 def check_structure_dict_int_dict_str_any(
-    student_answer: dict[str, dict],
-    instructor_answer: dict[str, dict],
+    student_answer: dict[int, dict[str, Any]],
+    instructor_answer: dict[int, dict[str, Any]],
     keys: list[str] | None = None,
 ) -> tuple[bool, str]:
     """Check if student's nested dictionary structure matches instructor's.
@@ -5391,3 +5393,178 @@ def check_answer_list_tuple_float(
 
 
 # ----------------------------------------------------------------------
+def check_answer_scatterplot2d(student_answer, instructor_answer, options, validation_functions):
+    status = True
+    msg_list = []
+
+    s_answ = student_answer
+    i_answ = instructor_answer
+
+    s_plt = s_answ
+    i_plt = i_answ
+
+    at_least_val = options.get('at_least_validation', None)
+
+    # print("s_answ= ", s_answ)
+    # print(f"{type(s_answ)=}")
+    s_fig = s_plt.figure
+    i_fig = i_plt.figure
+    # Assume only a single axis
+
+    def check_grid_status(ax):
+        # Check visibility of grid lines
+        # Get a list of booleans indicating the visibility status of each gridline
+        xgrid_visible = any([line.get_visible() for line in ax.xaxis.get_gridlines()])
+        ygrid_visible = any([line.get_visible() for line in ax.yaxis.get_gridlines()])
+        
+        # If any of the grid lines are visible, we consider the grid "on"
+        return xgrid_visible and ygrid_visible
+
+
+    def fig_dict(answ):
+        fig = answ.figure
+        # print("==> answ= ", answ)
+        # print("==> fig= ", fig)
+        # print("==> ", dir(fig))
+        ax = fig.axes[0]
+        coll = ax.collections[0]
+        xy = ax.collections[0].get_offsets()
+        path_collection = answ
+        face_colors = path_collection.get_facecolor() # RGBA
+        s_face_colors_readable = [mcolors.to_hex(c) for c in face_colors]
+        s_dict = {
+            'ax': ax,
+            'title': ax.get_title(),
+            'xlabel': ax.get_xlabel(),
+            'ylabel': ax.get_ylabel(),
+            'x': xy[:, 0],
+            'y': xy[:, 1],
+            'colors': np.unique(s_face_colors_readable)
+        }
+        return s_dict
+
+    s_dict = fig_dict(s_answ)
+    i_dict = fig_dict(i_answ)
+
+    s_grid = check_grid_status(s_dict['ax'])
+    i_grid = check_grid_status(s_dict['ax'])
+
+    title = s_dict['title']
+    x_label = s_dict['xlabel']
+    y_label = s_dict['ylabel']
+
+    if clean_str_answer(x_label) == "" or clean_str_answer(y_label) == "":
+        status = False
+        msg_list.append("The plot is missing either xlabel or ylabel")
+
+    if clean_str_answer(title) == "":
+        status = False
+        msg_list.append("The plot is missing the title")
+
+    if at_least_val:
+        count = at_least_val.get('count', 0)
+        nb_points = len(s_dict['x'])
+        if (nb_points < count):
+            status = False
+            msg_list.append(f"The 2D scatterplot should have at least {count} points")
+
+    # print(f"{s_grid=}, {i_grid=}")
+
+    return return_value(status, msg_list, student_answer, instructor_answer)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
+def check_structure_scatterplot2d(student_answer):
+    from matplotlib.collections import PathCollection
+
+    status = True
+    msg_list = []
+
+    s_answ = student_answer
+
+    if not isinstance(student_answer, PathCollection):
+        status = False
+        msg_list.append(
+            "The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'."
+        )
+
+    xy = s_answ.get_offsets()
+    #x, y = s_answ.get_offsets()
+    #sxsy = x.data.astype(float), y.data.astype(float)
+    #s_x, s_y = x.data.astype(float), y.data.astype(float)
+
+    # x, y, z = i_answ._offsets3d
+    # i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+
+    """
+    if i_x.shape == s_x.shape and i_y.shape == s_y.shape and i_z.shape == s_z.shape:
+        status = False
+        msg_list.append(f"The number of points ({s_x.shape[0]}) is incorrect")
+    """
+
+    return status, "\n".join(msg_list)
+
+
+# ======================================================================
+
+
+def check_answer_scatterplot3d(student_answer, instructor_answer, options, validation_functions):
+    status = True
+    msg_list = []
+
+    s_answ = student_answer
+    i_answ = instructor_answer
+
+    rel_tol = options.get("rel_tol", 1.e-2)
+
+    # Check for equality
+    x, y, z = s_answ._offsets3d
+    s_x, s_y, s_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+
+    x, y, z = i_answ._offsets3d
+    i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+
+    # print(f"==> {i_x=}, {i_y=}, {i_z=}")
+    # print(f"==> {s_x=}, {s_y=}, {s_z=}")
+
+    sum_i = np.sum(i_x) + np.sum(i_y) + np.sum(i_z)
+    sum_s = np.sum(s_x) + np.sum(s_y) + np.sum(s_z)
+
+    status, msg = check_float(sum_s, sum_i, rel_tol=rel_tol, abs_tol=1.e-5)
+    msg_list.append(msg)
+
+    return return_value(status, msg_list, s_answ, i_answ)
+
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
+def check_structure_scatterplot3d(student_answer):
+    from matplotlib.collections import PathCollection
+
+    status = True
+    msg_list = []
+
+    s_answ = student_answer
+
+    if not isinstance(student_answer, PathCollection):
+        status = False
+        msg_list.append(
+            "The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'."
+        )
+
+    x, y, z = s_answ._offsets3d
+    s_x, s_y, s_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+
+    x, y, z = i_answ._offsets3d
+    i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+
+    if i_x.shape == s_x.shape and i_y.shape == s_y.shape and i_z.shape == s_z.shape:
+        status = False
+        msg_list.append(f"The number of points ({s_x.shape[0]}) is incorrect")
+
+    return status, "\n".join(msg_list)
+
+
+# ======================================================================
