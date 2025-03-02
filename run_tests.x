@@ -1,37 +1,41 @@
 #!/bin/bash
 
-# Runs on Gradescope server
-export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./student_code_with_answers:./instructor_code_with_answers:.:./tests
+# Disable answer checking. 
+# Change manually after due date
 
-<<<<<<< HEAD
-due_date="2025-05-01"
-=======
->>>>>>> b6afed15545ba57dce1ba59049f0abd8666b1266
-due_date="2025-03-20"
+# Runs on Gradescope server
+# CODE: student code
+
+# student_code_with_answers is on my local system
+export PYTHONPATH=student_code_with_answers:/autograder/MAKE-STUDENT-OUTPUT/CODE:.:pytest_utils:instructor_code_with_answers:tests
+
+due_date="2025-03-04"
 
 # Current date in YYYY-MM-DD format
 current_date=$(date '+%Y-%m-%d')
 echo "current_date" : $current_date
 echo "due_date" : $due_date
 
-
-
 if [[ "$current_date" < "$due_date" ]] || [[ "$current_date" == "$due_date" ]]; then
     echo "Current date is earlier than the due date."
 
-# 8 tests
-# pytest -s --import-mode='append' tests/test_structure_preprocessed_jarvis_patrick_expand.py 
+    pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part1_expand.py
+    # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part1_expand.py
 
-# pytest -s --import-mode='append' tests/test_structure_preprocessed_em_expand.py 
+    pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part2_expand.py
+    # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part2_expand.py
 
-pytest -s --import-mode='append' tests/test_structure_preprocessed_spectral_expand.py
+    pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part3_expand.py
+    # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part3_expand.py
 
-else
+
+else 
     echo "Current date is later than the due date."
 
-pytest -s --import-mode='append' \
-    tests/test_answers_preprocessed_jarvis_patrick_expand.py \
-    tests/test_answers_preprocessed_em_expand.py \
-    tests/test_answers_preprocessed_spectral_expand.py
-
+#   >>>> CHANGE MANUALLY
+    pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part1_expand.py
 fi
+
+#
+# test_answers_preprocessed_assignment_part1_expand.py	
+# test_structure_preprocessed_hw1_expand.py
