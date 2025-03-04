@@ -1833,6 +1833,9 @@ def check_structure_dict_str_int(
     status = True
     msg_list = []
 
+    print(f"check_structure_dict_str_int, {student_answer}")
+    print(f"check_structure_dict_str_int, {instructor_answer}")
+
     if status and not isinstance(student_answer, dict):
         msg_list += ["Student answer should be a dict"]
         status = False
@@ -4559,7 +4562,7 @@ def check_structure_dict_str_float(
         i_val = instructor_answer[k]
 
         # Check types match
-        if not isinstance(s_val, type(i_val)):
+        if not isinstance(s_val, float | np.floating):
             status = False
             msg_list.append(
                 f"Type mismatch for key '{k}': "
