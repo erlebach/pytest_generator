@@ -1,13 +1,10 @@
 #!/bin/bash
 
-# Disable answer checking. 
-# Change manually after due date
-
 # Runs on Gradescope server
 # CODE: student code
 
 # student_code_with_answers is on my local system
-export PYTHONPATH=student_code_with_answers:/autograder/MAKE-STUDENT-OUTPUT/CODE:.:pytest_utils:instructor_code_with_answers:tests
+export PYTHONPATH=/autograder/MAKE-STUDENT-OUTPUT/student_code:./pytest_utils:./student_code_with_answers:./instructor_code_with_answers:.:./tests
 
 due_date="2025-03-04"
 
@@ -18,7 +15,6 @@ echo "due_date" : $due_date
 
 if [[ "$current_date" < "$due_date" ]] || [[ "$current_date" == "$due_date" ]]; then
     echo "Current date is earlier than the due date."
-
     pytest -s --import-mode='append' \
        tests/test_structure_preprocessed_assignment_part1_expand.py \
        tests/test_structure_preprocessed_assignment_part2_expand.py \
@@ -27,7 +23,6 @@ if [[ "$current_date" < "$due_date" ]] || [[ "$current_date" == "$due_date" ]]; 
     # pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part1_expand.py
     # pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part2_expand.py
     # pytest -s --import-mode='append' tests/test_structure_preprocessed_assignment_part3_expand.py
-
 
 else 
     echo "Current date is later than the due date."
@@ -42,4 +37,3 @@ else
     # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part2_expand.py
     # pytest -s --import-mode='append' tests/test_answers_preprocessed_assignment_part3_expand.py
 fi
-
