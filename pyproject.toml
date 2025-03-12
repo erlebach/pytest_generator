@@ -3,5 +3,20 @@ name = "pytest-generator"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "erlebach", email = "gordon.erlebach@gmail.com" }
+]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+ "matplotlib>=3.10.1",
+ "numpy>=2.2.3",
+ "pytest>=8.3.5",
+ "pyyaml>=6.0.2",
+]
+
+#[project.scripts]
+#pytest-generator = "pytest_generator:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -4,7 +4,7 @@ Expand a yaml file that contains answer lists so that there is only a single ans
 
 import yaml
 import pytest
-from generator_utils import sanitize_function_name
+from .generator_utils import sanitize_function_name
 import argparse
 from copy import deepcopy
 

@@ -3,8 +3,8 @@ import re
 import yaml
 import pytest
 import argparse
-from types_list import types_list
-from generator_utils import sanitize_function_name, get_decoded_str, evaluate_answers
+from .types_list import types_list
+from .generator_utils import sanitize_function_name, get_decoded_str, evaluate_answers
 
 def add_attribute(name, attr):
     if attr is not None:

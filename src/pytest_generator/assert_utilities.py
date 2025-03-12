@@ -24,10 +24,12 @@ from typing import Any, cast
 # ! import matplotlib.pyplot as plt
 import numpy as np
 import yaml
+
+# Used for typechecking arguments
+from matplotlib.lines import Line2D
 from matplotlib.figure import Figure
 
 # ! from matplotlib.collections import PathCollection
-from matplotlib.lines import Line2D
 from numpy.typing import NDArray
 
 """
@@ -3830,6 +3832,7 @@ def check_answer_lineplot(
             Min and max point values in x and y
 
     """
+
     status = True
     msg_list = []
 
@@ -3866,6 +3869,9 @@ def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> tuple[boo
         # I can check the instructor answer AND the student answer structurally
 
     """
+    # from matplotlib.figure import Figure
+    # from matplotlib.lines import Line2D
+
     status = True
     msg_list = []
 
