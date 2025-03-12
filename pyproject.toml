@@ -20,3 +20,8 @@ dependencies = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-package =  true
+exclude = ["tests/*", "template/*", "useful_script/*", "tmp/*", "pytest_utils/*"]
+include = ["src/*"]
