@@ -57,7 +57,7 @@ types:
 
   list[int]:
     import: "" 
-    assert_answer: "assert_utilities.check_answer_list_int(student_answer, instructor_answer)"
+    assert_answer: "assert_utilities.check_answer_list_int(student_answer, instructor_answer, partial_score_frac_l)"
     assert_structure: "assert_utilities.check_structure_list_int(student_answer, instructor_answer)"
 
   list[str]:
@@ -116,8 +116,10 @@ types:
 
   dict[str,set[int]]:
     import: ""
-    assert_answer: "assert_utilities.check_answer_dict_str_set_int(student_answer, instructor_answer, keys)"
-    assert_structure: "assert_utilities.check_structure_dict_str_set_int(student_answer, instructor_answer, keys)"
+    # assert_answer: "assert_utilities.check_answer_dict_str_set_int(student_answer, instructor_answer, keys)"
+    # assert_structure: "assert_utilities.check_structure_dict_str_set_int(student_answer, instructor_answer, keys)"
+    assert_answer: "assert_utilities.check_answer_dict_str_set_int(student_answer, instructor_answer)"
+    assert_structure: "assert_utilities.check_structure_dict_str_set_int(student_answer, instructor_answer)"
 
   dict[str,set]:
     import: ""
@@ -267,8 +269,8 @@ types:
 
   scatterplot3d:
     import: ""
-    assert_answer: "assert_utilities.check_answer_scatterplot3d(student_answer, instructor_answer, rel_tol)"
-    assert_structure: "assert_utilities.check_structure_scatterplot3d(student_answer)"
+    assert_answer: "assert_utilities.check_answer_scatterplot3d(student_answer, instructor_answer, options)"
+    assert_structure: "assert_utilities.check_structure_scatterplot3d(student_answer, instructor_answer)"
 
   dendrogram: 
     import: ""
