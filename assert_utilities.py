@@ -53,16 +53,6 @@ def init_partial_score_dict() -> dict[str, float | int]:
 
 # ----------------------------------------------------------------------
 
-def partial_score(ps_dict: dict) -> float:
-    """Assign partial socre."""
-    try:
-        partial_score_ = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-    except ZeroDivisionError:
-        partial_score_ = 1.0
-
-    print(f"===check_answer_dict_str_list_int, {partial_score_=}")
-    return partial_score_
-
 
 def check_missing_keys(
     missing_keys: list[str],
@@ -861,7 +851,11 @@ def check_answer_dict_str_list_int(
             status = False
             msg_list.extend([f"For key {key!r}:"] + [msg_])
 
-    partial_score_l[0] = partial_score(ps_dict)
+    try:
+        partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        partial_score_frac_l[0] = 1.0
+    print(f"===check_answer_dict_str_list_int, {partial_score_frac_l=}")
     if not msg_list:
         msg_list = ["Answer matches expected values."]
 
@@ -1037,7 +1031,10 @@ def check_answer_dict_str_list_str(
             msg_list.append(message_lines)
 
     # Calculate partial credit
-    partial_score_l[0] = partial_score(ps_dict)
+    try:
+        partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        partial_score_frac_l[0] = 1.0
     print(f"==> inside check_answer_dict_str_list_str, {partial_score_frac_l=}")
 
     if status and not msg_list:
@@ -2103,8 +2100,7 @@ def check_answer_dict_tuple_int_ndarray(
             status = False
             msg_list.append(msg)
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     if not msg_list:
         msg_list = ["Answer matches expected values. "]
@@ -2392,8 +2388,12 @@ def check_answer_dict_str_int(
             ps_dict["nb_mismatches"] += 1
             msg_list.append(msg_)
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
+    print(f"==> {ps_dict=}")
+    try:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        print("ZeroDivisionError: check_answer_dict_str_int. FIX.")
+        partial_score_frac[0] = 1.0
 
     if not msg_list:
         msg_list = ["Answer matches expected values. "]
@@ -2522,8 +2522,7 @@ def check_answer_dict_int_list_float(
             status = False
             msg_list.extend(msg_list_)
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     if not msg_list:
         msg_list = ["Answer matches expected values. "]
@@ -2689,9 +2688,12 @@ def check_answer_dict_int_float(
         if status_ is False:
             status = False
             ps_dict["nb_mismatches"] += 1
-  
-    # Calculate partial credit
-    partial_score_frac_l[0] = partial_score(ps_dict)
+    try:
+        print(f"==> {ps_dict=}")
+        partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        print("ZeroDivisionError in check_answer_dict_int_float. TO FIX.")
+        partial_score_frac_l[0] = 1.0
 
     if not msg_list:
         msg_list = ["Answer values are as expected. "]
@@ -2733,8 +2735,7 @@ def check_answer_list_int(
     if not status:
         msg_list.append("Some elements are incorrect")
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     if not msg_list:
         msg_list = ["Answer matches expected values. "]
@@ -2850,8 +2851,10 @@ def check_answer_list_float(
     if partial_score_frac is None:
         partial_score_frac = []
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
+    if monotone_increasing:
+        partial_score_frac[0] = 1.0
+    else:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     if not msg_list:
         msg_list = ["Answer matches expected values. "]
@@ -2965,9 +2968,7 @@ def check_answer_list_ndarray(
     if not status:
         msg_list.append("Replace the arrays by their norms")
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
-
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     if not msg_list:
         msg_list = ["Answer matches expected values. "]
@@ -3181,9 +3182,7 @@ def check_answer_list_list_float(
         if status is True:
             status = status_
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
-
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     msg_list.append(f"Answer correct if relative error < {rel_tol * 100} percent")
 
     if not msg_list:
@@ -3490,9 +3489,7 @@ def check_answer_dict_str_tuple_ndarray(
             msg_list.append(msg_)
             status = False
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
-
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     msg_list.append("Only print the norms of the arrays")
 
     if not msg_list:
@@ -3801,9 +3798,11 @@ def check_answer_list_str(
             ps_dict["nb_mismatches"] += 1
             mismatched_strings.append(s_a)
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
-
+    try:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+        print(f"==> inside check_answer_list_str, {partial_score_frac=}")
+    except ZeroDivisionError:
+        partial_score_frac[0] = 1.0
 
     # ! TODO: Explicitly state the indices considered for grading.
     """
@@ -4688,8 +4687,7 @@ def check_answer_dict_str_float(
             ps_dict["nb_mismatches"] += 1
             msg_list.append(msg_)
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     if not msg_list:
         msg_list = ["Answer matches expected values. "]
@@ -4777,8 +4775,7 @@ def check_answer_dict_str_float(
             ps_dict["nb_mismatches"] += 1
             msg_list.append(msg_)
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
+    partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
 
     if not msg_list:
         msg_list = ["Answer parameters match expected values. "]
@@ -4856,11 +4853,13 @@ def check_answer_dict_str_any(
             ps_dict["nb_mismatches"] += 1
             msg_list.append(msg_)
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
+    try:
+        partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+    except ZeroDivisionError:
+        partial_score_frac[0] = 1.0
 
     if not msg_list:
-        msg_list = ["Answer parameters match expected values. "]
+        msg_list = ["Answre parameters match expected values. "]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -5179,12 +5178,11 @@ def check_answer_dict_int_dict_str_any(
 
             # ... rest of the type checking logic remains the same ...
 
-    # Calculate partial credit
     if total_checks > 0:
         partial_score_frac_l[0] = 1.0 - (mismatches / total_checks)
 
     if not msg_list:
-        msg_list = ["Answer parameters match expected values. "]
+        msg_list = ["Answre parameters match expected values. "]
 
     return return_value(status, msg_list, student_answer, instructor_answer)
 
@@ -5437,8 +5435,11 @@ def check_answer_list_tuple_float(
                 ps_dict["nb_mismatches"] += 1
                 msg_list.append(f"Tuple {i}, element {j}: {msg}")
 
-    # Calculate partial credit
-    partial_score_frac[0] = partial_score(ps_dict)
+    try:
+        partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
+        print(f"==> **** inside check_answer_list_tuple_float, {partial_score_frac_l=}")
+    except ZeroDivisionError:
+        partial_score_frac_l[0] = 1.0
 
     if not msg_list:
         msg_list = ["Answer matches expected values."]
@@ -5563,10 +5564,7 @@ def check_structure_scatterplot2d(student_answer):
 # ======================================================================
 
 
-# More advanced version, not fully implemented
-#def check_answer_scatterplot3d(student_answer, instructor_answer, options, validation_functions):
-# Earlier version. Options is probably rel_err, but should be a dict
-def check_answer_scatterplot3d(student_answer, instructor_answer, options): #, validation_functions):
+def check_answer_scatterplot3d(student_answer, instructor_answer, options, validation_functions):
     status = True
     msg_list = []
 
@@ -5597,21 +5595,18 @@ def check_answer_scatterplot3d(student_answer, instructor_answer, options): #, v
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_scatterplot3d(student_answer, instructor_answer):
+def check_structure_scatterplot3d(student_answer):
     from matplotlib.collections import PathCollection
 
     status = True
     msg_list = []
 
     s_answ = student_answer
-    i_answ = instructor_answer
-    print("structure scatterplot3d")
-    print(f"==> {student_answer=}")
 
     if not isinstance(student_answer, PathCollection):
         status = False
         msg_list.append(
-            "The answer type should be 'PathCollection', which is the type of the output of 'plt.scatter'."
+            "The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'."
         )
 
     x, y, z = s_answ._offsets3d
@@ -5621,15 +5616,9 @@ def check_structure_scatterplot3d(student_answer, instructor_answer):
     i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
 
     if i_x.shape == s_x.shape and i_y.shape == s_y.shape and i_z.shape == s_z.shape:
-        status = True
-        msg_list.append("The number of points is correct.")
-    else:
         status = False
-        msg_list.append(f"The number of points is incorrect.")
-        msg_list.append(f"Instructor: {i_x.shape, i_y.shape, i_z.shape}")
-        msg_list.append("Student: {s_x.shape, s_y.shape, s_z.shape}")
+        msg_list.append(f"The number of points ({s_x.shape[0]}) is incorrect")
 
-    print("explanation: ", '\n'.join(msg_list))
     return status, "\n".join(msg_list)
 
 
