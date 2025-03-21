@@ -589,6 +589,7 @@ def check_answer_float(
     instructor_answer: float,
     rel_tol: float,
     abs_tol: float,
+    choices: list = [],
 ) -> tuple[bool, str]:
     """Check answer correctness. Assume the structure is correct.
 
@@ -602,15 +603,45 @@ def check_answer_float(
         tuple[bool, str]: The status and message
 
     """
-    status, msg = check_float(
-        instructor_answer,
-        student_answer,
-        rel_tol=rel_tol,
-        abs_tol=abs_tol,
-    )
+    print("\n...==> check_answer_float, choices= ", choices)
+    if choices is None:
+        choices = []
+    msgs = []
+    status = False
 
-    if not msg:
-        msg = "Float value is as expected."
+    if isinstance(instructor_answer, float):
+        accepted_answers = [instructor_answer] + choices
+
+
+    for i_answer in accepted_answers:
+        print(f"{i_answer=}, {student_answer=}")
+        status, msg = check_float(
+            i_answer,
+            student_answer,
+            rel_tol=rel_tol,
+            abs_tol=abs_tol)
+        msgs.append(msg)
+        if status == True:
+            return return_value(status, msg, student_answer, i_answer)
+
+    #print("==> .venv, check_answer_float, choices= ", choices)
+    #status, msg = check_float(
+        #instructor_answer,
+        #student_answer,
+        #rel_tol=rel_tol,
+        #abs_tol=abs_tol,
+    #)
+
+    if status == False:
+        msgs.append("Float value is as expected.")
+
+    # if not msg:
+        # msg = "Float value is as expected."
+
+    return return_value(status, msgs, student_answer, instructor_answer)
+    # return return_value(status, [msg], student_answer, instructor_answer)
+
+
 
     return return_value(status, [msg], student_answer, instructor_answer)
 
