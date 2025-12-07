@@ -1,10 +1,13 @@
-from pprint import pprint
-import re
-import yaml
-import pytest
 import argparse
+import re
+from pprint import pprint
+
+import pytest
+import yaml
+
+from .generator_utils import evaluate_answers, get_decoded_str, sanitize_function_name
 from .types_list import types_list
-from .generator_utils import sanitize_function_name, get_decoded_str, evaluate_answers
+
 
 def add_attribute(name, attr):
     if attr is not None:
@@ -14,29 +17,35 @@ def add_attribute(name, attr):
         test_code = ""
     return test_code
 
+
 def apply_options(defaults: dict, overrides: dict) -> dict:
     result = defaults.copy()  # Start with the defaults
     print(f"{overrides=}")
     result.update(overrides)  # Apply overrides
     return result
 
+
 with open("type_handlers.yaml") as f:
     type_handlers = yaml.safe_load(f)
+
 
 def load_yaml_file(file_path):
     with open(file_path, "r") as file:
         questions_data = yaml.safe_load(file)
     return questions_data
 
+
 def load_validations_options_file(file_path):
     with open(file_path, "r") as file:
         validations_options = yaml.safe_load(file)
     return validations_options
 
+
 def load_configuration_file(file_path):
     with open(file_path, "r") as file:
         config = yaml.safe_load(file)
     return config
+
 
 def create_config_dict():
     with open("generator_config.yaml", "r") as f:
@@ -45,7 +54,7 @@ def create_config_dict():
     option_defaults = config.get("option_defaults", {})
     types = config.get("types", {})
     config_dict = {}
-    config_dict['answer_type'] = config.get("all_tests").get("type", "float")
+    config_dict["answer_type"] = config.get("all_tests").get("type", "float")
     config_dict["rel_tol"] = (
         config.get("types", {}).get("float", {}).get("rel_tol", 0.01)
     )
@@ -100,6 +109,7 @@ def create_config_dict():
     )
     return config, config_dict
 
+
 config, config_dict = create_config_dict()
 
 # student_folder_name: student_code_with_answers
@@ -117,7 +127,8 @@ function_header_str = f"""
 # pytest_utils.pytest_utils necessary if I have pytest_utils as a local package
 # defined in pyproject.toml (might not work on Gradescope)
 from pytest_utils.decorators import max_score, visibility, hide_errors, partial_score
-import assert_utilities  # <<< SHOULD be specified in config
+# import assert_utilities  # <<< SHOULD be specified in config
+from pytest_generator import assert_utilities  # <<< SHOULD be specified in config
 from {fixture_import_file} import *   
 # meant to handle fixtures (ideally auto-generated, but not yet)
 from function_dictionaries import *
@@ -134,6 +145,7 @@ with open('type_handlers.yaml', 'r') as f:
 """
 
 # ----------------------------------------------------------------------
+
 
 def generate_test_answers_code(questions_data, sim_type, output_file="test_answers.py"):
     global rel_tol, abs_tol, exclude_indices, include_indices
@@ -155,7 +167,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
     )
     """
     # Update the questions_data with the keys of config_dict that are not present in questions_data
-    for k, v in config['all_tests'].items():
+    for k, v in config["all_tests"].items():
         if k not in questions_data:
             questions_data[k] = v
 
@@ -215,8 +227,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             fixture_args = fixture["args"]  # list of strings
 
         for part in question["parts"]:
-            options = part.get('options', {})
-            answer_type = config_dict['answer_type']
+            options = part.get("options", {})
+            answer_type = config_dict["answer_type"]
             part_type = part.get("type", answer_type)
             # I will need all fields in lower-level function
             part["type"] = part_type
@@ -307,8 +319,8 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 function_name,
             )
 
-            #print(f"{part_type=}")
-            #print("types_list= ", types_list)
+            # print(f"{part_type=}")
+            # print("types_list= ", types_list)
             if part_type in types_list:
                 print("part_type is in types_list")
                 test_code += "    local_namespace = {}\n"
@@ -342,13 +354,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                     "    local_namespace['exclude_indices'] = exclude_indices\n"
                 )
 
-                exclude_keys = part.get(
-                    "exclude_keys", config_dict["exclude_keys"]
-                )
+                exclude_keys = part.get("exclude_keys", config_dict["exclude_keys"])
                 test_code += f"    exclude_keys = {exclude_keys}\n"
-                test_code += (
-                    "    local_namespace['exclude_keys'] = exclude_keys\n"
-                )
+                test_code += "    local_namespace['exclude_keys'] = exclude_keys\n"
 
                 # indices to include from grading for list[float]
                 # Ignore index if not in include list
@@ -369,27 +377,28 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
                 if part_type in ["dict[str,int]"]:
                     test_code += f"    dict_int_choices = {dict_int_choices}\n"
-                    test_code +=  "    local_namespace['dict_int_choices'] = dict_int_choices\n"
+                    test_code += (
+                        "    local_namespace['dict_int_choices'] = dict_int_choices\n"
+                    )
 
                 if part_type in ["dict[str,float]", "dict[str,dict[str,float]]"]:
                     test_code += f"    dict_float_choices = {dict_float_choices}\n"
-                    test_code +=  "    local_namespace['dict_float_choices'] = dict_float_choices\n"
+                    test_code += "    local_namespace['dict_float_choices'] = dict_float_choices\n"
 
                 if part_type in ["str", "dict[str,float]", "list[str]"]:
                     test_code += f"    remove_spaces = {remove_spaces}\n"
                     test_code += (
-                         "    local_namespace['remove_spaces'] = remove_spaces\n"
+                        "    local_namespace['remove_spaces'] = remove_spaces\n"
                     )
 
                 if part_type in ["dict[str,list[str]]"]:
                     test_code += f"    dict_key_choices = {dict_key_choices}\n"
                     test_code += (
-                         "    local_namespace['key_choices'] = dict_key_choices\n"
+                        "    local_namespace['key_choices'] = dict_key_choices\n"
                     )
 
-
-                test_code +=  "    local_namespace['rel_tol'] = rel_tol\n"
-                test_code +=  "    local_namespace['abs_tol'] = abs_tol\n"
+                test_code += "    local_namespace['rel_tol'] = rel_tol\n"
+                test_code += "    local_namespace['abs_tol'] = abs_tol\n"
 
                 strg = f"type_handlers['types']['{part_type}']['assert_answer']"
 
@@ -405,7 +414,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 test_code += f"    keys = {keys}\n"
 
                 if eval(import_file):
-                    test_code += f"    {eval(import_file)}\n" # new: 2025-01-27
+                    test_code += f"    {eval(import_file)}\n"  # new: 2025-01-27
 
                 # Check structures
                 test_code += f'    msg_structure = "{assertion_structure}"\n'
@@ -474,7 +483,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
 
             else:
                 test_code += f"    print('type {part['type']} NOT HANDLED!')\n"
-                test_code +=  "    assert False\n"
+                test_code += "    assert False\n"
 
             if assert_false:
                 test_code += f"    assert False\n"
