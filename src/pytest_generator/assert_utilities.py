@@ -3266,7 +3266,7 @@ def check_structure_list_list_float(
         for j, el in enumerate(s_list):
             if not isinstance(el, float | np.floating):
                 msg = (
-                    f"- answer[{i}][{j}] cannot be cast to a float. All elements "
+                    f"- answer[{i}][{j}]={el} cannot be cast to a float. All elements "
                     "must be castable to float."
                 )
                 msg_list.append(msg)
