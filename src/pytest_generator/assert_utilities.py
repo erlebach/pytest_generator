@@ -1939,8 +1939,9 @@ def check_structure_dict_str_ndarray(
     Args:
         student_answer (dict[str, NDArray]): The student's submitted answer
         instructor_answer (dict[str, NDArray]): The instructor's correct answer
-        keys (list[str] | None): Optional list of keys to check. If None, all keys are
-            checked. If `keys` is provided, only the keys in `keys` are checked.
+        keys (list[str] | None): Optional list of keys to check. If None or empty list,
+            all keys in instructor_answer are checked. If `keys` is provided and non-empty,
+            only the keys in `keys` are checked for structure validation.
 
     Returns:
         tuple[bool, str]: A tuple containing:
@@ -1960,7 +1961,9 @@ def check_structure_dict_str_ndarray(
         status = False
 
     if status:
-        keys = keys if keys else list(instructor_answer.keys())
+        # If keys is None or empty, check all keys in instructor_answer
+        if keys is None or len(keys) == 0:
+            keys = list(instructor_answer.keys())
         instructor_keys = set(keys)
         instructor_answer = {k: v for k, v in instructor_answer.items() if k in keys}
         student_keys = set(student_answer.keys())
@@ -1975,7 +1978,11 @@ def check_structure_dict_str_ndarray(
     if status:
         # some keys are filtered. Student is allowed to have
         # keys not in the instructor set
-        for s_key, s_value in student_answer.items():
+        # Only check structure for keys in the keys list
+        for s_key in keys:
+            if s_key not in student_answer:
+                continue  # Skip if key is missing (already checked above)
+            s_value = student_answer[s_key]
             vs = s_value
             if not isinstance(vs, np.ndarray):
                 msg_list.append(f"- answer[{s_key!r}] should be a numpy array.")
