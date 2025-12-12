@@ -1716,7 +1716,7 @@ def check_answer_dict_str_set_int(
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_structure_str_set_int(
+def check_structure_dict_str_set_int(
     student_answer: dict[str, set[int] | list[int]],
     instructor_answer: dict[str, set[int] | list[int]],
 ) -> tuple[bool, str]:
