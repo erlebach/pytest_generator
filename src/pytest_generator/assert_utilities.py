@@ -1716,6 +1716,80 @@ def check_answer_dict_str_set_int(
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
+def check_structure_str_set_int(
+    student_answer: dict[str, set[int] | list[int]],
+    instructor_answer: dict[str, set[int] | list[int]],
+) -> tuple[bool, str]:
+    """Check if a student's dictionary of strings to sets of integers answer matches the expected structure.
+
+    Args:
+        student_answer (dict[str, set[int] | list[int]]): The student's submitted answer
+        instructor_answer (dict[str, set[int] | list[int]]): The instructor's correct answer
+
+    Returns:
+        tuple[bool, str]: A tuple containing:
+            - bool: True if answers match and validation passes, False otherwise
+            - str: Message explaining the validation result
+
+    """
+    status = True
+    msg_list = []
+
+    if not isinstance(student_answer, dict):
+        msg_list.append("- Answer should be of type 'dict'.")
+    else:
+        msg_list.append("- Type 'dict' is correct")
+
+    keys = set(instructor_answer.keys())
+    student_keys = set(student_answer.keys())
+    missing_keys = keys - student_keys
+
+    if status:
+        if len(missing_keys) > 0:
+            list_of_missing_keys = [repr(k) for k in missing_keys]
+            msg_list.append(f"- Missing keys: {list_of_missing_keys}.")
+            status = False
+        else:
+            msg_list.append("- No missing keys")
+
+    if status:
+        is_item_type_list = True
+        for k, v in student_answer.items():
+            if k in keys and not isinstance(v, set | list):
+                msg = f"- Answer[{k!r}] must be of type 'set' or 'list'."
+                msg_list.append(msg)
+                # The answer is cast to a set when checked for accuracy
+                status = False
+                is_item_type_list = False
+
+        if is_item_type_list:
+            msg_list.append("- All list elements are of type 'list' or 'set' as expected")
+            status = True
+
+    # Check that all set/list elements are integers
+    if status:
+        are_all_int = True
+        for k, v in student_answer.items():
+            if k in keys and isinstance(v, set | list):
+                for e in v:
+                    if not isinstance(e, int | np.integer):
+                        msg = f"- Answer[{k!r}] contains element {e!r} which must be of type 'int'"
+                        msg_list.append(msg)
+                        status = False
+                        are_all_int = False
+                        break
+                if not are_all_int:
+                    break
+
+        if are_all_int:
+            msg_list.append("- All set/list elements are of type 'int' as expected")
+
+    return status, "\n".join(msg_list)
+
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
 # ======================================================================
 
 
