@@ -3264,7 +3264,7 @@ def check_structure_list_list_float(
             continue
 
         for j, el in enumerate(s_list):
-            if not isinstance(el, float | np.floating):
+            if not isinstance(el, float | np.floating | int | np.integer):
                 msg = (
                     f"- answer[{i}][{j}]={el} cannot be cast to a float. All elements "
                     "must be castable to float."
@@ -4603,7 +4603,7 @@ def check_structure_dict_str_float(
         # keys not in the instructor set
         for k in instructor_answer:
             vs = student_answer[k]
-            if not isinstance(vs, float | np.floating | int):
+            if not isinstance(vs, float | np.floating | int | np.integer):
                 msg_list.append(f"- answer[{k!r}] should be a float.")
                 status = False
 
