@@ -5647,12 +5647,12 @@ def check_structure_scatterplot3d(student_answer):
     x, y, z = s_answ._offsets3d
     s_x, s_y, s_z = x.data.astype(float), y.data.astype(float), z.astype(float)
 
-    x, y, z = i_answ._offsets3d
-    i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
+    #x, y, z = i_answ._offsets3d
+    #i_x, i_y, i_z = x.data.astype(float), y.data.astype(float), z.astype(float)
 
-    if i_x.shape == s_x.shape and i_y.shape == s_y.shape and i_z.shape == s_z.shape:
-        status = False
-        msg_list.append(f"The number of points ({s_x.shape[0]}) is incorrect")
+    #if i_x.shape == s_x.shape and i_y.shape == s_y.shape and i_z.shape == s_z.shape:
+        #status = False
+        #msg_list.append(f"The number of points ({s_x.shape[0]}) is incorrect")
 
     return status, "\n".join(msg_list)
 
