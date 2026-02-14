@@ -94,6 +94,7 @@ def create_config_dict():
     config_dict["outer_key_choices"] = []  # default
     config_dict["inner_key_choices"] = []  # default
     config_dict["key_choices"] = {}  # default
+    config_dict["part_key_choices"] = []  # default
 
     config_dict["student_folder_name"] = config.get("all_tests").get(
         "student_folder_name", "student_code_with_answers"
@@ -305,6 +306,14 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
             if is_fixture and fixture_name is None:
                 raise "Fixture name is not defined"
 
+            # Read part_key_choices and auto-include the original part ID
+            part_key_choices = part.get("part_key_choices", config_dict["part_key_choices"])
+            part_id_str = part["id"]
+            if part_key_choices and part_id_str not in part_key_choices:
+                part_key_choices = [part_id_str] + list(part_key_choices)
+            elif not part_key_choices:
+                part_key_choices = [part_id_str]
+
             test_code = evaluate_answers(
                 questions_data,
                 question,
@@ -317,6 +326,7 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 fixture,
                 part,
                 function_name,
+                part_key_choices,
             )
 
             # print(f"{part_type=}")
