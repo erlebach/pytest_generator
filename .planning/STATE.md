@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-03-10T22:57:51.048Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-03-10T23:07:35.790Z"
 last_activity: 2026-03-10 — Roadmap and initial state created
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 33
 ---
 
@@ -66,6 +66,7 @@ Recent decisions affecting current work:
 - [Phase 01-regression-safety-net]: matplotlib.use('Agg') placed at module scope in conftest before any pyplot import
 - [Phase 01-regression-safety-net]: Test actual behavior not intended behavior — pre-existing bugs documented as regression baseline
 - [Phase 01-regression-safety-net]: Use pytest.raises for scatterplot2d/3d fail cases — functions raise AttributeError on wrong type
+- [Phase 01-regression-safety-net]: Document pre-existing bugs as regression baselines rather than fixing them (Phase 1 policy)
 
 ### Pending Todos
 
@@ -77,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T22:57:51.046Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-03-10T23:07:32.060Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
