@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-03-10T23:09:23.280Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-10T23:50:37.218Z"
 last_activity: 2026-03-10 — Roadmap and initial state created
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  completed_phases: 2
+  total_plans: 4
+  completed_plans: 4
   percent: 33
 ---
 
@@ -67,6 +67,8 @@ Recent decisions affecting current work:
 - [Phase 01-regression-safety-net]: Test actual behavior not intended behavior — pre-existing bugs documented as regression baseline
 - [Phase 01-regression-safety-net]: Use pytest.raises for scatterplot2d/3d fail cases — functions raise AttributeError on wrong type
 - [Phase 01-regression-safety-net]: Document pre-existing bugs as regression baselines rather than fixing them (Phase 1 policy)
+- [Phase 02-duplicate-removal]: Deleted only earlier definitions; runtime-active (later) definitions are always the keeper
+- [Phase 02-duplicate-removal]: Bottom-to-top deletion order prevents line-number shift errors when batch-removing multiple blocks
 
 ### Pending Todos
 
@@ -78,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T23:07:32.060Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-03-10T23:50:30.627Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

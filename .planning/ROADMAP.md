@@ -17,7 +17,7 @@ mechanical. The external interface of `test_generator.py` does not change.
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Regression Safety Net** - Write comprehensive tests covering all existing checker functions before touching any code (completed 2026-03-10)
-- [ ] **Phase 2: Duplicate Removal** - Identify and eliminate all duplicate function definitions
+- [x] **Phase 2: Duplicate Removal** - Identify and eliminate all duplicate function definitions (completed 2026-03-10)
 - [ ] **Phase 3: File Cleanup** - Extract utilities, add type aliases, reorganize file into logical sections
 - [ ] **Phase 4: Signature Standardization** - Standardize all checker signatures and confirm uniform return types
 - [ ] **Phase 5: Extensibility Template** - Document and demonstrate the canonical pattern for adding a new answer type
@@ -95,7 +95,7 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Regression Safety Net | 3/3 | Complete   | 2026-03-10 |
-| 2. Duplicate Removal | 0/1 | Not started | - |
+| 2. Duplicate Removal | 1/1 | Complete   | 2026-03-10 |
 | 3. File Cleanup | 0/? | Not started | - |
 | 4. Signature Standardization | 0/? | Not started | - |
 | 5. Extensibility Template | 0/? | Not started | - |

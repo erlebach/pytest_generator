@@ -50,7 +50,7 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | REQ-INFRA-01 | Phase 1 | Complete |
-| REQ-INFRA-02 | Phase 2 | Pending |
+| REQ-INFRA-02 | Phase 2 | Complete |
 | REQ-CLEAN-01 | Phase 3 | Pending |
 | REQ-CLEAN-02 | Phase 3 | Pending |
 | REQ-CLEAN-03 | Phase 3 | Pending |
