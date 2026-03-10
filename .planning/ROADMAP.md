@@ -48,7 +48,10 @@ Plans:
   1. A search for duplicate `def check_` names returns zero results
   2. All Phase 1 regression tests continue to pass after duplicate removal
   3. type_handlers.yaml references remain intact (no broken handler lookups)
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 02-01-PLAN.md — Remove all 7 duplicate definition blocks (5 Category A string-wrapped + 2 Category B live shadows), audit zero duplicates remain
 
 ### Phase 3: File Cleanup
 **Goal**: assert_utilities.py has a clear, navigable structure with named sections, type aliases, and shared primitives in a dedicated area
@@ -92,7 +95,7 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Regression Safety Net | 3/3 | Complete   | 2026-03-10 |
-| 2. Duplicate Removal | 0/? | Not started | - |
+| 2. Duplicate Removal | 0/1 | Not started | - |
 | 3. File Cleanup | 0/? | Not started | - |
 | 4. Signature Standardization | 0/? | Not started | - |
 | 5. Extensibility Template | 0/? | Not started | - |
