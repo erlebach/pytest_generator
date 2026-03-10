@@ -33,7 +33,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. All tests pass against the unmodified assert_utilities.py
   3. The test suite can be run with a single pytest invocation and produces a clear pass/fail result
   4. Each test validates both the `bool` and `str` components of the returned tuple
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Test infrastructure (sklearn dep, pyproject.toml config, conftest fixtures)
+- [ ] 01-02-PLAN.md — check_structure_* regression tests (47 functions, 94 test cases)
+- [ ] 01-03-PLAN.md — check_answer_* regression tests + AST inventory completeness test
 
 ### Phase 2: Duplicate Removal
 **Goal**: Each function in assert_utilities.py is defined exactly once; no shadowed definitions remain
@@ -86,7 +91,7 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Regression Safety Net | 0/? | Not started | - |
+| 1. Regression Safety Net | 0/3 | Planned | - |
 | 2. Duplicate Removal | 0/? | Not started | - |
 | 3. File Cleanup | 0/? | Not started | - |
 | 4. Signature Standardization | 0/? | Not started | - |
