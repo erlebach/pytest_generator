@@ -1,3 +1,10 @@
+import sys
+import os
+# Ensure src/ is on the path for pytest discovery
+_src = os.path.join(os.path.dirname(os.path.dirname(__file__)), "src")
+if _src not in sys.path:
+    sys.path.insert(0, _src)
+
 import matplotlib
 matplotlib.use('Agg')  # must be before any pyplot import
 
@@ -102,7 +109,7 @@ def fitted_gridsearchcv():
     try:
         from sklearn.svm import SVC
         from sklearn.model_selection import GridSearchCV
-        model = GridSearchCV(SVC(), {'C': [1, 10]})
+        model = GridSearchCV(SVC(), {'C': [1, 10]}, cv=2)
         model.fit([[0, 0], [1, 1], [2, 2], [3, 3]], [0, 1, 0, 1])
         return model
     except ImportError:
