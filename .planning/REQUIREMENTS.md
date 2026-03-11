@@ -29,6 +29,10 @@
 - **REQ-EXT-01**: Document template/recipe for adding a new answer type
 - **REQ-EXT-02**: Apply template retroactively to one existing type as the canonical reference implementation
 
+### AUDIT — Code Quality
+
+- **REQ-AUDIT-01**: Audit assert_utilities.py for code quality issues (debug dead code, logic bugs, stale comments, print statements) and fix all confirmed problems
+
 ## Out of Scope
 
 - Refactoring `test_generator.py` — future phase
@@ -58,3 +62,4 @@
 | REQ-CONS-02 | Phase 4 | Complete |
 | REQ-EXT-01 | Phase 5 | Pending |
 | REQ-EXT-02 | Phase 5 | Pending |
+| REQ-AUDIT-01 | Phase 6 | Complete |
