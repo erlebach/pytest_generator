@@ -123,10 +123,12 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 
 ### Phase 6: detailed-refactoring
 
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 5
-**Plans:** 1/1 plans complete
-
-Plans:
-- [ ] TBD (run /gsd:plan-phase 6 to break down)
+**Goal:** Audit assert_utilities.py after phases 1-5 and identify/implement any remaining refactoring opportunities — code quality issues, inconsistencies, dead code, debug prints, misleading comments, or structural problems not addressed by earlier phases
+**Requirements**: REQ-AUDIT-01
+**Depends on:** Phase 4 (Phase 5 may run in parallel)
+**Success Criteria** (what must be TRUE):
+  1. Every `print(...)` debug statement has been removed or replaced with proper logging
+  2. No misleading, stale, or incorrect comments remain in the file
+  3. Any remaining structural inconsistencies across check_structure_X or check_answer_X functions are resolved
+  4. All Phase 1 regression tests continue to pass after changes
+**Plans:** 2 plans\n\nPlans:\n- [ ] 06-01-PLAN.md — Fix logic inversion bug in check_structure_dict_str_set, update regression tests, remove stale bare-string block\n- [ ] 06-02-PLAN.md — Remove all 67 print/pprint statements, pprint import, 28 commented-out dead-code lines, and resolve 3 TODO markers
