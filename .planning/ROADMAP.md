@@ -78,7 +78,10 @@ Plans:
   2. All `check_answer_X` functions share a consistent parameter order and naming scheme
   3. Running a type-check or audit script confirms every public function has a `tuple[bool, str]` return annotation and returns nothing else
   4. All Phase 1 regression tests continue to pass
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 04-01-PLAN.md — Write audit script, add 4 missing scatterplot annotations, apply CheckResult alias, fix dendrogram param names
 
 ### Phase 5: Extensibility Template
 **Goal**: Adding a new answer type requires only filling in a documented template; one existing type serves as the reference implementation
@@ -101,7 +104,7 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 | 1. Regression Safety Net | 3/3 | Complete   | 2026-03-10 |
 | 2. Duplicate Removal | 1/1 | Complete   | 2026-03-10 |
 | 3. File Cleanup | 2/2 | Complete   | 2026-03-11 |
-| 4. Signature Standardization | 0/? | Not started | - |
+| 4. Signature Standardization | 0/1 | Not started | - |
 | 5. Extensibility Template | 0/? | Not started | - |
 
 ## Traceability
@@ -117,3 +120,13 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 | REQ-CONS-02 | Phase 4 | Pending |
 | REQ-EXT-01 | Phase 5 | Pending |
 | REQ-EXT-02 | Phase 5 | Pending |
+
+### Phase 6: detailed-refactoring
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 6 to break down)
