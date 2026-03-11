@@ -100,7 +100,7 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Regression Safety Net | 3/3 | Complete   | 2026-03-10 |
 | 2. Duplicate Removal | 1/1 | Complete   | 2026-03-10 |
-| 3. File Cleanup | 0/2 | Not started | - |
+| 3. File Cleanup | 1/2 | In Progress|  |
 | 4. Signature Standardization | 0/? | Not started | - |
 | 5. Extensibility Template | 0/? | Not started | - |
 
