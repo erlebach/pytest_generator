@@ -710,12 +710,12 @@ def check_structure_decisiontreeclassifier(student_answer) -> CheckResult:
     return status, "\n".join(msg_list)
 
 
-def check_structure_dendrogram(student_dendro: dict[str, Any]) -> CheckResult:
+def check_structure_dendrogram(student_answer: dict[str, Any]) -> CheckResult:
     """Check if the structure and types of the student's dendrogram dictionary match.
 
     Args:
-         student_dendro: The dendrogram dictionary from a student.
-         instructor_dendro: not used.
+         student_answer: The dendrogram dictionary from a student.
+         instructor_answer: not used.
 
     Returns:
          A tuple (bool, str): True and an empty string if the structure matches,
@@ -724,7 +724,7 @@ def check_structure_dendrogram(student_dendro: dict[str, Any]) -> CheckResult:
     """
     # Expected keys in a scipy dendrogram
     expected_keys = {"icoord", "dcoord", "leaves", "ivl", "color_list"}
-    student_keys = set(student_dendro.keys())
+    student_keys = set(student_answer.keys())
 
     # Check for missing keys in student dendrogram
     missing_keys = expected_keys - student_keys
@@ -736,7 +736,7 @@ def check_structure_dendrogram(student_dendro: dict[str, Any]) -> CheckResult:
         if (
             key in student_keys
         ):  # Check only if key is present, though missing keys were already caught
-            value = student_dendro[key]
+            value = student_answer[key]
 
             # Ensure value is a list
             if not isinstance(value, list):
@@ -754,14 +754,14 @@ def check_structure_dendrogram(student_dendro: dict[str, Any]) -> CheckResult:
 
 
 def check_structure_dict_any(
-    student_dict: dict[Any, Any],
-    instructor_dict: dict[Any, Any],
+    student_answer: dict[Any, Any],
+    instructor_answer: dict[Any, Any],
 ) -> CheckResult:
     """Check if student's dictionary has same structure/types as instructor's.
 
     Args:
-        student_dict: Student's submitted dictionary
-        instructor_dict: Instructor's reference dictionary
+        student_answer: Student's submitted dictionary
+        instructor_answer: Instructor's reference dictionary
 
     Returns:
         tuple[bool, str]: A tuple containing:
@@ -773,13 +773,13 @@ def check_structure_dict_any(
     status = True
 
     # Check if all instructor keys exist in student dict
-    for k, i_val in instructor_dict.items():
-        if k not in student_dict:
+    for k, i_val in instructor_answer.items():
+        if k not in student_answer:
             status = False
             msg_list.append(f"Missing key '{k}' in student answer")
             continue
 
-        s_val = student_dict[k]
+        s_val = student_answer[k]
 
         # Check if types match
         if not isinstance(s_val, type(i_val)):
@@ -2790,15 +2790,15 @@ def check_answer_decisiontreeclassifier(
 
 
 def check_answer_dendrogram(
-    student_dendro: dict[str, Any],
-    instructor_dendro: dict[str, Any],
+    student_answer: dict[str, Any],
+    instructor_answer: dict[str, Any],
     rel_tol: float,
 ) -> CheckResult:
     """Check if the student's dendrogram is equal to the instructor's dendrogram.
 
     Args:
-        student_dendro (dict[str, Any]): The student's dendrogram
-        instructor_dendro (dict[str, Any]): The instructor's dendrogram
+        student_answer (dict[str, Any]): The student's dendrogram
+        instructor_answer (dict[str, Any]): The instructor's dendrogram
         rel_tol (float): The relative tolerance for coordinate comparison
 
     Returns:
@@ -2810,8 +2810,8 @@ def check_answer_dendrogram(
     status = True
     msg_list = []
 
-    dend1 = student_dendro
-    dend2 = instructor_dendro
+    dend1 = student_answer
+    dend2 = instructor_answer
 
     # Might crash if structures don't match. To fix later.
     # Coordinate comparison
@@ -2834,7 +2834,7 @@ def check_answer_dendrogram(
     if not msg_list:
         msg_list = ["Answer matches expected values. "]
 
-    return return_value(status, msg_list, student_dendro, instructor_dendro)
+    return return_value(status, msg_list, student_answer, instructor_answer)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
