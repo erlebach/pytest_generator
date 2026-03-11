@@ -593,6 +593,79 @@ def are_sets_equal(
 
 
 # ======================================================================
+# SECTION 3: UTILITY PRIMITIVES
+# ======================================================================
+
+
+def check_key_structure(
+    s_dict: dict[Any, Any],
+    i_dict: dict[Any, Any],
+) -> bool:
+    """Recursively checks if two dictionaries have matching key structures.
+
+    Compares the key structure of a student dictionary against an instructor
+    dictionary (gold standard) to ensure they have the same nested structure.
+    Will check nested dictionaries recursively two levels deep.
+
+    Args:
+        s_dict (dict): Student dictionary to check
+        i_dict (dict): Instructor dictionary to compare against (gold standard)
+
+    Returns:
+        bool: True if dictionaries have matching key structures at all levels,
+              False if structures differ
+
+    """
+    if not isinstance(s_dict, dict) or not isinstance(i_dict, dict):
+        return False
+
+    # Check the top-level keys match
+    if set(s_dict.keys()) != set(i_dict.keys()):
+        return False
+
+    # Iterate through keys and check structures
+    # Both dictionaries have the same keys
+    for i_key, i_value in i_dict.items():
+        # If both values are dictionaries, compare their key sets
+        if isinstance(s_dict.get(i_key), dict) and isinstance(i_value, dict):
+            if not check_key_structure(s_dict[i_key], i_value):
+                return False
+        elif isinstance(s_dict.get(i_key), dict) != isinstance(i_value, dict):
+            # One is a dict and the other is not, key structure does not match
+            return False
+
+    return True
+
+
+def convert_to_set_of_sets(input_sequence: set[set[Any]]) -> set[frozenset[Any]]:
+    """Convert each inner sequence to a set, then the outer sequence to a set of sets.
+
+    Args:
+        input_sequence (set[set[Any]]): The input sequence to convert
+
+    Returns:
+        set[frozenset[Any]]: The converted set of sets
+
+    """
+    return {frozenset(inner) for inner in input_sequence}
+
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+# Function to check if an object is a sequence but not a string
+def is_sequence_but_not_str(obj: list | tuple | set) -> bool:
+    """Check if an object is a sequence (list, tuple, or set) but not a string.
+
+    Args:
+        obj (Any): The object to check
+
+    Returns:
+        bool: True if obj is a list, tuple or set but not a string, False otherwise
+
+    """
+    return isinstance(obj, list | tuple | set)
+
+
+# ======================================================================
 def check_answer_float(
     student_answer: float,
     instructor_answer: float,
@@ -1154,47 +1227,6 @@ def check_structure_dict_str_dict_str_float(
 
 
 # ======================================================================
-
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-def check_key_structure(
-    s_dict: dict[Any, Any],
-    i_dict: dict[Any, Any],
-) -> bool:
-    """Recursively checks if two dictionaries have matching key structures.
-
-    Compares the key structure of a student dictionary against an instructor
-    dictionary (gold standard) to ensure they have the same nested structure.
-    Will check nested dictionaries recursively two levels deep.
-
-    Args:
-        s_dict (dict): Student dictionary to check
-        i_dict (dict): Instructor dictionary to compare against (gold standard)
-
-    Returns:
-        bool: True if dictionaries have matching key structures at all levels,
-              False if structures differ
-
-    """
-    if not isinstance(s_dict, dict) or not isinstance(i_dict, dict):
-        return False
-
-    # Check the top-level keys match
-    if set(s_dict.keys()) != set(i_dict.keys()):
-        return False
-
-    # Iterate through keys and check structures
-    # Both dictionaries have the same keys
-    for i_key, i_value in i_dict.items():
-        # If both values are dictionaries, compare their key sets
-        if isinstance(s_dict.get(i_key), dict) and isinstance(i_value, dict):
-            if not check_key_structure(s_dict[i_key], i_value):
-                return False
-        elif isinstance(s_dict.get(i_key), dict) != isinstance(i_value, dict):
-            # One is a dict and the other is not, key structure does not match
-            return False
-
-    return True
 
 
 # ======================================================================
@@ -3173,22 +3205,6 @@ def check_answer_list_set(
 # ======================================================================
 
 
-def convert_to_set_of_sets(input_sequence: set[set[Any]]) -> set[frozenset[Any]]:
-    """Convert each inner sequence to a set, then the outer sequence to a set of sets.
-
-    Args:
-        input_sequence (set[set[Any]]): The input sequence to convert
-
-    Returns:
-        set[frozenset[Any]]: The converted set of sets
-
-    """
-    return {frozenset(inner) for inner in input_sequence}
-
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-
 def check_answer_set_set_int(
     student_answer: set[set[int]],
     instructor_answer: set[set[int]],
@@ -3233,20 +3249,6 @@ def check_answer_set_set_int(
 
     return return_value(status, msg_list, set_of_sets_s, set_of_sets_i)
 
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-# Function to check if an object is a sequence but not a string
-def is_sequence_but_not_str(obj: list | tuple | set) -> bool:
-    """Check if an object is a sequence (list, tuple, or set) but not a string.
-
-    Args:
-        obj (Any): The object to check
-
-    Returns:
-        bool: True if obj is a list, tuple or set but not a string, False otherwise
-
-    """
-    return isinstance(obj, list | tuple | set)
 
 
 def check_structure_set_set_int(student_answer: set[set[int]]) -> tuple[bool, str]:
