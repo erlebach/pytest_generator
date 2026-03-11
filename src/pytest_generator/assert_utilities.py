@@ -527,8 +527,6 @@ def return_value(
     #     msg_list.append("Answer is correct")
     # else:
     #     msg_list.append("Answer is incorrect.")
-    # msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
-    # msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
 
 
     # return status, "\n".join(msg_list)
@@ -3164,10 +3162,6 @@ def check_answer_dict_str_dict_str_float(
     msg_list = []
     ps_dict = init_partial_score_dict()
 
-    # msg_list.append(f"DEBUG: {dict_float_choices=}")
-    # msg_list.append(f"DEBUG: {instructor_answer=}")
-    # msg_list.append(f"DEBUG: {student_answer=}")
-
     # Should go in structure check
     if not isinstance(student_answer, dict):
         return False, ""
@@ -3346,10 +3340,6 @@ def check_answer_dict_str_int(
         keys = []
 
     msg_list = []
-
-    # msg_list.append(f"DEBUG: {dict_float_choices=}")
-    # msg_list.append(f"DEBUG: {instructor_answer=}")
-    # msg_list.append(f"DEBUG: {student_answer=}")
 
     status = True
     keys = list(instructor_answer.keys()) if keys is [] else keys
@@ -4353,8 +4343,6 @@ def check_answer_list_str(
 
     # Note: the indices considered for grading are not explicitly stated in the message.
     """
-    # msg_list += [f"List elements in position()s {exclude_indices} is/are not graded.\n"]
-    # msg_list += [f"Only list elements in position()s {include_indices} is/are not graded.\n"]
     """
     msg = f"There is/are {len(mismatched_strings)} mismatched string(s): ({mismatched_strings})."
     msg_list += [msg]
