@@ -669,7 +669,7 @@ def is_sequence_but_not_str(obj: list | tuple | set) -> bool:
 # SECTION 4: STRUCTURE CHECKS
 # ======================================================================
 
-def check_structure_bool(student_answer: bool) -> tuple[bool, str]:
+def check_structure_bool(student_answer: bool) -> CheckResult:
     """Check if the student's answer is a boolean.
 
     Args:
@@ -693,7 +693,7 @@ def check_structure_bool(student_answer: bool) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_decisiontreeclassifier(student_answer) -> tuple[bool, str]:
+def check_structure_decisiontreeclassifier(student_answer) -> CheckResult:
     from sklearn.tree import DecisionTreeClassifier
 
     if not isinstance(student_answer, DecisionTreeClassifier):
@@ -710,7 +710,7 @@ def check_structure_decisiontreeclassifier(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_dendrogram(student_dendro: dict[str, Any]) -> tuple[bool, str]:
+def check_structure_dendrogram(student_dendro: dict[str, Any]) -> CheckResult:
     """Check if the structure and types of the student's dendrogram dictionary match.
 
     Args:
@@ -756,7 +756,7 @@ def check_structure_dendrogram(student_dendro: dict[str, Any]) -> tuple[bool, st
 def check_structure_dict_any(
     student_dict: dict[Any, Any],
     instructor_dict: dict[Any, Any],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's dictionary has same structure/types as instructor's.
 
     Args:
@@ -800,7 +800,7 @@ def check_structure_dict_int_dict_str_any(
     student_answer: dict[int, dict[str, Any]],
     instructor_answer: dict[int, dict[str, Any]],
     keys: list[str] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's nested dictionary structure matches instructor's.
 
     Checks a dictionary where each value is expected to be another dictionary
@@ -901,7 +901,7 @@ def check_structure_dict_int_dict_str_any(
 def check_structure_dict_int_float(
     student_answer: dict[int, float],
     instructor_answer: dict[int, float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches expected structure of dict[int, float].
 
     Verifies that:
@@ -948,7 +948,7 @@ def check_structure_dict_int_list(
     student_answer: dict[int, list[float]],
     instructor_answer: dict[int, list[float]],
     keys: list[int] | None,  # NOT USED
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches expected structure of dict[int, list[float]].
 
     Verifies that:
@@ -1020,7 +1020,7 @@ def check_structure_dict_int_list_float(
     student_answer: dict[int, list[float]],
     instructor_answer: dict[int, list[float]],
     keys: list[int] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches expected structure of dict[int, list[float]].
 
     Verifies that:
@@ -1086,7 +1086,7 @@ def check_structure_dict_int_ndarray(
     student_answer: dict[int, NDArray],
     instructor_answer: dict[int, NDArray],
     keys: list[int] | None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches expected structure of dict[int, ndarray].
 
     Verifies that:
@@ -1154,7 +1154,7 @@ def check_structure_dict_str_any(
     student_answer: dict[str, Any],
     instructor_answer: dict[str, Any],
     keys: list[str] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's dictionary has same structure/types as instructor's.
 
     Args:
@@ -1232,7 +1232,7 @@ def check_structure_dict_str_any(
 def check_structure_dict_str_dict_str_float(
     student_answer: dict[str, dict[str, float]],
     instructor_answer: dict[str, dict[str, float]],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches expected structure of dict[str, dict[str, float]].
 
     Verifies that:
@@ -1289,7 +1289,7 @@ def check_structure_dict_str_float(
     student_answer: dict,
     instructor_answer: dict,
     keys: list[str] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's dictionary has same structure/types as instructor's.
 
     Args:
@@ -1341,7 +1341,7 @@ def check_structure_dict_str_int(
     student_answer: dict[str, int],
     instructor_answer: dict[str, int],
     keys: list[str] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's dictionary of strings answer matches the instructor's answer.
 
     Args:
@@ -1400,7 +1400,7 @@ def check_structure_dict_str_int(
 def check_structure_dict_str_list_int(
     student_answer: dict[str, list[int]],
     instructor_answer: dict[str, list[int]],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check the structure of the student's answer.
 
     Args:
@@ -1446,7 +1446,7 @@ def check_structure_dict_str_list_str(
     student_answer: dict[str, list[str]],
     instructor_answer: dict[str, list[str]],
     key_choices: dict[str, list[str]] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches expected structure of dict[str, list[str]].
 
     Args:
@@ -1527,7 +1527,7 @@ def check_structure_dict_str_ndarray(
     student_answer: dict[str, NDArray],
     instructor_answer: dict[str, NDArray],
     keys: list[str] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's dictionary of strings answer matches the instructor's answer.
 
     Args:
@@ -1594,7 +1594,7 @@ def check_structure_dict_str_ndarray(
 def check_structure_dict_str_set(
     student_answer: dict[str, set[str] | list[str]],
     instructor_answer: dict[str, set[str] | list[str]],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's dictionary of strings answer matches the expected structure.
 
     Args:
@@ -1648,7 +1648,7 @@ def check_structure_dict_str_set(
 def check_structure_dict_str_set_int(
     student_answer: dict[str, set[int] | list[int]],
     instructor_answer: dict[str, set[int] | list[int]],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's dictionary of strings to sets of integers answer matches the expected structure.
 
     Args:
@@ -1722,7 +1722,7 @@ def check_structure_dict_str_set_int(
 def check_structure_dict_str_tuple_ndarray(
     student_answer: dict[str, tuple[NDArray]],
     instructor_answer: dict[str, tuple[NDArray]],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check structure of student_answer.
 
     Args:
@@ -1762,7 +1762,7 @@ def check_structure_dict_tuple_int_ndarray(
     student_answer: dict[tuple[int], NDArray],
     instructor_answer: dict[tuple[int], NDArray],
     keys: list[tuple[int]] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's dictionary of strings answer matches the instructor's answer.
 
     Args:
@@ -1824,7 +1824,7 @@ def check_structure_dict_tuple_int_ndarray(
 # ----------------------------------------------------------------------
 
 
-def check_structure_eval_float(student_answer: str) -> tuple[bool, str]:
+def check_structure_eval_float(student_answer: str) -> CheckResult:
     """Check the structure of the student answer.
 
     Args:
@@ -1850,7 +1850,7 @@ def check_structure_eval_float(student_answer: str) -> tuple[bool, str]:
     return return_value
 
 
-def check_structure_explain_str(student_answer: str) -> tuple[bool, str]:
+def check_structure_explain_str(student_answer: str) -> CheckResult:
     """Check if a student's string answer matches the expected structure.
 
     Args:
@@ -1885,7 +1885,7 @@ def check_structure_explain_str(student_answer: str) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_float(student_answer: float) -> tuple[bool, str]:
+def check_structure_float(student_answer: float) -> CheckResult:
     """Check the structure of the student answer.
 
     Args:
@@ -1907,7 +1907,7 @@ def check_structure_float(student_answer: float) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_function(student_answer: Callable) -> tuple[bool, str]:
+def check_structure_function(student_answer: Callable) -> CheckResult:
     """Check that the student's function matches the instructor's function.
 
     Args:
@@ -1924,7 +1924,7 @@ def check_structure_function(student_answer: Callable) -> tuple[bool, str]:
     return True, "Type 'function' is correct."
 
 
-def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
+def check_structure_gridsearchcv(student_answer) -> CheckResult:
     from sklearn.model_selection import GridSearchCV
 
     if not isinstance(student_answer, GridSearchCV):
@@ -1941,7 +1941,7 @@ def check_structure_gridsearchcv(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_int(student_answer: int) -> tuple[bool, str]:
+def check_structure_int(student_answer: int) -> CheckResult:
     """Check if the student's answer is an integer.
 
     Args:
@@ -1966,7 +1966,7 @@ def check_structure_int(student_answer: int) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_kfold(student_answer) -> tuple[bool, str]:
+def check_structure_kfold(student_answer) -> CheckResult:
     from sklearn.model_selection import KFold
 
     if not isinstance(student_answer, KFold):
@@ -1983,7 +1983,7 @@ def check_structure_kfold(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> tuple[bool, str]:
+def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> CheckResult:
     """Check if the student's answer is a lineplot.
 
     Args:
@@ -2088,7 +2088,7 @@ def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> tuple[boo
 def check_structure_list_float(
     student_answer: list[float],
     instructor_answer: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's list of floats matches the instructor's answer.
 
     Args:
@@ -2140,7 +2140,7 @@ def check_structure_list_float(
 def check_structure_list_int(
     student_answer: list[int],
     instructor_answer: list[int],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's list of integers matches the instructor's answer.
 
     Args:
@@ -2192,7 +2192,7 @@ def check_structure_list_int(
 def check_structure_list_list_float(
     student_answer: list[list[float]],
     instructor_answer: list[list[float]],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check structure of student_answer.
 
     Args:
@@ -2244,7 +2244,7 @@ def check_structure_list_list_float(
 def check_structure_list_ndarray(
     student_answer: list[np.ndarray],
     instructor_answer: list[np.ndarray],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check that elements in the list are ndarrays.
 
     Args:
@@ -2296,7 +2296,7 @@ def check_structure_list_ndarray(
 def check_structure_list_set(
     student_answer: list[set],
     instructor_answer: list[set],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check structure of student_answer.
 
     Args:
@@ -2317,7 +2317,7 @@ def check_structure_list_set(
     return status, "\n".join(msg_list)
 
 
-def check_structure_list_str(student_answer: list[str]) -> tuple[bool, str]:
+def check_structure_list_str(student_answer: list[str]) -> CheckResult:
     """Check if the student's answer is a list of strings.
 
     Args:
@@ -2348,7 +2348,7 @@ def check_structure_list_str(student_answer: list[str]) -> tuple[bool, str]:
 
 def check_structure_list_tuple_float(
     student_answer: list[tuple[float, ...]],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's answer is a list of tuples containing floats.
 
     Args:
@@ -2390,7 +2390,7 @@ def check_structure_list_tuple_float(
     ) if msg_list else "Structure matches expected list[tuple[float, ...]]"
 
 
-def check_structure_logisticregression(student_answer) -> tuple[bool, str]:
+def check_structure_logisticregression(student_answer) -> CheckResult:
     from sklearn.linear_model import LogisticRegression
 
     if not isinstance(student_answer, LogisticRegression):
@@ -2407,7 +2407,7 @@ def check_structure_logisticregression(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_ndarray(student_answer: np.ndarray) -> tuple[bool, str]:
+def check_structure_ndarray(student_answer: np.ndarray) -> CheckResult:
     """Check that all elements in the list have matching norms.
 
     Args:
@@ -2427,7 +2427,7 @@ def check_structure_ndarray(student_answer: np.ndarray) -> tuple[bool, str]:
     return True, "Type 'ndarray' is correct."
 
 
-def check_structure_randomforestclassifier(student_answer) -> tuple[bool, str]:
+def check_structure_randomforestclassifier(student_answer) -> CheckResult:
     from sklearn.ensemble import RandomForestClassifier
 
     if not isinstance(student_answer, RandomForestClassifier):
@@ -2444,7 +2444,7 @@ def check_structure_randomforestclassifier(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_scatterplot2d(student_answer):
+def check_structure_scatterplot2d(student_answer) -> CheckResult:
     from matplotlib.collections import PathCollection
 
     status = True
@@ -2475,7 +2475,7 @@ def check_structure_scatterplot2d(student_answer):
     return status, "\n".join(msg_list)
 
 
-def check_structure_scatterplot3d(student_answer):
+def check_structure_scatterplot3d(student_answer) -> CheckResult:
     from matplotlib.collections import PathCollection
 
     status = True
@@ -2502,7 +2502,7 @@ def check_structure_scatterplot3d(student_answer):
     return status, "\n".join(msg_list)
 
 
-def check_structure_set_set_int(student_answer: set[set[int]]) -> tuple[bool, str]:
+def check_structure_set_set_int(student_answer: set[set[int]]) -> CheckResult:
     """Check structure of student_answer.
 
     Args:
@@ -2543,7 +2543,7 @@ def check_structure_set_set_int(student_answer: set[set[int]]) -> tuple[bool, st
     return status, "\n".join(msg_list)
 
 
-def check_structure_set_str(student_answer: set[str] | list[str]) -> tuple[bool, str]:
+def check_structure_set_str(student_answer: set[str] | list[str]) -> CheckResult:
     """Check if a student's set of strings answer matches the expected structure.
 
     Args:
@@ -2585,7 +2585,7 @@ def check_structure_set_str(student_answer: set[str] | list[str]) -> tuple[bool,
 
 def check_structure_set_tuple_int(
     student_answer: set[tuple[int, ...]],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's answer is a set of tuples containing integers.
 
     Args:
@@ -2626,7 +2626,7 @@ def check_structure_set_tuple_int(
     ) if msg_list else "Structure matches expected set[tuple[int, ...]]"
 
 
-def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
+def check_structure_shufflesplit(student_answer) -> CheckResult:
     from sklearn.model_selection import ShuffleSplit
 
     if not isinstance(student_answer, ShuffleSplit):
@@ -2646,7 +2646,7 @@ def check_structure_shufflesplit(student_answer) -> tuple[bool, str]:
 def check_structure_str(
     student_answer: str,
     choices: list[str],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's string answer matches the expected structure.
 
     Args:
@@ -2686,7 +2686,7 @@ def check_structure_str(
     return status, "\n".join(msg_list)
 
 
-def check_structure_stratifiedkfold(student_answer) -> tuple[bool, str]:
+def check_structure_stratifiedkfold(student_answer) -> CheckResult:
     from sklearn.model_selection import StratifiedKFold
 
     if not isinstance(student_answer, StratifiedKFold):
@@ -2703,7 +2703,7 @@ def check_structure_stratifiedkfold(student_answer) -> tuple[bool, str]:
     return status, "\n".join(msg_list)
 
 
-def check_structure_svc(student_answer) -> tuple[bool, str]:
+def check_structure_svc(student_answer) -> CheckResult:
     from sklearn.svm import SVC
 
     if not isinstance(student_answer, SVC):
@@ -2723,7 +2723,7 @@ def check_structure_svc(student_answer) -> tuple[bool, str]:
 # SECTION 5: ANSWER CHECKS
 # ======================================================================
 
-def check_answer_bool(student_answer: bool, instructor_answer: bool) -> tuple[bool, str]:
+def check_answer_bool(student_answer: bool, instructor_answer: bool) -> CheckResult:
     """Check if the student's answer is equal to the instructor's answer.
 
     Args:
@@ -2758,7 +2758,7 @@ def check_answer_bool(student_answer: bool, instructor_answer: bool) -> tuple[bo
 def check_answer_decisiontreeclassifier(
     student_answer,
     instructor_answer,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's DecisionTreeClassifier matches instructor's.
 
     Args:
@@ -2793,7 +2793,7 @@ def check_answer_dendrogram(
     student_dendro: dict[str, Any],
     instructor_dendro: dict[str, Any],
     rel_tol: float,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if the student's dendrogram is equal to the instructor's dendrogram.
 
     Args:
@@ -2847,7 +2847,7 @@ def check_answer_dict_int_dict_str_any(
     keys: list[str] | None = None,
     exclude_keys: list[str] | None = None,
     partial_score_frac_l: list[float] = [0.0],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's nested dictionary values match instructor's.
 
     Checks a dictionary where each value is expected to be another dictionary
@@ -2941,7 +2941,7 @@ def check_answer_dict_int_float(
     instructor_answer: dict[int, float],
     rel_tol: float,
     partial_score_frac_l: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches instructor answer for dict[int, float] type.
 
     Compares student and instructor answers that are dictionaries with integer keys and float values.
@@ -2993,7 +2993,7 @@ def check_answer_dict_int_list_float(
     keys: list[int] | None,
     rel_tol: float,
     partial_score_frac: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches instructor answer for dict[int, list[float]] type.
 
     Compares student and instructor answers that are dictionaries with integer keys and
@@ -3045,7 +3045,7 @@ def check_answer_dict_int_ndarray(
     instructor_answer: dict[int, NDArray],
     rel_tol: float,
     keys: list[int] | None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches instructor answer for dict[int, ndarray] type.
 
     Compares student and instructor answers that are dictionaries with integer keys and numpy array values.
@@ -3110,7 +3110,7 @@ def check_answer_dict_str_any(
     rel_tol: float = 1e-04,
     keys: list[str] | None = None,
     partial_score_frac: list[float] = [0.0],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's dictionary matches instructor's, handling various value types.
 
     Args:
@@ -3188,7 +3188,7 @@ def check_answer_dict_str_dict_str_float(
     rel_tol: float,
     dict_float_choices: dict[str, list[float]],
     partial_score_frac: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches instructor answer.
 
     Compares student and instructor answers that are nested dictionaries with string
@@ -3278,7 +3278,7 @@ def check_answer_dict_str_float(
     exclude_keys: list[str] | None = None,
     dict_float_choices: dict[str, float] | None = None,
     partial_score_frac: list[float] = [0.0],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's dictionary of strings answer matches the instructor's answer.
 
     Args:
@@ -3363,7 +3363,7 @@ def check_answer_dict_str_int(
     keys: list[str] | None = None,
     dict_int_choices: dict[str, int] | None = None,
     partial_score_frac: list[float] = [0.0],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's dictionary of strings answer matches the instructor's answer.
 
     Args:
@@ -3452,7 +3452,7 @@ def check_answer_dict_str_list_int(
     student_answer: dict[str, list[int]],
     instructor_answer: dict[str, list[int]],
     partial_score_frac_l: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches instructor answer for dict[str, list[int]] type.
 
     Compares student and instructor answers that are dictionaries with string keys and
@@ -3513,7 +3513,7 @@ def check_answer_dict_str_list_str(
     instructor_answer: dict[str, list[str]],
     key_choices: dict[str, list[str]] | None = None,
     partial_score_frac_l: list[float] = [0.0],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student answer matches instructor answer for dict[str, list[str]] type.
     Assumes structure validation has already passed.
     """
@@ -3604,7 +3604,7 @@ def check_answer_dict_str_ndarray(
     rel_tol: float,
     keys: list[str] | None = None,
     partial_score_frac: list[float] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's dictionary of strings answer matches the instructor's answer.
 
     Args:
@@ -3652,7 +3652,7 @@ def check_answer_dict_str_set_int(
     student_answer: dict[str, set[int]],
     instructor_answer: dict[str, set[int]],
     keys: list[str] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check whether a student and instruct's dictionary of strings match.
 
     Args:
@@ -3692,7 +3692,7 @@ def check_answer_dict_str_tuple_ndarray(
     instructor_answer: dict[str, tuple[NDArray]],
     rel_tol: float,
     partial_score_frac: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check two dictionaries with keys:str, values: tuple of ndarrays with each other.
 
     Args:
@@ -3767,7 +3767,7 @@ def check_answer_dict_tuple_int_ndarray(
     rel_tol: float,
     keys: list[tuple[int]] | None = None,
     partial_score_frac: list[float] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's dictionary of strings answer matches the instructor's answer.
 
     Args:
@@ -3838,7 +3838,7 @@ def check_answer_eval_float(
     instructor_answer: str,
     local_vars_dict: dict[str, tuple[float, float]],
     rel_tol: float,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check the answer correctness.
 
     Args:
@@ -3885,7 +3885,7 @@ def check_answer_eval_float(
 def check_answer_explain_str(
     student_answer: str,
     instructor_answer: str,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's string answer matches the instructor's answer.
 
     Args:
@@ -3915,7 +3915,7 @@ def check_answer_float(
     instructor_answer: float,
     rel_tol: float,
     abs_tol: float,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check answer correctness. Assume the structure is correct.
 
     Args:
@@ -3947,7 +3947,7 @@ def check_answer_float(
 def check_answer_function(
     student_answer: Callable,
     instructor_answer: Callable,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check that the student's function matches the instructor's function.
 
     Args:
@@ -3982,7 +3982,7 @@ def check_answer_function(
 def check_answer_gridsearchcv(
     student_answer,
     instructor_answer,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's GridSearchCV matches instructor's.
 
     Args:
@@ -4040,7 +4040,7 @@ def check_answer_gridsearchcv(
 def check_answer_int(
     student_answer: int,
     instructor_answer: int,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if the student's answer is equal to the instructor's answer.
 
     Args:
@@ -4067,7 +4067,7 @@ def check_answer_int(
 def check_answer_kfold(
     student_answer,
     instructor_answer,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's KFold matches instructor's.
 
     Args:
@@ -4102,7 +4102,7 @@ def check_answer_lineplot(
     student_answer: list[Line2D],
     instructor_answer: list[Line2D],
     rel_tol: float,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if the student's answer is equal to the instructor's answer.
 
     Args:
@@ -4141,7 +4141,7 @@ def check_answer_list_float(
     rel_tol: float,
     monotone_increasing: bool | None = None,
     partial_score_frac: list[float] | None = None,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check that all elements in the list have matching norms.
 
     Args:
@@ -4205,7 +4205,7 @@ def check_answer_list_int(
     student_answer: list[int],
     instructor_answer: list[int],
     partial_score_frac: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check that all elements in the list have matching norms.
 
     Args:
@@ -4248,7 +4248,7 @@ def check_answer_list_list_float(
     instructor_answer: list[list[float]],
     rel_tol: float,
     partial_score_frac: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check two lists of lists of floats with each other.
 
     Args:
@@ -4290,7 +4290,7 @@ def check_answer_list_ndarray(
     instructor_answer: list[np.ndarray],
     rel_tol: float,
     partial_score_frac: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check that all elements in the list have matching norms.
 
     Args:
@@ -4347,7 +4347,7 @@ def check_answer_list_ndarray(
 def check_answer_list_set(
     student_answer: list[set],
     instructor_answer: list[set],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check two lists of sets (although the set is encoded as a list) with each other.
 
     Args:
@@ -4380,7 +4380,7 @@ def check_answer_list_str(
     include_indices: list[int],
     exclude_indices: list[int],
     partial_score_frac: list[float],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if the student's answer is equal to the instructor's answer.
 
     Args:
@@ -4446,7 +4446,7 @@ def check_answer_list_tuple_float(
     instructor_answer: list[tuple[float, ...]],
     rel_tol: float,
     partial_score_frac_l: list[float] = [0.0],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's list of float tuples matches instructor's.
 
     Args:
@@ -4525,7 +4525,7 @@ def check_answer_list_tuple_float(
 def check_answer_logisticregression(
     student_answer,
     instructor_answer,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's LogisticRegression matches instructor's.
 
     Args:
@@ -4563,7 +4563,7 @@ def check_answer_ndarray(
     student_answer: np.ndarray,
     instructor_answer: np.ndarray,
     rel_tol: float,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check that all elements in the list have matching norms.
 
     Args:
@@ -4602,7 +4602,7 @@ def check_answer_ndarray(
 def check_answer_randomforestclassifier(
     student_answer,
     instructor_answer,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's RandomForestClassifier matches instructor's.
 
     Args:
@@ -4641,7 +4641,7 @@ def check_answer_randomforestclassifier(
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
-def check_answer_scatterplot2d(student_answer, instructor_answer, options, validation_functions):
+def check_answer_scatterplot2d(student_answer, instructor_answer, options, validation_functions) -> CheckResult:
     status = True
     msg_list = []
 
@@ -4723,7 +4723,7 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, options, valid
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-def check_answer_scatterplot3d(student_answer, instructor_answer, options, validation_functions):
+def check_answer_scatterplot3d(student_answer, instructor_answer, options, validation_functions) -> CheckResult:
     status = True
     msg_list = []
 
@@ -4757,7 +4757,7 @@ def check_answer_scatterplot3d(student_answer, instructor_answer, options, valid
 def check_answer_set_set_int(
     student_answer: set[set[int]],
     instructor_answer: set[set[int]],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check two sets of sets of integers with each other.
 
     Args:
@@ -4804,7 +4804,7 @@ def check_answer_set_str(
     instructor_answer: set[str],
     choices: list[set[str]] | None = None,
     partial_score_frac_l: list[float] = [0.0],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's set of strings answer matches the instructor's answer.
 
     Args:
@@ -4875,7 +4875,7 @@ def check_answer_set_tuple_int(
     student_answer: set[tuple[int, ...]],
     instructor_answer: set[tuple[int, ...]],
     partial_score_frac_l: list[float] = [0.0],
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's set of integer tuples matches instructor's.
 
     Args:
@@ -4926,7 +4926,7 @@ def check_answer_set_tuple_int(
 def check_answer_shufflesplit(
     student_answer,
     instructor_answer,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's ShuffleSplit matches instructor's.
 
     Args:
@@ -4962,7 +4962,7 @@ def check_answer_str(
     instructor_answer: str,
     str_choices: list[str],
     remove_spaces: bool,  # noqa: FBT001
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if a student's string answer matches the instructor's answer.
 
     Args:
@@ -5001,7 +5001,7 @@ def check_answer_str(
 def check_answer_stratifiedkfold(
     student_answer,
     instructor_answer,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's StratifiedKFold matches instructor's.
 
     Args:
@@ -5036,7 +5036,7 @@ def check_answer_stratifiedkfold(
 def check_answer_svc(
     student_answer,
     instructor_answer,
-) -> tuple[bool, str]:
+) -> CheckResult:
     """Check if student's SVC classifier matches instructor's.
 
     Args:
