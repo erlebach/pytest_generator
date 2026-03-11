@@ -53,7 +53,7 @@
 | REQ-INFRA-02 | Phase 2 | Complete |
 | REQ-CLEAN-01 | Phase 3 | Complete |
 | REQ-CLEAN-02 | Phase 3 | Complete |
-| REQ-CLEAN-03 | Phase 3 | Pending |
+| REQ-CLEAN-03 | Phase 3 | Complete |
 | REQ-CONS-01 | Phase 4 | Pending |
 | REQ-CONS-02 | Phase 4 | Pending |
 | REQ-EXT-01 | Phase 5 | Pending |
