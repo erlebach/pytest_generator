@@ -19,7 +19,7 @@ import re
 from collections.abc import Callable
 from pathlib import Path
 from pprint import pprint
-from typing import Any, cast
+from typing import Any, TypeAlias, cast
 
 # ! import matplotlib.pyplot as plt
 import numpy as np
@@ -37,6 +37,15 @@ from numpy.typing import NDArray
 # import matplotlib.pyplot as plt
 """
 
+# ======================================================================
+# SECTION 1: TYPE ALIASES
+# ======================================================================
+CheckResult: TypeAlias = tuple[bool, str]
+PartialScoreDict: TypeAlias = dict[str, float | int]
+
+# ======================================================================
+# SECTION 2: CONSTANTS
+# ======================================================================
 FLOAT_TOL = 1.0e-5
 
 
