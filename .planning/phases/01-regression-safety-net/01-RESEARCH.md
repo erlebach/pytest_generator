@@ -11,14 +11,14 @@
 
 | ID | Description | Research Support |
 |----|-------------|-----------------|
-| REQ-INFRA-01 | Comprehensive regression tests for all existing checker functions (written BEFORE any refactoring begins) | Checker inventory complete: 91 unique names (44 check_answer_*, 45 check_structure_*, 2 structure-only orphans). pytest 8.3.5 is already installed. uv run pytest is the invocation. |
+| REQ-INFRA-01 | Comprehensive regression tests for all existing checker functions (written BEFORE any refactoring begins) | Checker inventory complete: 103 unique names (44 check_answer_*, 47 check_structure_*, 12 other check_* helpers). pytest 8.3.5 is already installed. uv run pytest is the invocation. |
 </phase_requirements>
 
 ---
 
 ## Summary
 
-`assert_utilities.py` is 5660 lines and contains 109 `def check_*` definitions. After deduplication by name, there are 91 unique public checker names: 44 `check_answer_*` and 45 `check_structure_*` functions, plus 2 structure-only functions with no answer counterpart (`check_structure_dict_str_set`, `check_structure_dict_any`). There are also 7 known duplicate definitions (same name appears twice or three times) — Python silently uses the last definition. The regression tests must cover the last-defined version of each name.
+`assert_utilities.py` contains 103 unique checker function definitions (confirmed via Python AST parsing). Breakdown: 44 `check_answer_*`, 47 `check_structure_*`, and 12 helper `check_*` functions (e.g. `check_float`, `check_int`, `check_str`, `check_list_float`, etc.). There are 2 true duplicate definitions where the same name appears twice as real Python code: `check_answer_dict_str_int` (lines 1796, 2348) and `check_structure_dict_str_list_str` (lines 826, 1009) — Python silently uses the last definition. The other apparent duplicates found by grep were inside `'''...'''` triple-quoted comment blocks and are not active code. Tests must cover all 103 unique names, targeting the last-defined version for the 2 real duplicates.
 
 All functions return `tuple[bool, str]`. The `bool` component indicates correctness; the `str` component is a human-readable message. Tests must assert both components. The package is managed with `uv` and `pyproject.toml`; `pytest 8.3.5` is already a declared dependency. The correct invocation is `uv run pytest`.
 
