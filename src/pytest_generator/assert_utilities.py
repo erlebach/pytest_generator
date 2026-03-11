@@ -20,7 +20,6 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, TypeAlias, cast
 
-# ! import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
@@ -28,7 +27,6 @@ import yaml
 from matplotlib.lines import Line2D
 from matplotlib.figure import Figure
 
-# ! from matplotlib.collections import PathCollection
 from numpy.typing import NDArray
 
 # ======================================================================
@@ -503,8 +501,6 @@ def fmt_ifstr(x: object) -> str:
         str: The formatted string
 
     """
-    # ! return repr(x) if isinstance(x, str) else str(x)
-    # ! if isinstance(x, str), str(x) == x
     return str(x)
 
 
@@ -807,7 +803,7 @@ def check_structure_dict_int_dict_str_any(
     status = True
     keys = list(instructor_answer.keys()) if keys is None else keys
 
-    ## ARE WE CHECKING THAT THE KEYS ARE int ! TODO
+    # Known gap: top-level key type (int) is not explicitly validated.
 
     # Check top-level keys
     for k in keys:
@@ -1249,9 +1245,6 @@ def check_structure_dict_str_dict_str_float(
     if len(missing_keys) > 0:
         return False, f"- Missing keys: {[repr(k) for k in missing_keys]}."
 
-    # ! print("answer keys: ", list(student_answer.keys()))
-    # ! for k, v in instructor_answer.items():
-    # ! print(f"key: {k}, value: {v}")
 
     for k, v in instructor_answer.items():
         if not isinstance(v, dict):
@@ -2035,11 +2028,8 @@ def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> CheckResu
 
     # What happens if the label is not a sring? None if no label
     s_xlabel = clean_str_answer(s_ax.get_xlabel())  # if s_ax.get_xlabel() else None
-    # ! i_xlabel = clean_str_answer(i_ax.get_xlabel())  # if s_ax.get_xlabel() else None
     s_ylabel = clean_str_answer(s_ax.get_ylabel())  # if s_ax.get_ylabel() else None
-    # ! i_ylabel = clean_str_answer(i_ax.get_ylabel())  # if s_ax.get_ylabel() else None
     s_title = clean_str_answer(s_ax.get_title())  # if s_ax.get_title() else None
-    # ! i_title = clean_str_answer(i_ax.get_title())  # if s_ax.get_title() else None
 
     if not s_xlabel or not s_ylabel:
         msg_list.append("Either x or y label is missing! Must be there to get a grade.")
@@ -2638,7 +2628,6 @@ def check_structure_str(
 
     # Ideally, should be done when yaml file is preprocessed
     # All strings should be lowered at that time.
-    # ! choices = [clean_str_answer(s) for s in choices]
 
     if not isinstance(student_answer, str):
         status = False
@@ -3614,7 +3603,7 @@ def check_answer_dict_str_set_int(
     keys = list(instructor_answer.keys()) if keys is None else keys
     ps_dict = init_partial_score_dict()
 
-    # ! TODO: check that keys are in the instructor answer
+    # Known gap: student keys are not verified against instructor_answer keys.
     for i_key, i_value in instructor_answer.items():
         status_, msg_ = check_set_int(set(student_answer[i_key]), set(i_value), ps_dict)
         status = False if status_ is False else status
@@ -3678,7 +3667,6 @@ def check_answer_dict_str_tuple_ndarray(
             s_norms[k].append(s_norm)
             i_norms[k].append(i_norm)
 
-        # ! print(f"{i_norms=}, {s_norms=}")
         status_, msg_ = check_list_float(
             i_norms[k],
             s_norms[k],
@@ -3735,8 +3723,6 @@ def check_answer_dict_tuple_int_ndarray(
     keys = list(instructor_answer.keys()) if keys is None else keys
     sub_instructor_answer = {k: instructor_answer[k] for k in keys}
 
-    # ! print("Assert_utilities, type dict_tuple_int_ndarray NOT HANDLED")
-    # ! return False, ""
 
     ps_dict = init_partial_score_dict()
     ps_dict["total_nb"] = len(sub_instructor_answer)
@@ -4365,7 +4351,7 @@ def check_answer_list_str(
     except ZeroDivisionError:
         partial_score_frac[0] = 1.0
 
-    # ! TODO: Explicitly state the indices considered for grading.
+    # Note: the indices considered for grading are not explicitly stated in the message.
     """
     # msg_list += [f"List elements in position()s {exclude_indices} is/are not graded.\n"]
     # msg_list += [f"Only list elements in position()s {include_indices} is/are not graded.\n"]
@@ -4902,7 +4888,6 @@ def check_answer_str(
             - str: Message explaining the validation result
 
     """
-    # ! print(f"check_answer_str, {remove_spaces=}")
     status, msg = check_str(
         instructor_answer,
         student_answer,
