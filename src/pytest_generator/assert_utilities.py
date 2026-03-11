@@ -18,7 +18,6 @@ import random
 import re
 from collections.abc import Callable
 from pathlib import Path
-from pprint import pprint
 from typing import Any, TypeAlias, cast
 
 # ! import matplotlib.pyplot as plt
@@ -107,12 +106,10 @@ def check_float(
     status = True
     msg = ""
 
-    print("===> check_float <====")
     # print(f"{i_el=}, {s_el=}")
     # print(f"{rel_tol=}, {abs_tol=}")
     if math.fabs(i_el) <= abs_tol:
         abs_err = math.fabs(i_el - s_el)
-        print(f"{abs_err=}")
         status = abs_err < FLOAT_TOL
     elif math.fabs((i_el - s_el) / i_el) < rel_tol:
         status = True
@@ -209,7 +206,6 @@ def check_list_int(
     msg_list = []
     status = True
     ps_dict["nb_total"] += len(i_arr)
-    print(f"==> inside check_list_int, {ps_dict=}")
 
     for i_el, s_el in zip(i_arr, s_arr, strict=True):
         status_, msg_ = check_int(i_el, s_el)
@@ -538,8 +534,6 @@ def return_value(
     # msg_list.append(f"Instructor answer: {fmt_ifstr(i_answ)}")
     # msg_list.append(f"Student answer: {fmt_ifstr(s_answ)}")
 
-    print(f"*** Instructor answer: {i_answ}")
-    print(f"*** Student answer: {s_answ}")
 
     # return status, "\n".join(msg_list)
 
@@ -676,7 +670,6 @@ def check_structure_bool(student_answer: bool) -> CheckResult:
             - str: Message explaining the validation result
 
     """
-    print(f"\n==> inside check_structure_bool, {student_answer=}")
     if not isinstance(student_answer, (bool, np.bool_)):
         status = False
         msg = f"Answer must be of type 'bool'. Your answer is of type {type(student_answer)}."
@@ -1354,8 +1347,6 @@ def check_structure_dict_str_int(
     status = True
     msg_list = []
 
-    print(f"check_structure_dict_str_int, {student_answer}")
-    print(f"check_structure_dict_str_int, {instructor_answer}")
 
     if status and not isinstance(student_answer, dict):
         msg_list += ["Student answer should be a dict"]
@@ -1410,8 +1401,6 @@ def check_structure_dict_str_list_int(
     status: bool = True
     msg_list: list[str] = []
 
-    print(f"structure, {student_answer=}")
-    print(f"structure, {instructor_answer=}")
 
     if not isinstance(student_answer, dict):
         return False, "Answer must be a dict"
@@ -2356,17 +2345,13 @@ def check_structure_list_tuple_float(
     msg_list = []
     status = True
 
-    print("INSIDE structure")
-    print(f"{student_answer=}")
 
     # Check if it's a list
     if not isinstance(student_answer, list):
-        print("not a list")
         return False, f"Expected type list, got {type(student_answer).__name__}"
 
     # Check each element
     for i, item in enumerate(student_answer):
-        print(f"{i=}, {item=}")
         # Check if element is a tuple
         if not isinstance(item, tuple):
             status = False
@@ -2378,7 +2363,6 @@ def check_structure_list_tuple_float(
             status = False
             msg_list.append(f"Tuple {i} {item} contains non-float values")
 
-    print("status= ", status)
     return status, "\n".join(
         msg_list
     ) if msg_list else "Structure matches expected list[tuple[float, ...]]"
@@ -2563,7 +2547,6 @@ def check_structure_set_str(student_answer: set[str] | list[str]) -> CheckResult
 
     if status:
         for s in student_answer:
-            print("s= ", s, flush=True)
             if not isinstance(s, str):
                 msg = f"- Set element {s!r} must be of type 'str'"
                 msg_list.append(msg)
@@ -2595,26 +2578,21 @@ def check_structure_set_tuple_int(
 
     # Check if it's a set
     if not isinstance(student_answer, set):
-        print("1. false", flush=True)
         return False, f"Expected type set, got {type(student_answer).__name__}"
 
     # Check each element
     for i, item in enumerate(student_answer):
-        print(f"for, {i=}", flush=True)
         # Check if element is a tuple
         if not isinstance(item, tuple):
             status = False
             msg_list.append(f"Element {i} is not a tuple: got {type(item).__name__}")
-            print("if not")
             continue
 
         # Check if all elements in tuple are integers
         if not all(isinstance(x, int) for x in item):
-            print("if not all")
             status = False
             msg_list.append(f"Tuple {i} {item} contains non-integer values")
 
-    print("msg_list= ", msg_list, flush=True)
     return status, "\n".join(
         msg_list
     ) if msg_list else "Structure matches expected set[tuple[int, ...]]"
@@ -2860,13 +2838,6 @@ def check_answer_dict_int_dict_str_any(
             any mismatches
 
     """
-    print("===> *** check_answer_dict_int_dict_str_any")
-    print("\nstudent_answer=")
-    pprint(student_answer)
-    print("\ninstructor+answer")
-    pprint(instructor_answer)
-    print(f"{exclude_keys=}")
-    print()
 
     msg_list = []
     status = True
@@ -2969,10 +2940,8 @@ def check_answer_dict_int_float(
             status = False
             ps_dict["nb_mismatches"] += 1
     try:
-        print(f"==> {ps_dict=}")
         partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     except ZeroDivisionError:
-        print("ZeroDivisionError in check_answer_dict_int_float. TO FIX.")
         partial_score_frac_l[0] = 1.0
 
     if not msg_list:
@@ -3305,7 +3274,6 @@ def check_answer_dict_str_float(
 
     """
     if dict_float_choices is not None:
-        print("dict_float_choices is not implemented in dict[str,float] types")
         dict_float_choices = {}
 
     msg_list = []
@@ -3321,9 +3289,7 @@ def check_answer_dict_str_float(
 
     # Need an exception in case the student key is not found
     for k in keys:
-        print(f"{exclude_keys=}, key={k}")
         if k in exclude_keys:
-            print(f"==> Exclude {k=}")
             continue
         s_float = student_answer[k]
         i_float = instructor_answer[k]
@@ -3385,12 +3351,10 @@ def check_answer_dict_str_int(
     """
     if dict_int_choices is not None:
         dict_int_choices = {}
-        print("dict_int_choices is not implemented in dict[str,int] types")
 
     # keys not implement
     if keys is not None or keys is None:
         keys = []
-        print("keys is not yet implemented for dict[str,int] types")
 
     msg_list = []
 
@@ -3405,8 +3369,6 @@ def check_answer_dict_str_int(
     if dict_int_choices is None:
         dict_int_choices = {}
 
-    print(f"==> {student_answer=}")
-    print(f"==> {instructor_answer=}")
 
     # Need an exception in case the student key is not found
     for k in keys:
@@ -3429,11 +3391,9 @@ def check_answer_dict_str_int(
             ps_dict["nb_mismatches"] += 1
             msg_list.append(msg_)
 
-    print(f"==> {ps_dict=}")
     try:
         partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     except ZeroDivisionError:
-        print("ZeroDivisionError: check_answer_dict_str_int. FIX.")
         partial_score_frac[0] = 1.0
 
     if not msg_list:
@@ -3462,7 +3422,6 @@ def check_answer_dict_str_list_int(
             any mismatches
 
     """
-    print(f"==> inside check_answer_dict_str_list_int, {partial_score_frac_l=}", flush=True)
     msg_list = []
     status = True
     ps_dict = init_partial_score_dict()
@@ -3478,7 +3437,6 @@ def check_answer_dict_str_list_int(
 
         s_list = student_answer[key]
         status_, msg_ = check_list_int(i_list, s_list, ps_dict)
-        print("check_list return, ps_dict= ", ps_dict, "\n", flush=True)
         if not status_:
             status = False
             msg_list.extend([f"For key {key!r}:"] + [msg_])
@@ -3487,7 +3445,6 @@ def check_answer_dict_str_list_int(
         partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     except ZeroDivisionError:
         partial_score_frac_l[0] = 1.0
-    print(f"===check_answer_dict_str_list_int, {partial_score_frac_l=}")
     if not msg_list:
         msg_list = ["Answer matches expected values."]
 
@@ -3550,10 +3507,7 @@ def check_answer_dict_str_list_str(
 
         # Check list values
         s_list = student_answer[s_key]
-        print(f"\nsend to check_list_str, {i_list=}")
-        print(f"send to check_list_str, {s_list=}")
         status_, msg_ = check_list_str(i_list, s_list, ps_dict)
-        print("return from check_list_str, ps_dict= ", ps_dict, "\n")
         if not status_:
             # Update status and increment mismatch counter
             status = False
@@ -3565,10 +3519,8 @@ def check_answer_dict_str_list_str(
             # Format message based on whether msg_ is string or list
             if isinstance(msg_, str):
                 message_lines = [key_msg, msg_]
-                print(f"if instance, {message_lines=}", flush=True)
             else:
                 message_lines = [key_msg] + msg_
-                print(f"else, {message_lines=}", flush=True)
 
             # Add formatted message to msg_list
             msg_list.extend(message_lines)
@@ -3579,13 +3531,9 @@ def check_answer_dict_str_list_str(
         partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
     except ZeroDivisionError:
         partial_score_frac_l[0] = 1.0
-    print(f"==> inside check_answer_dict_str_list_str, {partial_score_frac_l=}")
 
     if status and not msg_list:
         msg_list = ["Answer matches expected values."]
-    print(f"{msg_list=}")
-    print(f"{status=}")
-    print(f"{partial_score_frac_l=}")
     return return_value(status, msg_list, student_answer, instructor_answer)
 
 
@@ -4414,7 +4362,6 @@ def check_answer_list_str(
 
     try:
         partial_score_frac[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-        print(f"==> inside check_answer_list_str, {partial_score_frac=}")
     except ZeroDivisionError:
         partial_score_frac[0] = 1.0
 
@@ -4455,17 +4402,12 @@ def check_answer_list_tuple_float(
             any mismatches
 
     """
-    print(f"...{rel_tol=}")
-    print(f"{partial_score_frac_l=}")
-    print(f"==> {student_answer=}")
-    print(f"==> {instructor_answer=}")
     msg_list = []
     status = True
     ps_dict = init_partial_score_dict()
 
     # First check structure
     structure_status, structure_msg = check_structure_list_tuple_float(student_answer)
-    print("===> EXIT check_structure_list_tuple_float")
     if not structure_status:
         return False, structure_msg
 
@@ -4490,12 +4432,8 @@ def check_answer_list_tuple_float(
             continue
 
         # Compare each float in the tuples
-        print(f"==> {s_tuple=}, {i_tuple=}")
         for j, (s_val, i_val) in enumerate(zip(s_tuple, i_tuple, strict=True)):
-            print(f"==> {j=}, {s_val=}, {i_val=}")
-            print(f"{type(s_val)=}, {type(i_val)=}")
             status_, msg = check_float(i_val, s_val, rel_tol=rel_tol, abs_tol=1.0e-6)
-            print(f"==> {status_=}, {msg=}")
             if not status_:
                 status = False
                 ps_dict["nb_mismatches"] += 1
@@ -4503,7 +4441,6 @@ def check_answer_list_tuple_float(
 
     try:
         partial_score_frac_l[0] = 1.0 - ps_dict["nb_mismatches"] / ps_dict["nb_total"]
-        print(f"==> **** inside check_answer_list_tuple_float, {partial_score_frac_l=}")
     except ZeroDivisionError:
         partial_score_frac_l[0] = 1.0
 
@@ -4823,10 +4760,8 @@ def check_answer_set_str(
     status = False
     ps_dict = init_partial_score_dict()
     ps_dict["nb_total"] = len(instructor_answer)
-    print("top ==> choices: ", choices)
     if not choices:
         choices = set()
-        print("choices is None -> set()")
 
     # Clean all strings using clean_str_answer
     s_answ = {clean_str_answer(i) for i in student_answer}
@@ -4857,7 +4792,6 @@ def check_answer_set_str(
     except ZeroDivisionError:
         partial_score_frac_l[0] = 1.0
 
-    print(f"==> inside check_answer_set_str, {partial_score_frac_l=}")
 
     return return_value(status, msg_list, s_answ, i_answ)
 
@@ -4885,15 +4819,11 @@ def check_answer_set_tuple_int(
     msg_list = []
     status = True
 
-    print("===> *** check_answer_set_tuple_int")
-    print(f"{student_answer=}")
-    print(f"{instructor_answer=}")
 
     # First check structure
     structure_status, structure_msg = check_structure_set_tuple_int(student_answer)
 
     if not structure_status:
-        print("Return due to bad structure check")
         return False, structure_msg
 
     # Check for missing tuples
