@@ -63,7 +63,11 @@ Plans:
   3. Structure check functions (`check_structure_X`) are grouped together in their own section
   4. Answer check functions (`check_answer_X`) are grouped together in their own section
   5. All Phase 1 regression tests continue to pass
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Add type aliases (REQ-CLEAN-02) and consolidate scattered helpers into SECTION 3 UTILITY PRIMITIVES (REQ-CLEAN-01)
+- [ ] 03-02-PLAN.md — Reorganize all check_structure_X and check_answer_X into SECTION 4 and SECTION 5 (REQ-CLEAN-03)
 
 ### Phase 4: Signature Standardization
 **Goal**: Every public checker function follows the same signature convention and every public function returns `tuple[bool, str]`
@@ -96,7 +100,7 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Regression Safety Net | 3/3 | Complete   | 2026-03-10 |
 | 2. Duplicate Removal | 1/1 | Complete   | 2026-03-10 |
-| 3. File Cleanup | 0/? | Not started | - |
+| 3. File Cleanup | 0/2 | Not started | - |
 | 4. Signature Standardization | 0/? | Not started | - |
 | 5. Extensibility Template | 0/? | Not started | - |
 
