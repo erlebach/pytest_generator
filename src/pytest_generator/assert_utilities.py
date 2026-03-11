@@ -1996,18 +1996,6 @@ def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> CheckResu
 
     student_answer.figure = cast(Figure, student_answer.figure)
     s_ax = student_answer.figure.gca()
-    """
-    # print(f"{dir(s_ax)=}")
-    # print(f"{type(s_ax).__name__=}")
-    # s_ax = s_ax.gcf().get_axes()
-    # i_ax = instructor_answer[0].gcf().get_axes()
-    """
-
-    """
-    if len(s_ax) != len(i_ax):
-        msg_list.append(f"There should only be {len(i_ax)} plot(s)!")
-        status = False
-    """
 
     if type(student_answer).__name__ != "Line2D":
         msg_list.append("Wrong plot type, not created with plt.plot!")
