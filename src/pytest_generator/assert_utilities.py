@@ -2017,22 +2017,6 @@ def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> CheckResu
         msg_list.append("The title is missing")
         status = False
 
-    """ USE LATER
-    s_xgrid_vis = any(line.getvisible() for line in s_ax.xaxis.get_gridlines())
-    i_xgrid_vis = any(line.getvisible() for line in i_ax.xaxis.get_gridlines())
-    s_ygrid_vis = any(line.getvisible() for line in s_ax.yaxis.get_gridlines())
-    i_ygrid_vis = any(line.getvisible() for line in i_ax.yaxis.get_gridlines())
-    """
-
-    """
-    ax:  Axes3D
-    fig:  Figure
-    scat3:  Path3DCollection
-    scat2:  PathCollection
-    plot:  list
-    plot[0]:  Line2D
-    """
-
     return status, "\n".join(msg_list)
 
 
