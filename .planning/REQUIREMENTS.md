@@ -54,7 +54,7 @@
 | REQ-CLEAN-01 | Phase 3 | Complete |
 | REQ-CLEAN-02 | Phase 3 | Complete |
 | REQ-CLEAN-03 | Phase 3 | Complete |
-| REQ-CONS-01 | Phase 4 | Pending |
-| REQ-CONS-02 | Phase 4 | Pending |
+| REQ-CONS-01 | Phase 4 | Complete |
+| REQ-CONS-02 | Phase 4 | Complete |
 | REQ-EXT-01 | Phase 5 | Pending |
 | REQ-EXT-02 | Phase 5 | Pending |

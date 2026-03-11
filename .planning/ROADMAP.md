@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Regression Safety Net** - Write comprehensive tests covering all existing checker functions before touching any code (completed 2026-03-10)
 - [x] **Phase 2: Duplicate Removal** - Identify and eliminate all duplicate function definitions (completed 2026-03-10)
 - [x] **Phase 3: File Cleanup** - Extract utilities, add type aliases, reorganize file into logical sections (completed 2026-03-11)
-- [ ] **Phase 4: Signature Standardization** - Standardize all checker signatures and confirm uniform return types
+- [x] **Phase 4: Signature Standardization** - Standardize all checker signatures and confirm uniform return types (completed 2026-03-11)
 - [ ] **Phase 5: Extensibility Template** - Document and demonstrate the canonical pattern for adding a new answer type
 
 ## Phase Details
@@ -104,7 +104,7 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 | 1. Regression Safety Net | 3/3 | Complete   | 2026-03-10 |
 | 2. Duplicate Removal | 1/1 | Complete   | 2026-03-10 |
 | 3. File Cleanup | 2/2 | Complete   | 2026-03-11 |
-| 4. Signature Standardization | 0/1 | Not started | - |
+| 4. Signature Standardization | 1/1 | Complete   | 2026-03-11 |
 | 5. Extensibility Template | 0/? | Not started | - |
 
 ## Traceability
@@ -126,7 +126,7 @@ Phases execute in order: 1 → 2 → 3 → 4 → 5
 **Goal:** [To be planned]
 **Requirements**: TBD
 **Depends on:** Phase 5
-**Plans:** 0 plans
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] TBD (run /gsd:plan-phase 6 to break down)
