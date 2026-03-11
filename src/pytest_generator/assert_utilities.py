@@ -1981,17 +1981,9 @@ def check_structure_lineplot(student_answer: list[Line2D] | Line2D) -> CheckResu
         # I can check the instructor answer AND the student answer structurally
 
     """
-    # from matplotlib.figure import Figure
-    # from matplotlib.lines import Line2D
-
     status = True
     msg_list = []
 
-    """
-    # print("==> check structure lineplot")
-    # get axis object
-    # print(f"{student_answer=}")
-    """
     if isinstance(student_answer, list):
         student_answer = student_answer[0]
         msg_list.append("A list of Line2D obects detected. We only consider the first ")
