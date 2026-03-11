@@ -32,11 +32,6 @@ from matplotlib.figure import Figure
 # ! from matplotlib.collections import PathCollection
 from numpy.typing import NDArray
 
-"""
-# from pprint import pprint
-# import matplotlib.pyplot as plt
-"""
-
 # ======================================================================
 # SECTION 1: TYPE ALIASES
 # ======================================================================
