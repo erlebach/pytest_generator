@@ -1630,10 +1630,9 @@ def check_structure_dict_str_set(
     if status:
         is_item_type_list = True
         for k, v in student_answer.items():
-            if k in keys and isinstance(v, set | list):
+            if k in keys and not isinstance(v, set | list):
                 msg = f"- Answer[{k!r}] must be of type 'set' or 'list'."
                 msg_list.append(msg)
-                # msg_list.append(f"- Answer[repr(k)r}] must be of type 'set' or 'list'.")
                 # The answer is cast to a set when checked for accuracy
                 status = False
                 is_item_type_list = False

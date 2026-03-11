@@ -489,18 +489,15 @@ def test_check_structure_dict_str_any_fail():
 # ---------------------------------------------------------------------------
 
 def test_check_structure_dict_str_set_pass():
-    # NOTE: this function has inverted logic; it passes when value is NOT a set/list
-    # Testing actual current behavior (regression baseline)
-    status, msg = check_structure_dict_str_set({"a": 42}, {"a": {1, 2}})
+    # Student value is a set — correct type, should return True
+    status, msg = check_structure_dict_str_set({"a": {1, 2}}, {"a": {1, 2}})
     assert status is True
     assert isinstance(msg, str) and len(msg) > 0
 
 
 def test_check_structure_dict_str_set_fail():
-    # Function incorrectly fails when value IS a set (inverted logic bug)
-    status, msg = check_structure_dict_str_set(
-        {}, {"a": {1, 2}}  # missing key triggers False
-    )
+    # Student value is an int (not a set/list) — wrong type, should return False
+    status, msg = check_structure_dict_str_set({"a": 42}, {"a": {1, 2}})
     assert status is False
     assert isinstance(msg, str) and len(msg) > 0
 
