@@ -5483,7 +5483,9 @@ def check_answer_list_tuple_float(
 
 
 # ----------------------------------------------------------------------
-def check_answer_scatterplot2d(student_answer, instructor_answer, options, validation_functions):
+# Need validation functions in the future to check validity of scatter plots. 
+# def check_answer_scatterplot2d(student_answer, instructor_answer, options, validation_functions):
+def check_answer_scatterplot2d(student_answer, instructor_answer, options):
     status = True
     msg_list = []
 
@@ -5602,7 +5604,9 @@ def check_structure_scatterplot2d(student_answer):
 # ======================================================================
 
 
-def check_answer_scatterplot3d(student_answer, instructor_answer, options, validation_functions):
+# Need validation functions in the future to check validity of scatter plots. 
+# def check_answer_scatterplot3d(student_answer, instructor_answer, options, validation_functions):
+def check_answer_scatterplot3d(student_answer, instructor_answer, options):
     status = True
     msg_list = []
 
