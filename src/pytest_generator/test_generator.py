@@ -326,7 +326,9 @@ def generate_test_answers_code(questions_data, sim_type, output_file="test_answe
                 fixture,
                 part,
                 function_name,
-                part_key_choices,
+                # Must implement part_key_choices in generator_utils in main and claude git
+                # branches. (2026-03-29)
+                # part_key_choices,
             )
 
             # print(f"{part_type=}")
