@@ -2385,8 +2385,11 @@ def check_structure_scatterplot2d(student_answer) -> CheckResult:
     if not isinstance(student_answer, PathCollection):
         status = False
         msg_list.append(
-            "The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'."
+            "The answer type should be 'PathCollection', the type of the output of 'plt.scatter'."
         )
+
+    if isinstance(s_answ, list):
+        s_answ = s_answ[0]
 
     xy = s_answ.get_offsets()
     #x, y = s_answ.get_offsets()
