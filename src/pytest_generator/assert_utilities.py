@@ -5495,6 +5495,8 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, options):
     s_plt = s_answ
     i_plt = i_answ
 
+    print("==> options= ", options)
+    print("==> type(options)= ", type(options))
     at_least_val = options.get('at_least_validation', None)
 
     # print("s_answ= ", s_answ)
