@@ -5579,6 +5579,9 @@ def check_structure_scatterplot2d(student_answer):
             "The answer type should be 'PathCollectdion', the type of the output of 'plt.scatter'."
         )
 
+    if isinstance(s_answ, list):
+        s_answ = s_answ[0]
+
     xy = s_answ.get_offsets()
     #x, y = s_answ.get_offsets()
     #sxsy = x.data.astype(float), y.data.astype(float)
