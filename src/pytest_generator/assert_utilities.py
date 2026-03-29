@@ -17,6 +17,7 @@ import math
 import random
 import re
 from collections.abc import Callable
+import matplotlib.colors as mcolors
 from pathlib import Path
 from pprint import pprint
 from typing import Any, cast
