@@ -5485,7 +5485,8 @@ def check_answer_list_tuple_float(
 # ----------------------------------------------------------------------
 # Need validation functions in the future to check validity of scatter plots. 
 # def check_answer_scatterplot2d(student_answer, instructor_answer, options, validation_functions):
-def check_answer_scatterplot2d(student_answer, instructor_answer, options):
+# def check_answer_scatterplot2d(student_answer, instructor_answer, options):
+def check_answer_scatterplot2d(student_answer, instructor_answer, rel_tol):
     status = True
     msg_list = []
 
@@ -5495,9 +5496,9 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, options):
     s_plt = s_answ
     i_plt = i_answ
 
-    print("==> options= ", options)
-    print("==> type(options)= ", type(options))
-    at_least_val = options.get('at_least_validation', None)
+    # print("==> options= ", options)
+    # print("==> type(options)= ", type(options))
+    # at_least_val = options.get('at_least_validation', None)
 
     # print("s_answ= ", s_answ)
     # print(f"{type(s_answ)=}")
@@ -5555,12 +5556,14 @@ def check_answer_scatterplot2d(student_answer, instructor_answer, options):
         status = False
         msg_list.append("The plot is missing the title")
 
+    '''
     if at_least_val:
         count = at_least_val.get('count', 0)
         nb_points = len(s_dict['x'])
         if (nb_points < count):
             status = False
             msg_list.append(f"The 2D scatterplot should have at least {count} points")
+    '''
 
     # print(f"{s_grid=}, {i_grid=}")
 
